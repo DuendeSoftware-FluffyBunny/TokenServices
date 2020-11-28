@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>FluffyBunny4</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Hosting\**" />
+    <EmbeddedResource Remove="Hosting\**" />
+    <None Remove="Hosting\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="IdentityModel" Version="5.0.0-preview.0" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.0" />
+    <PackageReference Include="RSAKeyVaultProvider" Version="2.1.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
+    <ProjectReference Include="..\IdentityModel.FluffyBunny4\IdentityModel.FluffyBunny4.csproj" />
+    <ProjectReference Include="..\IdentityServer4.Alt\IdentityServer4.Alt.csproj" />
+  </ItemGroup>
+
+</Project>

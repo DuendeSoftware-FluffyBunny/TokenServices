@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IdentityModel" Version="5.0.0-preview.0" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="4.0.0-preview.4" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
+  </ItemGroup>
+
+</Project>
