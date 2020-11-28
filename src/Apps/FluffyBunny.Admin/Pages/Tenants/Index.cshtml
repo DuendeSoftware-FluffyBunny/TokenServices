@@ -1,0 +1,58 @@
+﻿@page
+@model FluffyBunny.Admin.Pages.Tenants.IndexModel
+@{
+    ViewData["Title"] = "Tenants";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Tenants</li>
+        @if (!string.IsNullOrWhiteSpace(Model.TenantId))
+        {
+            <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenant/Index">@Model.TenantId</a></li>
+
+        }
+        else
+        {
+            <li class="breadcrumb-item active" aria-current="page">Please switch to a tenant.</li>
+
+        }
+    </ol>
+</nav>
+
+ 
+
+<div class="card">
+    <div class="card-header text-muted">
+        <a class="btn btn-sm btn-primary" asp-page="./AddTenant">Add Tenant</a>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th colspan="1">Tenant</th>
+                    <th colspan="1">Enabled</th>
+                    <th colspan="1"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tenant in @Model.Tenants)
+                {
+                    <tr>
+
+                        <td class="w-50">
+                            @tenant.Name
+                        </td>
+                        <td class="w-50">
+                            @tenant.Enabled
+                        </td>
+                        <td class="w-50">
+                            <form class="form-inline" asp-area="" asp-page="./Index" asp-route-tenantName=@tenant.Name method="post">
+                                <button type="submit" class="btn btn-sm  btn-primary">Switch</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

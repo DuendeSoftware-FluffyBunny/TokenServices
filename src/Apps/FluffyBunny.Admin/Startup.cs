@@ -12,10 +12,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Duende.IdentityServer.EntityFramework.Options;
 using FluffyBunny.Admin.Model;
+using FluffyBunny.Admin.Services;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions;
 using FluffyBunny4.DotNetCore;
 using FluffyBunny4.DotNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny.Admin
@@ -47,9 +53,56 @@ namespace FluffyBunny.Admin
                     .GetSection("AppOptions")
                     .Get<AppOptions>();
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));
+                services.Configure<EntityFrameworkConnectionOptions>(Configuration.GetSection("EntityFrameworkConnectionOptions"));
 
+                services.AddScoped<ISessionTenantAccessor, SessionTenantAccessor>();
                 services.AddTransient<ISigninManager, DefaultSigninManager>();
                 services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, SeedSessionClaimsPrincipalFactory>();
+
+                services.AddCors(options => options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+
+                        builder.AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowAnyOrigin();
+                    }));
+                // set forward header keys to be the same value as request's header keys
+                // so that redirect URIs and other security policies work correctly.
+                var aspNETCORE_FORWARDEDHEADERS_ENABLED = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase);
+                if (aspNETCORE_FORWARDEDHEADERS_ENABLED)
+                {
+                    //To forward the scheme from the proxy in non-IIS scenarios
+                    services.Configure<ForwardedHeadersOptions>(options =>
+                    {
+                        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                        // Only loopback proxies are allowed by default.
+                        // Clear that restriction because forwarders are enabled by explicit 
+                        // configuration.
+                        options.KnownNetworks.Clear();
+                        options.KnownProxies.Clear();
+                    });
+                }
+
+
+
+                switch (appOptions.DatabaseType)
+                {
+                    default:
+                        services.AddInMemoryDbContextOptionsProvider();
+                        break;
+                    case AppOptions.DatabaseTypes.Postgres:
+                        services.AddPostgresDbContextOptionsProvider();
+                        break;
+                    case AppOptions.DatabaseTypes.SqlServer:
+                        services.AddSqlServerDbContextOptionsProvider();
+                        break;
+
+                }
+                services.AddDbContextTenantServices();
+                var options = new ConfigurationStoreOptions();
+                services.AddSingleton(options);
+
 
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(
@@ -71,6 +124,63 @@ namespace FluffyBunny.Admin
                 {
                     builder.AddRazorRuntimeCompilation();
                 }
+
+                //*************************************************
+                //*********** COOKIE Start ************************
+                //*************************************************
+
+              
+                services.Configure<CookiePolicyOptions>(options =>
+                {
+                    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                    options.CheckConsentNeeded = context => true;
+                    options.MinimumSameSitePolicy = SameSiteMode.None;
+                });
+                services.ConfigureExternalCookie(config =>
+                {
+                    config.Cookie.SameSite = SameSiteMode.None;
+                });
+                services.ConfigureApplicationCookie(options =>
+                {
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                    options.ExpireTimeSpan = TimeSpan.FromSeconds(appOptions.AuthAndSessionCookies.TTL);
+                    options.SlidingExpiration = true;
+                    options.Cookie.Name = $"{Configuration["applicationName"]}.AspNetCore.Identity.Application";
+                    options.LoginPath = $"/Identity/Account/Login";
+                    options.LogoutPath = $"/Identity/Account/Logout";
+                    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+                    options.Events = new CookieAuthenticationEvents()
+                    {
+
+                        OnRedirectToLogin = (ctx) =>
+                        {
+                            if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == StatusCodes.Status200OK)
+                            {
+                                ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                                return Task.CompletedTask;
+                            }
+                            ctx.Response.Redirect(ctx.RedirectUri);
+                            return Task.CompletedTask;
+                        },
+                        OnRedirectToAccessDenied = (ctx) =>
+                        {
+                            if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == StatusCodes.Status200OK)
+                            {
+                                ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                                return Task.CompletedTask;
+                            }
+                            ctx.Response.Redirect(ctx.RedirectUri);
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+
+                //*************************************************
+                //*********** COOKIE END **************************
+                //*************************************************
 
                 // Adds a default in-memory implementation of IDistributedCache.
                 services.AddDistributedMemoryCache();
@@ -133,7 +243,7 @@ namespace FluffyBunny.Admin
             app.UseAuthorization();
 
             app.UseMiddleware<AuthSessionValidationMiddleware>();
-     //      app.UseMiddleware<EnsureSessionTenantMiddleware>();
+           app.UseMiddleware<EnsureSessionTenantMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

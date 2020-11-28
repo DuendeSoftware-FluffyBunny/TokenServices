@@ -91,5 +91,29 @@ namespace XUnitTest_EntityFramework
                 c.Should().BeNull();
             }
         }
+        [Fact]
+        public async Task Ensure_IMainEntityCoreContext_Async()
+        {
+            var serviceProvider = _factory.Server.Services;
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var sp = scope.ServiceProvider;
+                var mainEntityCoreContext = sp.GetRequiredService<IMainEntityCoreContext>();
+                mainEntityCoreContext.Should().NotBeNull(); 
+                await mainEntityCoreContext.DbContext.Database.MigrateAsync();
+
+                var tenantEntity = new Tenant()
+                {
+                    Name = "bob",
+                    Enabled = true
+                }; 
+                var result = await mainEntityCoreContext.Tenants.AddAsync(tenantEntity);
+                await mainEntityCoreContext.SaveChangesAsync();
+                var tenantInDb = await mainEntityCoreContext.Tenants.FirstOrDefaultAsync(
+                    t => t.Name == tenantEntity.Name);
+                tenantInDb.Should().NotBeNull();
+                tenantInDb.Name.Should().Be(tenantEntity.Name);
+            }
+        }
     }
 }

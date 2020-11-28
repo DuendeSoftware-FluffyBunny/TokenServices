@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Storage\FluffyBunny.IdentityServer.EntityFramework.Storage\FluffyBunny.IdentityServer.EntityFramework.Storage.csproj" />
     <ProjectReference Include="..\FluffyBunny4\FluffyBunny4.csproj" />
   </ItemGroup>
 

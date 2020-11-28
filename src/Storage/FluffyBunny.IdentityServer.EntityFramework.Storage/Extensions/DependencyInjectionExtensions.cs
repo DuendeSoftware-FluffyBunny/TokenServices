@@ -5,6 +5,7 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Interfaces;
 using Duende.IdentityServer.EntityFramework.Options;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -41,6 +42,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
  
         public static IServiceCollection AddDbContextTenantServices(this IServiceCollection services)
         {
+            services.AddScoped<IAdminServices, AdminServices>();
             services.TryAddSingleton<ITenantAwareConfigurationDbContextAccessor, TenantAwareConfigurationDbContextAccessor>();
             services.AddDbContext<TenantAwareConfigurationDbContext>((serviceProvider, optionsBuilder) => {
                 // for NON-INMEMORY  - TenantAwareConfigurationDbContext

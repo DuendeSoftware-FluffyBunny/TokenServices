@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\sqlserver.migrations\sqlserver.migrations.csproj" />
     <ProjectReference Include="..\..\Storage\FluffyBunny.IdentityServer.EntityFramework.Storage\FluffyBunny.IdentityServer.EntityFramework.Storage.csproj" />
     <ProjectReference Include="..\..\Storage\Migrations.SqlServer\Migrations.SqlServer.csproj" />
   </ItemGroup>
