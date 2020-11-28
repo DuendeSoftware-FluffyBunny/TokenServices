@@ -19,7 +19,7 @@
     </ol>
 </nav>
 
- 
+
 
 <div class="card">
     <div class="card-header text-muted">
@@ -29,8 +29,14 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th colspan="1">Tenant</th>
-                    <th colspan="1">Enabled</th>
+                    <th colspan="1">                    
+                        <a asp-action="Index" 
+                           asp-route-sortOrder="@ViewData["NameSortParm"]">Tenant</a>
+                    </th>
+                    <th colspan="1">
+                        <a asp-action="Index" 
+                           asp-route-sortOrder="@ViewData["EnabledSortParm"]">Enabled</a>
+                    </th>
                     <th colspan="1"></th>
                 </tr>
             </thead>
@@ -55,4 +61,8 @@
             </tbody>
         </table>
     </div>
+     
+
 </div>
+
+

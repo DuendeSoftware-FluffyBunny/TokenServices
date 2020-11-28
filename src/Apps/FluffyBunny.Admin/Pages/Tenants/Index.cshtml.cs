@@ -21,7 +21,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
         private ILogger<AddTenantModel> _logger;
 
         public string TenantId { get; private set; }
-
+        public int PageIndex { get; set; }
         public class InputModel
         {
             [Required]
@@ -40,9 +40,27 @@ namespace FluffyBunny.Admin.Pages.Tenants
             _sessionTenantAccessor = sessionTenantAccessor;
             _logger = logger;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string sortOrder)
         {
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["EnabledSortParm"] = sortOrder == "Enabled" ? "enabled_desc" : "Enabled";
             Tenants = await _adminServices.GetAllTenantsAsync();
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    Tenants = Tenants.OrderByDescending(s => s.Name);
+                    break;
+                case "Enabled":
+                    Tenants = Tenants.OrderBy(s => s.Enabled);
+                    break;
+                case "enabled_desc":
+                    Tenants = Tenants.OrderByDescending(s => s.Enabled);
+                    break;
+                default:
+                    Tenants = Tenants.OrderBy(s => s.Name);
+                    break;
+            }
+        
             TenantId = _sessionTenantAccessor.TenantId;
         }
         public async Task<IActionResult> OnPostAsync(string tenantName)

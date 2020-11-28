@@ -18,13 +18,13 @@ namespace FluffyBunny.Admin.Pages.Tenant
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private ILogger<IndexModel> _logger;
-
-        public string TenantId { get; private set; }
+        [BindProperty]
+        public string TenantId { get; set; }
+        public IdentityServer.EntityFramework.Storage.Entities.Tenant Tenant { get; private set; }
 
         public class InputModel
         {
-            [Required]
-            public string Name { get; set; }
+            public bool Enabled { get; set; }
         }
         [BindProperty]
         public InputModel Input { get; set; }
@@ -39,10 +39,21 @@ namespace FluffyBunny.Admin.Pages.Tenant
             _sessionTenantAccessor = sessionTenantAccessor;
             _logger = logger;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync( )
         {
-            Tenants = await _adminServices.GetAllTenantsAsync();
-            TenantId = _sessionTenantAccessor.TenantId;
+           TenantId = _sessionTenantAccessor.TenantId;
+           Tenant = await _adminServices.GetTenantByNameAsync(TenantId);
+           Input = new InputModel()
+           {
+               Enabled = Tenant.Enabled
+           };
+        }
+        public async Task<IActionResult> OnPostAsync(string tenantName)
+        {
+            Tenant = await _adminServices.GetTenantByNameAsync(TenantId);
+            Tenant.Enabled = Input.Enabled;
+            await _adminServices.UpdateTenantAsync(Tenant);
+            return RedirectToPage();
         }
     }
 }

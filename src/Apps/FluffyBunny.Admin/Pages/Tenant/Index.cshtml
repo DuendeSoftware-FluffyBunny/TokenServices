@@ -9,3 +9,32 @@
         <li class="breadcrumb-item"><a asp-area="" asp-page="./Tenant/Index">@Model.TenantId</a></li>
     </ol>
 </nav>
+
+<form method="post">
+    <input hidden asp-for="TenantId" />
+    <div class="card">
+        <div class="card-header">
+            <a class="btn btn-sm btn-secondary" asp-page="./ManageClients">Clients</a>
+            <a class="btn btn-sm btn-secondary" asp-page="./ManageApiResources">Api Resources</a>
+            <a class="btn btn-sm btn-secondary" asp-page="./ManageExternalServices">External Services</a>
+        </div>
+        <div class="card-body">
+            <tr>
+
+                <td class="w-50">
+                    <input asp-for="Input.Enabled"/>
+                    <label>Enabled</label>
+                </td>
+            </tr>
+        </div>
+        <div class="card-footer">
+            <div class="form-group">
+                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
