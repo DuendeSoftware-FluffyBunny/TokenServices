@@ -6,7 +6,8 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-area="" asp-page="./Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">@Model.TenantId</a></li>
     </ol>
 </nav>
 
@@ -14,9 +15,9 @@
     <input hidden asp-for="TenantId" />
     <div class="card">
         <div class="card-header">
-            <a class="btn btn-sm btn-secondary" asp-page="./ManageClients">Clients</a>
-            <a class="btn btn-sm btn-secondary" asp-page="./ManageApiResources">Api Resources</a>
-            <a class="btn btn-sm btn-secondary" asp-page="./ManageExternalServices">External Services</a>
+            <a class="btn btn-sm btn-primary" asp-page="./ManageClients">Clients</a>
+            <a class="btn btn-sm btn-primary" asp-page="./ManageApiResources">Api Resources</a>
+            <a class="btn btn-sm btn-primary" asp-page="./ManageExternalServices">External Services</a>
         </div>
         <div class="card-body">
             <tr>

@@ -35,7 +35,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.Tenant> PagedTenants { get; private set; }
+        public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.Tenant> PagedEntities { get; private set; }
         public IEnumerable<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant> Tenants { get; private set; }
 
         [ViewData]
@@ -74,19 +74,19 @@ namespace FluffyBunny.Admin.Pages.Tenants
             {
                 
                 case TenantSortType.EnabledAsc:
-                    PagedTenants =
+                    PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
                             TenantSortType.EnabledAsc);
                     EnabledSortType = TenantSortType.EnabledDesc;
                     break;
                 case TenantSortType.EnabledDesc:
-                    PagedTenants =
+                    PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
                             TenantSortType.EnabledDesc);
                     EnabledSortType = TenantSortType.EnabledAsc;
                     break;
                 case TenantSortType.NameDesc:
-                    PagedTenants =
+                    PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
                             TenantSortType.NameDesc);
                     NameSortType = TenantSortType.NameAsc;
@@ -94,7 +94,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
                     break;
                 case TenantSortType.NameAsc:
                 default:
-                    PagedTenants =
+                    PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
                             TenantSortType.NameAsc);
                     NameSortType = TenantSortType.NameDesc;

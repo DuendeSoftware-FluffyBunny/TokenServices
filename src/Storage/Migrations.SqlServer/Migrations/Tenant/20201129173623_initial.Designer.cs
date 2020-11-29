@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SqlServer.Migrations.Tenant
 {
     [DbContext(typeof(TenantAwareConfigurationDbContext))]
-    [Migration("20201127160612_initial")]
+    [Migration("20201129173623_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -764,6 +764,9 @@ namespace SqlServer.Migrations.Tenant
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");

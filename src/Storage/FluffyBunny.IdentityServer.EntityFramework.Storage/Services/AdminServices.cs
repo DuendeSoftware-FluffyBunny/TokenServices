@@ -12,15 +12,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
     {
         private IMainEntityCoreContext _mainEntityCoreContext;
         private ITenantAwareConfigurationDbContextAccessor _tenantAwareConfigurationDbContextAccessor;
+        private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
         private ILogger<AdminServices> _logger;
 
         public AdminServices(
             IMainEntityCoreContext mainEntityCoreContext,
             ITenantAwareConfigurationDbContextAccessor tenantAwareConfigurationDbContextAccessor,
+            IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ILogger<AdminServices> logger)
         {
             _mainEntityCoreContext = mainEntityCoreContext;
             _tenantAwareConfigurationDbContextAccessor = tenantAwareConfigurationDbContextAccessor;
+            _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
         }
 
@@ -50,12 +53,44 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             }
         }
 
+        ITenantAwareConfigurationDbContext GetTenantContext(string name) =>
+            _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
+        
+        public async Task DeleteExternalServiceByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.ExternalServices.FirstOrDefaultAsync(e => e.Name == name);
+            if (entityInDb != null)
+            {
+                tenantContext.ExternalServices.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<Tenant>> GetAllTenantsAsync()
         {
             return await _mainEntityCoreContext
                 .Tenants
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<ExternalService> GetExternalServiceByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.ExternalServices
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id);
+            return entityInDb;
+        }
+
+        public async Task<ExternalService> GetExternalServiceByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.ExternalServices
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Name == name);
+            return entityInDb;
         }
 
         public async Task<Tenant> GetTenantByNameAsync(string tenantId)
@@ -66,42 +101,90 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .FirstOrDefaultAsync(x => x.Name == tenantId);
         }
 
+        public async Task<PaginatedList<ExternalService>> PageExternalServicesAsync(
+            string tenantName, int pageNumber, int pageSize, ExternalServiceSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var entities = from t in tenantContext.ExternalServices
+                select t;
+            switch (sortType)
+            {
+                case ExternalServiceSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.Name);
+                    break;
+                case ExternalServiceSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.Name);
+                    break;
+                case ExternalServiceSortType.EnabledDesc:
+                    entities = entities.OrderByDescending(t => t.Enabled);
+                    break;
+                case ExternalServiceSortType.EnabledAsc:
+                    entities = entities.OrderBy(t => t.Enabled);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<ExternalService>
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
+        }
+
         public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantSortType sortType)
         {
-            var tenants = from t in _mainEntityCoreContext.Tenants
+            var entities = from t in _mainEntityCoreContext.Tenants
                 select t;
             switch (sortType)
             {
                 case TenantSortType.NameDesc:
-                    tenants = tenants.OrderByDescending(t => t.Name);
+                    entities = entities.OrderByDescending(t => t.Name);
                     break;
                 case TenantSortType.NameAsc:
-                    tenants = tenants.OrderBy(t => t.Name);
+                    entities = entities.OrderBy(t => t.Name);
                     break;
                 case TenantSortType.EnabledDesc:
-                    tenants = tenants.OrderByDescending(t => t.Enabled);
+                    entities = entities.OrderByDescending(t => t.Enabled);
                     break;
                 case TenantSortType.EnabledAsc:
-                    tenants = tenants.OrderBy(t => t.Enabled);
+                    entities = entities.OrderBy(t => t.Enabled);
                     break;
             }
 
             var paginatedList = await PaginatedList<Tenant>
-                .CreateAsync(tenants.AsNoTracking(), pageNumber, pageSize);
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
             return paginatedList;
         }
 
         public async Task UpdateTenantAsync(Tenant tenant)
         {
-            var tenantInDb = await _mainEntityCoreContext
+            var entityInDb = await _mainEntityCoreContext
                 .Tenants
                 .FirstOrDefaultAsync(x => x.Name == tenant.Name);
-            if (tenantInDb != null)
+            if (entityInDb != null)
             {
                 // no match, so no 
-                tenantInDb.Enabled = tenant.Enabled;
+                entityInDb.Enabled = tenant.Enabled;
                 await _mainEntityCoreContext.SaveChangesAsync();
             }
+        }
+
+        public async Task UpsertExternalServiceAsync(string tenantName, ExternalService entity)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ExternalServices
+                .FirstOrDefaultAsync(x => x.Name == entity.Name);
+            if (entityInDb != null)
+            {
+                entityInDb.Enabled = entity.Enabled;
+                entityInDb.Authority = entity.Authority;
+                entityInDb.Description = entity.Description;
+            }
+            else
+            {
+                var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<ExternalService>(entity);
+                tenantContext.ExternalServices.Add(newEntity);
+            }
+            await tenantContext.SaveChangesAsync();
         }
     }
 }

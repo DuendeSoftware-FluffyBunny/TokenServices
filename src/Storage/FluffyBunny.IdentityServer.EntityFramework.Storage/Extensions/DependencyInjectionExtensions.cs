@@ -4,6 +4,7 @@ using System.Text;
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Interfaces;
 using Duende.IdentityServer.EntityFramework.Options;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +59,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
                 var dbContextOptionsProvider = serviceProvider.GetRequiredService<IDbContextOptionsProvider>();
                 dbContextOptionsProvider.Configure(optionsBuilder);
             });
+
+            var mapperOneToOne = MapperConfigurationBuilder.BuidOneToOneMapper;
+            var mapperIgnoreBase = MapperConfigurationBuilder.BuidIgnoreBaseMapper;
+            services.AddSingleton<IEntityFrameworkMapperAccessor>(new EntityFrameworkMapperAccessor
+            {
+                MapperOneToOne = mapperOneToOne,
+                MapperIgnoreBase = mapperIgnoreBase
+            });
+
             return services;
         }
     }
