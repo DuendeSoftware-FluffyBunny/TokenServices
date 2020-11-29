@@ -7,10 +7,12 @@ using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny4.DotNetCore;
+using FluffyBunny4.DotNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny.Admin.Pages.Tenants
@@ -18,6 +20,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
     [Authorize]
     public class IndexModel : PageModel
     {
+        private const string PageSizeCookieName = "e4fce595-edf7-4874-977c-8f728d27ba76";
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private ILogger<AddTenantModel> _logger;
@@ -59,7 +62,30 @@ namespace FluffyBunny.Admin.Pages.Tenants
         }
         public async Task OnGetAsync(TenantSortType sortOrder,int? pageNumber,int? pageSize)
         {
-            PageSize = (int)(pageSize ?? 4);
+            if (pageSize == null)
+            {
+                var sPageSize = Request.GetStringCookie(PageSizeCookieName);
+                if (string.IsNullOrWhiteSpace(sPageSize))
+                {
+                    PageSize = 4;
+                }
+                else
+                {
+                    PageSize = Convert.ToInt32(sPageSize);
+                    int divisor = PageSize / 4;
+                    PageSize = divisor * 4;
+                }
+            }
+            else
+            {
+                PageSize = (int)pageSize;
+
+            }
+
+            if (PageSize <= 4 || PageSize > 32)
+            {
+                PageSize = 4;
+            }
             PageSizeOptions = new List<SelectListItem>()
             {
                 new SelectListItem("4", "4",PageSize==4),
@@ -68,7 +94,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
                 new SelectListItem("32", "32",PageSize==32),
             };
             SelectedPageSize = PageSize;
-
+            Response.SetStringCookie(PageSizeCookieName, PageSize.ToString(),60*24*30);
 
 
             switch (sortOrder)
