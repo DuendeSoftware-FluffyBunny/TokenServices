@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
- 
+using FluffyBunny.IdentityServer.EntityFramework.Storage;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
+using FluffyBunny4.DotNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny.Admin.Pages.Tenants
@@ -29,7 +31,22 @@ namespace FluffyBunny.Admin.Pages.Tenants
         }
         [BindProperty]
         public InputModel Input { get; set; }
+        public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.Tenant> PagedTenants { get; private set; }
         public IEnumerable<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant> Tenants { get; private set; }
+
+        [ViewData]
+        public TenantSortType NameSortType { get; set; }
+        [ViewData]
+        public TenantSortType EnabledSortType { get; set; }
+        [ViewData]
+        public TenantSortType CurrentSortType { get; set; }
+
+        [ViewData]
+        public int PageSize { get; set; }
+
+        [BindProperty]
+        public int SelectedPageSize { get; set; }
+        public List<SelectListItem> PageSizeOptions { get; set; }
 
         public IndexModel(
             IAdminServices adminServices,
@@ -40,33 +57,65 @@ namespace FluffyBunny.Admin.Pages.Tenants
             _sessionTenantAccessor = sessionTenantAccessor;
             _logger = logger;
         }
-        public async Task OnGetAsync(string sortOrder)
+        public async Task OnGetAsync(TenantSortType sortOrder,int? pageNumber,int? pageSize)
         {
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["EnabledSortParm"] = sortOrder == "Enabled" ? "enabled_desc" : "Enabled";
-            Tenants = await _adminServices.GetAllTenantsAsync();
+            PageSize = (int)(pageSize ?? 4);
+            PageSizeOptions = new List<SelectListItem>()
+            {
+                new SelectListItem("4", "4",PageSize==4),
+                new SelectListItem("8", "8",PageSize==8),
+                new SelectListItem("16", "16",PageSize==16),
+                new SelectListItem("32", "32",PageSize==32),
+            };
+            SelectedPageSize = PageSize;
+
+
+
             switch (sortOrder)
             {
-                case "name_desc":
-                    Tenants = Tenants.OrderByDescending(s => s.Name);
+                
+                case TenantSortType.EnabledAsc:
+                    PagedTenants =
+                        await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
+                            TenantSortType.EnabledAsc);
+                    EnabledSortType = TenantSortType.EnabledDesc;
                     break;
-                case "Enabled":
-                    Tenants = Tenants.OrderBy(s => s.Enabled);
+                case TenantSortType.EnabledDesc:
+                    PagedTenants =
+                        await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
+                            TenantSortType.EnabledDesc);
+                    EnabledSortType = TenantSortType.EnabledAsc;
                     break;
-                case "enabled_desc":
-                    Tenants = Tenants.OrderByDescending(s => s.Enabled);
+                case TenantSortType.NameDesc:
+                    PagedTenants =
+                        await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
+                            TenantSortType.NameDesc);
+                    NameSortType = TenantSortType.NameAsc;
+                    EnabledSortType = TenantSortType.EnabledDesc; 
                     break;
+                case TenantSortType.NameAsc:
                 default:
-                    Tenants = Tenants.OrderBy(s => s.Name);
+                    PagedTenants =
+                        await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
+                            TenantSortType.NameAsc);
+                    NameSortType = TenantSortType.NameDesc;
+                    EnabledSortType = TenantSortType.EnabledDesc;
+
                     break;
             }
-        
+
+            CurrentSortType = sortOrder;
             TenantId = _sessionTenantAccessor.TenantId;
+           
         }
-        public async Task<IActionResult> OnPostAsync(string tenantName)
+        public async Task<IActionResult> OnPostSwitchAsync(string tenantName)
         {
             _sessionTenantAccessor.TenantId = tenantName;
             return RedirectToPage("/Tenant/Index");
+        }
+        public async Task<IActionResult> OnPostPageSizeAsync( )
+        {
+            return RedirectToPage(new {sortOrder = CurrentSortType, pageNumber = 1, pageSize = SelectedPageSize});
         }
     }
 }

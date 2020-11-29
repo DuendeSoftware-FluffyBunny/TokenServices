@@ -19,7 +19,10 @@
     </ol>
 </nav>
 
-
+@{
+    var prevDisabled = !Model.PagedTenants.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.PagedTenants.HasNextPage ? "disabled" : "";
+}
 
 <div class="card">
     <div class="card-header text-muted">
@@ -29,19 +32,21 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th colspan="1">                    
-                        <a asp-action="Index" 
-                           asp-route-sortOrder="@ViewData["NameSortParm"]">Tenant</a>
+                    <th colspan="1">
+                        <a asp-action="Index"
+                           asp-route-sortOrder="@Model.NameSortType"
+                           asp-route-pageSize="@Model.PageSize">Tenant</a>
                     </th>
                     <th colspan="1">
-                        <a asp-action="Index" 
-                           asp-route-sortOrder="@ViewData["EnabledSortParm"]">Enabled</a>
+                        <a asp-action="Index"
+                           asp-route-sortOrder="@Model.EnabledSortType"
+                           asp-route-pageSize="@Model.PageSize">Enabled</a>
                     </th>
                     <th colspan="1"></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var tenant in @Model.Tenants)
+                @foreach (var tenant in Model.PagedTenants)
                 {
                     <tr>
 
@@ -52,7 +57,9 @@
                             @tenant.Enabled
                         </td>
                         <td class="w-50">
-                            <form class="form-inline" asp-area="" asp-page="./Index" asp-route-tenantName=@tenant.Name method="post">
+                            <form class="form-inline" 
+                                  asp-page-handler="switch"
+                                  asp-area="" asp-page="./Index" asp-route-tenantName=@tenant.Name method="post">
                                 <button type="submit" class="btn btn-sm  btn-primary">Switch</button>
                             </form>
                         </td>
@@ -61,8 +68,35 @@
             </tbody>
         </table>
     </div>
-     
 
+    <div class="card-footer text-muted container-fluid">
+        <div class="row">
+            <div class="col-md-10">
+                <a class="btn btn-sm btn-primary @prevDisabled" asp-page="/Tenants/Index"
+                   asp-route-sortOrder="@Model.CurrentSortType"
+                   asp-route-pageNumber="@(Model.PagedTenants.PageIndex - 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]">Previous</a>
+
+                <a class="btn btn-sm btn-primary @nextDisabled" asp-page="/Tenants/Index"
+                   asp-route-sortOrder="@Model.CurrentSortType"
+                   asp-route-pageNumber="@(Model.PagedTenants.PageIndex + 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]">Next</a>
+            </div>
+            <div class="col-md-2 float-right">
+                <form class="form-inline" 
+                      asp-page-handler="pageSize"
+                      asp-page="./Index" method="post">
+                    <select onchange="this.form.submit();" 
+                            asp-for="SelectedPageSize"
+                            asp-items="Model.PageSizeOptions" class="custom-select">
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 
+  

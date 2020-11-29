@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace FluffyBunny.Admin
+namespace FluffyBunny.IdentityServer.EntityFramework.Storage
 {
     public class PaginatedList<T> : List<T>
     {

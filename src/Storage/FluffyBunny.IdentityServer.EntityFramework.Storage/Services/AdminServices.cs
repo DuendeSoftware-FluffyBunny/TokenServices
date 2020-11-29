@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny4.DotNetCore;
@@ -63,6 +64,31 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Tenants
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Name == tenantId);
+        }
+
+        public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantSortType sortType)
+        {
+            var tenants = from t in _mainEntityCoreContext.Tenants
+                select t;
+            switch (sortType)
+            {
+                case TenantSortType.NameDesc:
+                    tenants = tenants.OrderByDescending(t => t.Name);
+                    break;
+                case TenantSortType.NameAsc:
+                    tenants = tenants.OrderBy(t => t.Name);
+                    break;
+                case TenantSortType.EnabledDesc:
+                    tenants = tenants.OrderByDescending(t => t.Enabled);
+                    break;
+                case TenantSortType.EnabledAsc:
+                    tenants = tenants.OrderBy(t => t.Enabled);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<Tenant>
+                .CreateAsync(tenants.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
         }
 
         public async Task UpdateTenantAsync(Tenant tenant)
