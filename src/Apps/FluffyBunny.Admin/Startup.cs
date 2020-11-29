@@ -49,7 +49,10 @@ namespace FluffyBunny.Admin
         {
             try
             {
-                var appOptions = Configuration
+                services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                services.AddSingleton<IPagingHelper, PagingHelper>();
+
+               var appOptions = Configuration
                     .GetSection("AppOptions")
                     .Get<AppOptions>();
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));
