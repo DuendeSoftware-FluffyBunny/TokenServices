@@ -70,8 +70,9 @@
     </div>
 
     <div class="card-footer text-muted container-fluid">
-        <div class="row">
-            <div class="col-md-10">
+        <div class="d-flex bd-highlight mb-3">
+            <div class="p-2 bd-highlight">
+
                 <a class="btn btn-sm btn-primary @prevDisabled" asp-page="/Tenants/Index"
                    asp-route-sortOrder="@Model.CurrentSortType"
                    asp-route-pageNumber="@(Model.PagedTenants.PageIndex - 1)"
@@ -84,17 +85,20 @@
                    asp-route-pageSize="@Model.PageSize"
                    asp-route-currentFilter="@ViewData["CurrentFilter"]">Next</a>
             </div>
-            <div class="col-md-2 float-right">
-                <form class="form-inline" 
+ 
+            <div class="ml-auto p-2 bd-highlight">
+                <form class="form-inline"
                       asp-page-handler="pageSize"
                       asp-page="./Index" method="post">
-                    <select onchange="this.form.submit();" 
+                    <select onchange="this.form.submit();"
                             asp-for="SelectedPageSize"
                             asp-items="Model.PageSizeOptions" class="custom-select">
                     </select>
                 </form>
             </div>
         </div>
+
+        
     </div>
 </div>
 
