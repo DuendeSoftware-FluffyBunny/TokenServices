@@ -10,3 +10,111 @@
         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
     </ol>
 </nav>
+
+@{
+    var prevDisabled = !Model.PagedEntities.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.PagedEntities.HasNextPage ? "disabled" : "";
+}
+
+<div class="card">
+    <div class="card-header text-muted">
+        <a class="btn btn-sm btn-primary" asp-page="./AddExternalService">Add External Service</a>
+    </div>
+    @if (Model.PagedEntities.Any())
+    {
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="1">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@Model.EnabledSortType"
+                               asp-route-pageSize="@Model.PageSize">Enabled</a>
+                        </th>
+                        <th colspan="1">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@Model.NameSortType"
+                               asp-route-pageSize="@Model.PageSize">Service</a>
+                        </th>
+
+                        <th colspan="1">Description</th>
+                        <th colspan="1">Authority</th>
+                        <th colspan="1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entity in Model.PagedEntities)
+                    {
+                        <tr>
+
+                            <td class="w-50">
+                                @entity.Enabled
+                            </td>
+                            <td class="w-50">
+                                @entity.Name
+                            </td>
+                            <td class="w-50">
+                                @entity.Description
+                            </td>
+                            <td class="w-50">
+                                @entity.Authority
+                            </td>
+                            <td class="w-50">
+                                <div class="btn-group " >
+                                    <a 
+                                        style="border-right-color: white;"
+                                        class="btn btn-primary btn-sm active " 
+                                        role="button" aria-pressed="true"
+                                        asp-page="./EditExternalService"
+                                        asp-route-id="@entity.Id">Edit</a>
+                                    <a    style="border-left-color: white;"
+                                       class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
+                                       asp-page="./DeleteExternalService"
+                                       asp-route-id="@entity.Id">Delete</a>
+                                </div>
+                               
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer text-muted container-fluid">
+            <div class="d-flex bd-highlight mb-3">
+                <div class="p-2 bd-highlight">
+
+                    <a class="btn btn-sm btn-primary @prevDisabled" asp-page="/Tenant/ManageExternalServices"
+                       asp-route-sortOrder="@Model.CurrentSortType"
+                       asp-route-pageNumber="@(Model.PagedEntities.PageIndex - 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]">Previous</a>
+
+                    <a class="btn btn-sm btn-primary @nextDisabled" asp-page="/Tenant/ManageExternalServices"
+                       asp-route-sortOrder="@Model.CurrentSortType"
+                       asp-route-pageNumber="@(Model.PagedEntities.PageIndex + 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]">Next</a>
+                </div>
+
+                <div class="ml-auto p-2 bd-highlight">
+                    <form class="form-inline"
+                          asp-page-handler="pageSize"
+                          method="post">
+                        <select onchange="this.form.submit();"
+                                asp-for="SelectedPageSize"
+                                asp-items="Model.PageSizeOptions" class="custom-select">
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

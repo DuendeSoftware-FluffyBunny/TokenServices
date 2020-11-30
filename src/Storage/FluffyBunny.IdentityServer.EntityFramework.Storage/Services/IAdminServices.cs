@@ -36,7 +36,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<ExternalService> GetExternalServiceByNameAsync(string tenantName, string name);
         Task<ExternalService> GetExternalServiceByIdAsync(string tenantName, int id);
         Task DeleteExternalServiceByNameAsync(string tenantName, string name);
-
+        Task DeleteExternalServiceByIdAsync(string tenantName, int id);
         Task<PaginatedList<ExternalService>> PageExternalServicesAsync(string tenantName, int pageNumber, int pageSize, ExternalServiceSortType sortType);
     }
 }

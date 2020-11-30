@@ -90,8 +90,7 @@
 
                 <div class="ml-auto p-2 bd-highlight">
                     <form class="form-inline"
-                          asp-page-handler="pageSize"
-                          asp-page="./Index" method="post">
+                          asp-page-handler="pageSize" method="post">
                         <select onchange="this.form.submit();"
                                 asp-for="SelectedPageSize"
                                 asp-items="Model.PageSizeOptions" class="custom-select">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
+using FluffyBunny.IdentityServer.EntityFramework.Storage;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -36,7 +37,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
 
         [ViewData]
         public ExternalServiceSortType NameSortType { get; set; }
-        public object PagedEntities { get; private set; }
+        public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.ExternalService> PagedEntities { get; private set; }
         [ViewData]
         public ExternalServiceSortType EnabledSortType { get; set; }
         [ViewData]

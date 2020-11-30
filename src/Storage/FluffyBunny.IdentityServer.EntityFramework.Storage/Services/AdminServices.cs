@@ -55,7 +55,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         ITenantAwareConfigurationDbContext GetTenantContext(string name) =>
             _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
-        
+        public async Task DeleteExternalServiceByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.ExternalServices.FirstOrDefaultAsync(e => e.Id == id);
+            if (entityInDb != null)
+            {
+                tenantContext.ExternalServices.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
         public async Task DeleteExternalServiceByNameAsync(string tenantName, string name)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -186,5 +195,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             }
             await tenantContext.SaveChangesAsync();
         }
+
+     
     }
 }
