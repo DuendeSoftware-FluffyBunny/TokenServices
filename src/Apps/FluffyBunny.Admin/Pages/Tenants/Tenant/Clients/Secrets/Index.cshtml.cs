@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
 {
     public class IndexModel : PageModel
     {
@@ -33,7 +33,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
         [ViewData]
         public SecretsSortType DescriptionSortType { get; set; }
       
-        public IEnumerable<ApiResourceSecret> Entities { get; private set; }
+        public IEnumerable<ClientSecret> Entities { get; private set; }
         [ViewData]
         public SecretsSortType ExpirationSortType { get; set; }
         [ViewData]
@@ -49,7 +49,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
 
                 case SecretsSortType.ExpirationAsc:
                    Entities =
-                        await _adminServices.GetAllApiResourceSecretsAsync(
+                        await _adminServices.GetAllClientSecretsAsync(
                             TenantId,
                             id,
                             SecretsSortType.ExpirationAsc);
@@ -57,7 +57,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
                     break;
                 case SecretsSortType.ExpirationDesc:
                     Entities =
-                        await _adminServices.GetAllApiResourceSecretsAsync(
+                        await _adminServices.GetAllClientSecretsAsync(
                             TenantId,
                             id,
                             SecretsSortType.ExpirationDesc);
@@ -65,7 +65,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
                     break;
                 case SecretsSortType.DescriptionDesc:
                     Entities =
-                        await _adminServices.GetAllApiResourceSecretsAsync(
+                        await _adminServices.GetAllClientSecretsAsync(
                             TenantId,
                             id,
                             SecretsSortType.DescriptionDesc);
@@ -75,7 +75,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
                 case SecretsSortType.DescriptionAsc:
                 default:
                     Entities =
-                        await _adminServices.GetAllApiResourceSecretsAsync(
+                        await _adminServices.GetAllClientSecretsAsync(
                             TenantId,
                             id,
                             SecretsSortType.DescriptionAsc);

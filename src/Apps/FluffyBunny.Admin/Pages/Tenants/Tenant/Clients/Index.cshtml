@@ -60,7 +60,13 @@
                             </td>
                             <td>
                                 <div class="btn-group ">
-                                    <a style="border-right-color: white;"
+                                    <a 
+                                         
+                                        class="btn btn-primary btn-sm active "
+                                        role="button" aria-pressed="true"
+                                        asp-page="./Secrets/Index"
+                                        asp-route-id="@entity.Id">Secrets</a>
+                                    <a style="border-left-color: white;"
                                        class="btn btn-primary btn-sm active "
                                        role="button" aria-pressed="true"
                                        asp-page="./Edit"

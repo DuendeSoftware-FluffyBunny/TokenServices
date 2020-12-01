@@ -420,7 +420,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         }
 
         public async Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(
-            string tenantName, int apiResourceId, ApiResourceSecretsSortType sortType)
+            string tenantName, int apiResourceId, SecretsSortType sortType)
         {
             var tenantContext = GetTenantContext(tenantName);
 
@@ -449,16 +449,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 select t;
             switch (sortType)
             {
-                case ApiResourceSecretsSortType.ExpirationDesc:
+                case SecretsSortType.ExpirationDesc:
                     entities = entities.OrderByDescending(t => t.Expiration);
                     break;
-                case ApiResourceSecretsSortType.ExpirationAsc:
+                case SecretsSortType.ExpirationAsc:
                     entities = entities.OrderBy(t => t.Expiration);
                     break;
-                case ApiResourceSecretsSortType.DescriptionDesc:
+                case SecretsSortType.DescriptionDesc:
                     entities = entities.OrderByDescending(t => t.Description);
                     break;
-                case ApiResourceSecretsSortType.DescriptionAsc:
+                case SecretsSortType.DescriptionAsc:
                     entities = entities.OrderBy(t => t.Description);
                     break;
             }
@@ -571,6 +571,129 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             var paginatedList = await PaginatedList<ClientExtra>
                 .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
             return paginatedList;
+        }
+
+        public async Task UpsertClientSecretAsync(string tenantName, int clientId, ClientSecret entity)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.ClientSecrets)
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+            var secret = client.ClientSecrets.FirstOrDefault(x => x.Id == entity.Id);
+            if (secret != null)
+            {
+                secret.Expiration = entity.Expiration;
+            }
+            else
+            {
+                client.ClientSecrets.Add(entity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<ClientSecret> GetClientSecretByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.ClientSecrets)
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+
+            return client.ClientSecrets.FirstOrDefault(x=>x.Id == id);
+        }
+
+        public async Task DeleteClientSecretByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.ClientSecrets)
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+
+            var result = client.ClientSecrets.FirstOrDefault(s => s.Id == id);
+            if (result != null)
+            {
+                client.ClientSecrets.Remove(result);
+                await tenantContext.SaveChangesAsync();
+
+            }
+        }
+
+        public async Task<IEnumerable<ClientSecret>> GetAllClientSecretsAsync(string tenantName, int id, SecretsSortType sortType)
+        {
+
+            var tenantContext = GetTenantContext(tenantName);
+
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == id
+                select item;
+
+          
+
+            var client = await query
+                .Include(x => x.ClientSecrets)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client doesnot exist tenant={tenantName}, id={id}");
+            }
+
+            var entities = from t in client.ClientSecrets
+                select t;
+            switch (sortType)
+            {
+                case SecretsSortType.ExpirationDesc:
+                    entities = entities.OrderByDescending(t => t.Expiration);
+                    break;
+                case SecretsSortType.ExpirationAsc:
+                    entities = entities.OrderBy(t => t.Expiration);
+                    break;
+                case SecretsSortType.DescriptionDesc:
+                    entities = entities.OrderByDescending(t => t.Description);
+                    break;
+                case SecretsSortType.DescriptionAsc:
+                    entities = entities.OrderBy(t => t.Description);
+                    break;
+            }
+
+            return entities;
         }
     }
 }
