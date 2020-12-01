@@ -36,12 +36,12 @@ namespace FluffyBunny.Admin.Pages.Tenant
         public List<SelectListItem> PageSizeOptions { get; private set; }
 
         [ViewData]
-        public ExternalServiceSortType NameSortType { get; set; }
+        public ExternalServicesSortType NameSortType { get; set; }
         public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.ExternalService> PagedEntities { get; private set; }
         [ViewData]
-        public ExternalServiceSortType EnabledSortType { get; set; }
+        public ExternalServicesSortType EnabledSortType { get; set; }
         [ViewData]
-        public ExternalServiceSortType CurrentSortType { get; set; }
+        public ExternalServicesSortType CurrentSortType { get; set; }
 
         [ViewData]
         public int PageSize { get; set; }
@@ -49,7 +49,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
         [BindProperty]
         public int SelectedPageSize { get; set; }
 
-        public async Task OnGetAsync(ExternalServiceSortType sortOrder, int? pageNumber, int? pageSize)
+        public async Task OnGetAsync(ExternalServicesSortType sortOrder, int? pageNumber, int? pageSize)
         {
             TenantId = _sessionTenantAccessor.TenantId;
             PageSize = _pagingHelper.ValidatePageSize(pageSize);
@@ -59,44 +59,44 @@ namespace FluffyBunny.Admin.Pages.Tenant
             switch (sortOrder)
             {
 
-                case ExternalServiceSortType.EnabledAsc:
+                case ExternalServicesSortType.EnabledAsc:
                     PagedEntities =
                         await _adminServices.PageExternalServicesAsync(
                             TenantId,
                             (int)(pageNumber ?? 1), 
                             PageSize,
-                            ExternalServiceSortType.EnabledAsc);
-                    EnabledSortType = ExternalServiceSortType.EnabledDesc;
+                            ExternalServicesSortType.EnabledAsc);
+                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
                     break;
-                case ExternalServiceSortType.EnabledDesc:
+                case ExternalServicesSortType.EnabledDesc:
                     PagedEntities =
                         await _adminServices.PageExternalServicesAsync(
                             TenantId, 
                             (int)(pageNumber ?? 1), 
                             PageSize,
-                            ExternalServiceSortType.EnabledDesc);
-                    EnabledSortType = ExternalServiceSortType.EnabledAsc;
+                            ExternalServicesSortType.EnabledDesc);
+                    EnabledSortType = ExternalServicesSortType.EnabledAsc;
                     break;
-                case ExternalServiceSortType.NameDesc:
+                case ExternalServicesSortType.NameDesc:
                     PagedEntities =
                         await _adminServices.PageExternalServicesAsync(
                             TenantId, 
                             (int)(pageNumber ?? 1), 
                             PageSize,
-                            ExternalServiceSortType.NameDesc);
-                    NameSortType = ExternalServiceSortType.NameAsc;
-                    EnabledSortType = ExternalServiceSortType.EnabledDesc;
+                            ExternalServicesSortType.NameDesc);
+                    NameSortType = ExternalServicesSortType.NameAsc;
+                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
                     break;
-                case ExternalServiceSortType.NameAsc:
+                case ExternalServicesSortType.NameAsc:
                 default:
                     PagedEntities =
                         await _adminServices.PageExternalServicesAsync(
                             TenantId, 
                             (int)(pageNumber ?? 1), 
                             PageSize,
-                            ExternalServiceSortType.NameAsc);
-                    NameSortType = ExternalServiceSortType.NameDesc;
-                    EnabledSortType = ExternalServiceSortType.EnabledDesc;
+                            ExternalServicesSortType.NameAsc);
+                    NameSortType = ExternalServicesSortType.NameDesc;
+                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
 
                     break;
             }

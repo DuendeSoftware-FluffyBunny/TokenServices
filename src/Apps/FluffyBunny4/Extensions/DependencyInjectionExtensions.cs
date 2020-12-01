@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
     { 
         public static IServiceCollection AddPasswordGenerator(this IServiceCollection services)
         {
-            services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
+            services.TryAddSingleton<IPasswordGenerator, PasswordGenerator>();
             return services;
         }
         /// <summary>

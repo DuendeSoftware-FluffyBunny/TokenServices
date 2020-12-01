@@ -39,11 +39,11 @@ namespace FluffyBunny.Admin.Pages.Tenants
         public IEnumerable<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant> Tenants { get; private set; }
 
         [ViewData]
-        public TenantSortType NameSortType { get; set; }
+        public TenantsSortType NameSortType { get; set; }
         [ViewData]
-        public TenantSortType EnabledSortType { get; set; }
+        public TenantsSortType EnabledSortType { get; set; }
         [ViewData]
-        public TenantSortType CurrentSortType { get; set; }
+        public TenantsSortType CurrentSortType { get; set; }
 
         [ViewData]
         public int PageSize { get; set; }
@@ -63,7 +63,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
             _pagingHelper = pagingHelper;
             _logger = logger;
         }
-        public async Task OnGetAsync(TenantSortType sortOrder,int? pageNumber,int? pageSize)
+        public async Task OnGetAsync(TenantsSortType sortOrder,int? pageNumber,int? pageSize)
         {
             PageSize = _pagingHelper.ValidatePageSize(pageSize);
             PageSizeOptions = _pagingHelper.GetPagingSizeOptions();
@@ -73,32 +73,32 @@ namespace FluffyBunny.Admin.Pages.Tenants
             switch (sortOrder)
             {
                 
-                case TenantSortType.EnabledAsc:
+                case TenantsSortType.EnabledAsc:
                     PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
-                            TenantSortType.EnabledAsc);
-                    EnabledSortType = TenantSortType.EnabledDesc;
+                            TenantsSortType.EnabledAsc);
+                    EnabledSortType = TenantsSortType.EnabledDesc;
                     break;
-                case TenantSortType.EnabledDesc:
+                case TenantsSortType.EnabledDesc:
                     PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
-                            TenantSortType.EnabledDesc);
-                    EnabledSortType = TenantSortType.EnabledAsc;
+                            TenantsSortType.EnabledDesc);
+                    EnabledSortType = TenantsSortType.EnabledAsc;
                     break;
-                case TenantSortType.NameDesc:
+                case TenantsSortType.NameDesc:
                     PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
-                            TenantSortType.NameDesc);
-                    NameSortType = TenantSortType.NameAsc;
-                    EnabledSortType = TenantSortType.EnabledDesc; 
+                            TenantsSortType.NameDesc);
+                    NameSortType = TenantsSortType.NameAsc;
+                    EnabledSortType = TenantsSortType.EnabledDesc; 
                     break;
-                case TenantSortType.NameAsc:
+                case TenantsSortType.NameAsc:
                 default:
                     PagedEntities =
                         await _adminServices.PageTenantsAsync((int)(pageNumber ?? 1), PageSize,
-                            TenantSortType.NameAsc);
-                    NameSortType = TenantSortType.NameDesc;
-                    EnabledSortType = TenantSortType.EnabledDesc;
+                            TenantsSortType.NameAsc);
+                    NameSortType = TenantsSortType.NameDesc;
+                    EnabledSortType = TenantsSortType.EnabledDesc;
 
                     break;
             }

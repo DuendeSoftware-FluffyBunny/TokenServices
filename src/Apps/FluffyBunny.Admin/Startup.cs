@@ -49,6 +49,7 @@ namespace FluffyBunny.Admin
         {
             try
             {
+                services.AddPasswordGenerator();
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<IPagingHelper, PagingHelper>();
 

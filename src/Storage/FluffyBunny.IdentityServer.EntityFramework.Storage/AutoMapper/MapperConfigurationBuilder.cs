@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AutoMapper;
+using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny4.DotNetCore.Extensions;
 
@@ -29,6 +30,14 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                 .Ignore(record => record.Claims)
                 .Ignore(record => record.AllowedCorsOrigins)
                 .Ignore(record => record.Properties);
+
+            cfg.CreateMap<ApiResource, ApiResource>()
+                .Ignore(record => record.Id)
+                .Ignore(record => record.Properties)
+                .Ignore(record => record.Scopes)
+                .Ignore(record => record.Secrets)
+                .Ignore(record => record.UserClaims) ;
+
         });
 
         public static IMapper BuidOneToOneMapper => BuidOneToOneMapperConfiguration.CreateMapper();

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny4.DotNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -111,7 +113,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         }
 
         public async Task<PaginatedList<ExternalService>> PageExternalServicesAsync(
-            string tenantName, int pageNumber, int pageSize, ExternalServiceSortType sortType)
+            string tenantName, int pageNumber, int pageSize, ExternalServicesSortType sortType)
         {
             var tenantContext = GetTenantContext(tenantName);
 
@@ -119,16 +121,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 select t;
             switch (sortType)
             {
-                case ExternalServiceSortType.NameDesc:
+                case ExternalServicesSortType.NameDesc:
                     entities = entities.OrderByDescending(t => t.Name);
                     break;
-                case ExternalServiceSortType.NameAsc:
+                case ExternalServicesSortType.NameAsc:
                     entities = entities.OrderBy(t => t.Name);
                     break;
-                case ExternalServiceSortType.EnabledDesc:
+                case ExternalServicesSortType.EnabledDesc:
                     entities = entities.OrderByDescending(t => t.Enabled);
                     break;
-                case ExternalServiceSortType.EnabledAsc:
+                case ExternalServicesSortType.EnabledAsc:
                     entities = entities.OrderBy(t => t.Enabled);
                     break;
             }
@@ -138,22 +140,22 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return paginatedList;
         }
 
-        public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantSortType sortType)
+        public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantsSortType sortType)
         {
             var entities = from t in _mainEntityCoreContext.Tenants
                 select t;
             switch (sortType)
             {
-                case TenantSortType.NameDesc:
+                case TenantsSortType.NameDesc:
                     entities = entities.OrderByDescending(t => t.Name);
                     break;
-                case TenantSortType.NameAsc:
+                case TenantsSortType.NameAsc:
                     entities = entities.OrderBy(t => t.Name);
                     break;
-                case TenantSortType.EnabledDesc:
+                case TenantsSortType.EnabledDesc:
                     entities = entities.OrderByDescending(t => t.Enabled);
                     break;
-                case TenantSortType.EnabledAsc:
+                case TenantsSortType.EnabledAsc:
                     entities = entities.OrderBy(t => t.Enabled);
                     break;
             }
@@ -196,6 +198,260 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             await tenantContext.SaveChangesAsync();
         }
 
-     
+        public async Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber, int pageSize, 
+            ApiResourcesSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var entities = from t in tenantContext.ApiResources
+                select t;
+            switch (sortType)
+            {
+                case ApiResourcesSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.Name);
+                    break;
+                case ApiResourcesSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.Name);
+                    break;
+                case ApiResourcesSortType.EnabledDesc:
+                    entities = entities.OrderByDescending(t => t.Enabled);
+                    break;
+                case ApiResourcesSortType.EnabledAsc:
+                    entities = entities.OrderBy(t => t.Enabled);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<ApiResource>
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
+        }
+
+        public async Task UpsertApiResourceAsync(string tenantName, ApiResource entity)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Name == entity.Name);
+
+            if (entityInDb != null)
+            {
+                // we can only allow one name
+                if (entityInDb.Id == entity.Id)
+                {
+                    // perfect match, update this.
+                    _entityFrameworkMapperAccessor.MapperIgnoreBase.Map(entity, entityInDb);
+                    await tenantContext.SaveChangesAsync();
+                    return;
+                }
+                else
+                {
+                    throw new System.Exception($"Resource already exists with the name={entity.Name}");
+                }
+
+            }
+
+            entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Id == entity.Id);
+            if (entityInDb != null)
+            {
+                _entityFrameworkMapperAccessor.MapperIgnoreBase.Map(entity, entityInDb);
+            }
+            else
+            {
+                var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<ApiResource>(entity);
+                tenantContext.ApiResources.Add(newEntity);
+            }
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<ApiResource> GetApiResourceByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Name == name);
+            return entityInDb;
+        }
+
+        public async Task<ApiResource> GetApiResourceByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Id == id);
+            return entityInDb;
+        }
+
+        public async Task DeleteApiResourceByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Name == name);
+            if (entityInDb != null)
+            {
+                tenantContext.ApiResources.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteApiResourceByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .ApiResources
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (entityInDb != null)
+            {
+                tenantContext.ApiResources.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpsertApiResourceSecretAsync(string tenantName, int apiResourceId, ApiResourceSecret entity)
+        {
+            try
+            {
+                var tenantContext = GetTenantContext(tenantName);
+
+                var query =
+                    from apiResource in tenantContext.ApiResources
+                    where apiResource.Id == apiResourceId
+                    select apiResource;
+
+                var apiResourceInDb = await query
+                    .Include(x => x.Secrets)
+                    .Include(x => x.Scopes)
+                    .Include(x => x.UserClaims)
+                    .Include(x => x.Properties)
+                    .FirstOrDefaultAsync();
+
+                if (apiResourceInDb == null)
+                {
+                    throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+                }
+
+
+                var secretEntity = apiResourceInDb.Secrets.FirstOrDefault(s => s.Id == entity.Id);
+                if (secretEntity != null)
+                {
+                    secretEntity.Expiration = entity.Expiration;
+                }
+                else
+                {
+                    apiResourceInDb.Secrets.Add(entity);
+                }
+
+                await tenantContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+                throw;
+
+            }
+
+
+        }
+
+
+        public async Task<ApiResourceSecret> GetApiResourceSecretByIdAsync(string tenantName, int apiResourceId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            if (apiResourceInDb == null)
+            {
+                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+            }
+            var result = apiResourceInDb.Secrets.FirstOrDefault(s => s.Id == id);
+            return result; 
+        }
+
+       
+
+        public async Task DeleteApiResourceBySecretIdAsync(string tenantName, int apiResourceId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
+                .FirstOrDefaultAsync();
+            if (apiResourceInDb == null)
+            {
+                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+            }
+            var result = apiResourceInDb.Secrets.FirstOrDefault(s => s.Id == id);
+            if (result != null)
+            {
+                apiResourceInDb.Secrets.Remove(result);
+                await tenantContext.SaveChangesAsync();
+
+            }
+        }
+
+        public async Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(
+                string tenantName, int apiResourceId, ApiResourceSecretsSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+ 
+            if (!query.Any() )
+            {
+                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+            }
+
+            var api = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+
+ 
+            var entities = from t in api.Secrets
+                           select t;
+            switch (sortType)
+            {
+                case ApiResourceSecretsSortType.ExpirationDesc:
+                    entities = entities.OrderByDescending(t => t.Expiration);
+                    break;
+                case ApiResourceSecretsSortType.ExpirationAsc:
+                    entities = entities.OrderBy(t => t.Expiration);
+                    break;
+                case ApiResourceSecretsSortType.DescriptionDesc:
+                    entities = entities.OrderByDescending(t => t.Description);
+                    break;
+                case ApiResourceSecretsSortType.DescriptionAsc:
+                    entities = entities.OrderBy(t => t.Description);
+                    break;
+            }
+
+            return entities;
+        }
     }
 }
