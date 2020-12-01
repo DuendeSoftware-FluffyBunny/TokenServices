@@ -1,5 +1,5 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ExternalServices.IndexModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices.IndexModel
 @{
     ViewData["Title"] = "External Services";
 }
@@ -18,7 +18,7 @@
 
 <div class="card">
     <div class="card-header text-muted">
-        <a class="btn btn-sm btn-primary" asp-page="./AddExternalService">Add External Service</a>
+        <a class="btn btn-sm btn-primary" asp-page="./Add">Add External Service</a>
     </div>
     @if (Model.PagedEntities.Any())
     {
@@ -65,11 +65,11 @@
                                         style="border-right-color: white;"
                                         class="btn btn-primary btn-sm active " 
                                         role="button" aria-pressed="true"
-                                        asp-page="./EditExternalService"
+                                        asp-page="./Edit"
                                         asp-route-id="@entity.Id">Edit</a>
                                     <a    style="border-left-color: white;"
                                        class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
-                                       asp-page="./DeleteExternalService"
+                                       asp-page="./Delete"
                                        asp-route-id="@entity.Id">Delete</a>
                                 </div>
                                

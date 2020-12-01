@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant.ExternalServices
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
 {
     public class IndexModel : PageModel
     {

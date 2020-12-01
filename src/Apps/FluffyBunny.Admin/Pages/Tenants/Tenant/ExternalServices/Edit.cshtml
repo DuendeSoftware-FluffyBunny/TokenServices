@@ -1,7 +1,7 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.DeleteExternalServiceModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices.EditModel
 @{
-    ViewData["Title"] = "Delete External Service";
+    ViewData["Title"] = "Edit External Service";
 }
 
 <nav aria-label="breadcrumb">
@@ -21,7 +21,7 @@
         <div id="cardBodyId">
 
             <div class="card-body">
-             
+                <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <table class="table">
 
@@ -32,35 +32,35 @@
                                 <td class="w-50">
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Enabled" />
+                                    <input asp-for="Input.Enabled" />
                                     <label>Enabled</label>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Name)
+                                    @nameof(Model.Input.Name)
                                 </td>
                                 <td class="w-50">
-                                    <input hidden asp-for="Entity.Name" class="form-control" />
-                                    @Model.Entity.Name
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="w-50">
-                                    @nameof(Model.Entity.Description)
-                                </td>
-                                <td class="w-50">
-                                    <input disabled asp-for="Entity.Description" class="form-control" />
-                                    
+                                    <input hidden asp-for="Input.Name" class="form-control" />
+                                    @Model.Input.Name
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Authority)
+                                    @nameof(Model.Input.Description)
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Authority" class="form-control" />
-                                   
+                                    <input asp-for="Input.Description" class="form-control" />
+                                    <span asp-validation-for="Input.Description" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.Authority)
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.Authority" class="form-control" />
+                                    <span asp-validation-for="Input.Authority" class="text-danger"></span>
                                 </td>
                             </tr>
                         <tbody>
@@ -69,8 +69,12 @@
             </div>
         </div>
         <div class="card-footer text-muted">
-            <button type="submit" class="btn btn-primary" name="submit" value="Delete">Delete</button>
-            <button type="submit" class="btn btn-primary" name="submit" value="Cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
         </div>
     </div>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+}

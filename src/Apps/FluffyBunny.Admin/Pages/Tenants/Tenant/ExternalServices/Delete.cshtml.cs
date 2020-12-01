@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
@@ -10,18 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
 {
-    public class EditExternalServiceModel : PageModel
+    public class DeleteModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<EditExternalServiceModel> _logger;
+        private ILogger<DeleteModel> _logger;
 
-        public EditExternalServiceModel(
+        public DeleteModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<EditExternalServiceModel> logger)
+            ILogger<DeleteModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
@@ -29,51 +26,37 @@ namespace FluffyBunny.Admin.Pages.Tenant
         }
         [BindProperty]
         public string TenantId { get; set; }
-
+        public ExternalService Entity { get; private set; }
         public class InputModel
         {
             public int Id { get; set; }
-            public string Name { get; set; }  // service name
-            [Required]
-            public string Description { get; set; }
-            [Required]
-            public string Authority { get; set; }
-            [Required]
-            public bool Enabled { get; set; }
         }
         [BindProperty]
         public InputModel Input { get; set; }
         public async Task OnGetAsync(int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
-            var entity = await _adminServices.GetExternalServiceByIdAsync(TenantId, id);
+            Entity = await _adminServices.GetExternalServiceByIdAsync(TenantId, id);
             Input = new InputModel()
             {
-                Id = entity.Id,
-                Name = entity.Name,
-                Description = entity.Description,
-                Authority = entity.Authority,
-                Enabled = entity.Enabled
+                Id = Entity.Id,
             };
         }
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string submit)
         {
             try
             {
-                var entity = new ExternalService
+                if (string.Compare(submit, "delete", true) == 0)
                 {
-                    Name = Input.Name,
-                    Description = Input.Description,
-                    Authority = Input.Authority,
-                    Enabled = Input.Enabled
-                };
-                await _adminServices.UpsertExternalServiceAsync(TenantId, entity);
+                    await _adminServices.DeleteExternalServiceByIdAsync(TenantId, Input.Id);
+                }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
+
             return RedirectToPage("./Index");
         }
     }
