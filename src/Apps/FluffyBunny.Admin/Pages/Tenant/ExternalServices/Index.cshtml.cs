@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage;
@@ -10,20 +8,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenant.ExternalServices
 {
-    public class ManageExternalServicesModel : PageModel
+    public class IndexModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private IPagingHelper _pagingHelper;
-        private ILogger<ManageExternalServicesModel> _logger;
+        private ILogger<IndexModel> _logger;
 
-        public ManageExternalServicesModel(
+        public IndexModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
             IPagingHelper pagingHelper,
-            ILogger<ManageExternalServicesModel> logger)
+            ILogger<IndexModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;

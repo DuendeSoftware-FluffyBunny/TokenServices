@@ -1,5 +1,5 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ManageExternalServicesModel
+@model FluffyBunny.Admin.Pages.Tenant.ExternalServices.IndexModel
 @{
     ViewData["Title"] = "External Services";
 }
@@ -85,13 +85,13 @@
             <div class="d-flex bd-highlight mb-3">
                 <div class="p-2 bd-highlight">
 
-                    <a class="btn btn-sm btn-primary @prevDisabled" asp-page="./ManageExternalServices"
+                    <a class="btn btn-sm btn-primary @prevDisabled" asp-page="./Index"
                        asp-route-sortOrder="@Model.CurrentSortType"
                        asp-route-pageNumber="@(Model.PagedEntities.PageIndex - 1)"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-currentFilter="@ViewData["CurrentFilter"]">Previous</a>
 
-                    <a class="btn btn-sm btn-primary @nextDisabled" asp-page="./ManageExternalServices"
+                    <a class="btn btn-sm btn-primary @nextDisabled" asp-page="./Index"
                        asp-route-sortOrder="@Model.CurrentSortType"
                        asp-route-pageNumber="@(Model.PagedEntities.PageIndex + 1)"
                        asp-route-pageSize="@Model.PageSize"

@@ -74,7 +74,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
-            return RedirectToPage("./ManageExternalServices");
+            return RedirectToPage("./Index");
         }
     }
 }
