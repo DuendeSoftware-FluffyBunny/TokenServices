@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer;
 using Duende.IdentityServer.EntityFramework.Entities;
@@ -13,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
 {
     public class AddApiResourceSecretModel : PageModel
     {
@@ -91,7 +89,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
                 return Page();
             }
 
-            return RedirectToPage("./ManageApiResourceSecrets", new { id = ApiResourceId });
+            return RedirectToPage("./Index", new { id = ApiResourceId });
         }
     }
 }

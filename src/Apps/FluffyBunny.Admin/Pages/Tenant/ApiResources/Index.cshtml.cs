@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
@@ -11,20 +9,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
 {
-    public class ManageApiResourcesModel : PageModel
+    public class IndexModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private IPagingHelper _pagingHelper;
-        private ILogger<ManageApiResourcesModel> _logger;
+        private ILogger<IndexModel> _logger;
 
-        public ManageApiResourcesModel(
+        public IndexModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
             IPagingHelper pagingHelper,
-            ILogger<ManageApiResourcesModel> logger)
+            ILogger<IndexModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;

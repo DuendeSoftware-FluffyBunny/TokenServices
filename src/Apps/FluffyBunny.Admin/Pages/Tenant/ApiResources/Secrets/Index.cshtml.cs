@@ -1,28 +1,24 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
-using FluffyBunny.IdentityServer.EntityFramework.Storage;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenant.ApiResources.Secrets
 {
-    public class ManageApiResourceSecretsModel : PageModel
+    public class IndexModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<ManageApiResourcesModel> _logger;
+        private ILogger<IndexModel> _logger;
 
-        public ManageApiResourceSecretsModel(
+        public IndexModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<ManageApiResourcesModel> logger)
+            ILogger<IndexModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;

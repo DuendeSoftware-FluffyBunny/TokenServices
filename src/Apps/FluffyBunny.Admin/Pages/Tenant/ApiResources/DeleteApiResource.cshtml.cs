@@ -1,28 +1,25 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant
+namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
 {
-    public class AddApiResourceModel : PageModel
+    public class DeleteApiResourceModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<AddApiResourceModel> _logger;
+        private ILogger<DeleteApiResourceModel> _logger;
 
-        public AddApiResourceModel(
+        public DeleteApiResourceModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<AddApiResourceModel> logger)
+            ILogger<DeleteApiResourceModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
@@ -30,40 +27,38 @@ namespace FluffyBunny.Admin.Pages.Tenant
         }
         [BindProperty]
         public string TenantId { get; set; }
-
+        public ApiResource Entity { get; private set; }
         public class InputModel
         {
             [Required]
-            public bool Enabled { get; set; }
-            [Required]
-            public string Name { get; set; }  // service name
-            [Required]
-            public string Description { get; set; }
+            public int Id { get; set; }
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
+            Entity = await _adminServices.GetApiResourceByIdAsync(TenantId, id);
+            Input = new InputModel()
+            {
+                Id = Entity.Id
+            };
         }
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string submit)
         {
             try
             {
-                var entity = new ApiResource()
+                if (string.Compare(submit, "delete", true) == 0)
                 {
-                    Name = Input.Name,
-                    Description = Input.Description,
-                    
-                    Enabled = Input.Enabled
-                };
-                await _adminServices.UpsertApiResourceAsync(TenantId, entity);
+                    await _adminServices.DeleteApiResourceByIdAsync(TenantId, Input.Id);
+                }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
+
             return RedirectToPage("./ManageApiResources");
         }
     }

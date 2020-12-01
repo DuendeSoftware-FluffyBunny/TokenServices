@@ -1,5 +1,5 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ManageApiResourcesModel
+@model FluffyBunny.Admin.Pages.Tenant.ApiResources.IndexModel
 @{
     ViewData["Title"] = "Api Resources";
 }
@@ -65,7 +65,7 @@
                                        
                                        class="btn btn-primary btn-sm active "
                                        role="button" aria-pressed="true"
-                                       asp-page="./ManageApiResourceSecrets"
+                                       asp-page="./Secrets/Index"
                                        asp-route-id="@Model.PagedEntities[i].Id">Secrets</a>
                                     <a 
                                         style="border-left-color: white;"
@@ -90,13 +90,13 @@
             <div class="d-flex bd-highlight mb-3">
                 <div class="p-2 bd-highlight">
 
-                    <a class="btn btn-sm btn-primary @prevDisabled" asp-page="/Tenant/ManageApiResources"
+                    <a class="btn btn-sm btn-primary @prevDisabled" asp-page="./Index"
                        asp-route-sortOrder="@Model.CurrentSortType"
                        asp-route-pageNumber="@(Model.PagedEntities.PageIndex - 1)"
                        asp-route-pageSize="@Model.PageSize"
                        asp-route-currentFilter="@ViewData["CurrentFilter"]">Previous</a>
 
-                    <a class="btn btn-sm btn-primary @nextDisabled" asp-page="/Tenant/ManageApiResources"
+                    <a class="btn btn-sm btn-primary @nextDisabled" asp-page="./Index"
                        asp-route-sortOrder="@Model.CurrentSortType"
                        asp-route-pageNumber="@(Model.PagedEntities.PageIndex + 1)"
                        asp-route-pageSize="@Model.PageSize"

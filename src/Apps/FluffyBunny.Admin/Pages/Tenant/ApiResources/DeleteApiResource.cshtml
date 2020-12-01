@@ -1,14 +1,14 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.AddApiResourceSecretModel
+@model FluffyBunny.Admin.Pages.Tenant.ApiResources.DeleteApiResourceModel
 @{
-    ViewData["Title"] = "Add Api Resource Secrets";
+    ViewData["Title"] = "Delete Api Resource";
 }
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
         <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">@Model.TenantId</a></li>
         <li class="breadcrumb-item"><a asp-area="" asp-page="./ManageApiResources">Api Resources</a></li>
-        <li class="breadcrumb-item"><a asp-area="" asp-page="./ManageApiResourceSecrets" asp-route-id="@Model.ApiResourceId">Api Resource Secrets</a></li>
+
         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
     </ol>
 </nav>
@@ -16,52 +16,55 @@
 <form method="post">
     <div class="card">
         <div class="card-header">
-            Add Api Resource Secret
+            Edit Api Resource
         </div>
         <input hidden asp-for="TenantId" class="form-control" />
-        <input hidden asp-for="ApiResourceId" class="form-control" />
-        <input hidden asp-for="Input.Value" class="form-control" />
+        <input hidden asp-for="Input.Id" class="form-control" />
         <div id="cardBodyId">
 
             <div class="card-body">
-
+                <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <table class="table">
- 
+
                         <tbody>
 
                             <tr>
+
                                 <td class="w-50">
-                                    <label asp-for="Input.SecretExpiration"></label>
                                 </td>
                                 <td class="w-50">
-                                    @foreach (var item in Model.Input.SecretExpirations)
-                                    {
-                                        <input type="radio" asp-for="Input.SecretExpiration" value="@item" /> @item<br />
-                                    }
-                                    <span asp-validation-for="Input.SecretExpiration" class="text-danger"></span>
-
+                                    <input disabled asp-for="Entity.Enabled" />
+                                    <label>Enabled</label>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    Secret
+                                    @nameof(Model.Entity.Name)
                                 </td>
                                 <td class="w-50">
-                                    <input asp-for="Input.Value" hidden class="form-control" />
-                                    <input disabled asp-for="Input.Value" class="form-control" />
-                                    <p>Please Copy you will not see it again.  You can always create another one later.</p>
-                                    <span asp-validation-for="Input.Value" class="text-danger"></span>
-
+                                    <input disabled asp-for="Entity.Name" class="form-control" />
+          
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Entity.Description)
+                                </td>
+                                <td class="w-50">
+                                    <input disabled asp-for="Entity.Description" class="form-control" />
+                                 
+                                </td>
+                            </tr>
+
                         <tbody>
                     </table>
                 </div>
             </div>
         </div>
         <div class="card-footer text-muted">
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="Delete">Delete</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="Cancel">Cancel</button>
         </div>
     </div>
 </form>
