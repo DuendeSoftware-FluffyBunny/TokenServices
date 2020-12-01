@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
@@ -8,60 +7,60 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
 {
-    public class AddApiResourceModel : PageModel
+    public class DeleteModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<AddApiResourceModel> _logger;
+        private ILogger<DeleteModel> _logger;
 
-        public AddApiResourceModel(
+        public DeleteModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<AddApiResourceModel> logger)
+            ILogger<DeleteModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
             _logger = logger;
         }
+
         [BindProperty]
         public string TenantId { get; set; }
 
-        public class InputModel
-        {
-            [Required]
-            public bool Enabled { get; set; }
-            [Required]
-            public string Name { get; set; }  // service name
-            [Required]
-            public string Description { get; set; }
-        }
         [BindProperty]
-        public InputModel Input { get; set; }
-        public async Task OnGetAsync()
+        public int ApiResourceId { get; set; }
+
+        [BindProperty]
+        public int SecretId { get; set; }
+
+        public ApiResourceSecret Secret { get; set; }
+
+
+        public async Task OnGetAsync(int apiResourceId, int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
+            ApiResourceId = apiResourceId;
+            SecretId = id;
+            Secret = await _adminServices.GetApiResourceSecretByIdAsync(TenantId, ApiResourceId, SecretId);
         }
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string submit)
         {
             try
             {
-                var entity = new ApiResource()
+                if (string.Compare(submit, "delete", true) == 0)
                 {
-                    Name = Input.Name,
-                    Description = Input.Description,
-                    
-                    Enabled = Input.Enabled
-                };
-                await _adminServices.UpsertApiResourceAsync(TenantId, entity);
+                    await _adminServices.DeleteApiResourceBySecretIdAsync(TenantId,ApiResourceId,SecretId);
+                }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
-            return RedirectToPage("./Index");
+
+            return RedirectToPage("./Index", new { id = ApiResourceId });
         }
+        
     }
 }

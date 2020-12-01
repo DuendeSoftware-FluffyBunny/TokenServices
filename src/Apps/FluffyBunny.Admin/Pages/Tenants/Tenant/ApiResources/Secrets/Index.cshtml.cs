@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenant.ApiResources.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
 {
     public class IndexModel : PageModel
     {

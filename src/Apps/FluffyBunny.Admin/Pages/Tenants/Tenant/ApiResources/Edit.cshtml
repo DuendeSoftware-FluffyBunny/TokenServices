@@ -1,7 +1,7 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ApiResources.DeleteApiResourceModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.EditModel
 @{
-    ViewData["Title"] = "Delete Api Resource";
+    ViewData["Title"] = "Edit Api Resource";
 }
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -34,26 +34,26 @@
                                 <td class="w-50">
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Enabled" />
+                                    <input asp-for="Input.Enabled" />
                                     <label>Enabled</label>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Name)
+                                    @nameof(Model.Input.Name)
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Name" class="form-control" />
-          
+                                    <input asp-for="Input.Name" class="form-control" />
+                                    <span asp-validation-for="Input.Name" class="text-danger"></span>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Description)
+                                    @nameof(Model.Input.Description)
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Description" class="form-control" />
-                                 
+                                    <input asp-for="Input.Description" class="form-control" />
+                                    <span asp-validation-for="Input.Description" class="text-danger"></span>
                                 </td>
                             </tr>
 
@@ -63,8 +63,7 @@
             </div>
         </div>
         <div class="card-footer text-muted">
-            <button type="submit" class="btn btn-primary" name="submit" value="Delete">Delete</button>
-            <button type="submit" class="btn btn-primary" name="submit" value="Cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
         </div>
     </div>
 </form>

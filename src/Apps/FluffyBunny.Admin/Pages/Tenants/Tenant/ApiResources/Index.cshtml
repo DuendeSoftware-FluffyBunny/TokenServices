@@ -1,5 +1,5 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ApiResources.IndexModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.IndexModel
 @{
     ViewData["Title"] = "Api Resources";
 }
@@ -19,7 +19,7 @@
 
 <div class="card">
     <div class="card-header text-muted">
-        <a class="btn btn-sm btn-primary" asp-page="./AddApiResource">Add Api Resource</a>
+        <a class="btn btn-sm btn-primary" asp-page="./Add">Add Api Resource</a>
     </div>
     @if (Model.PagedEntities.Any())
     {
@@ -71,11 +71,11 @@
                                         style="border-left-color: white;"
                                        class="btn btn-primary btn-sm active "
                                        role="button" aria-pressed="true"
-                                       asp-page="./EditApiResource"
+                                       asp-page="./Edit"
                                        asp-route-id="@Model.PagedEntities[i].Id">Edit</a>
                                     <a style="border-left-color: white;"
                                        class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
-                                       asp-page="./DeleteApiResource"
+                                       asp-page="./Delete"
                                        asp-route-id="@Model.PagedEntities[i].Id">Delete</a>
                                 </div>
 
