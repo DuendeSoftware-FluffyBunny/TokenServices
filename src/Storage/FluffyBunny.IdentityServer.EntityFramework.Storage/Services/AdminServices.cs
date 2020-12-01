@@ -31,7 +31,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task CreateTenantAsync(string name)
         {
-            Guard.ArgumentNotNullOrEmpty(nameof(name),name);
+            Guard.ArgumentNotNullOrEmpty(nameof(name), name);
 
             // ensure db created
             await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
@@ -57,6 +57,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         ITenantAwareConfigurationDbContext GetTenantContext(string name) =>
             _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
+
         public async Task DeleteExternalServiceByIdAsync(string tenantName, int id)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -67,6 +68,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 await tenantContext.SaveChangesAsync();
             }
         }
+
         public async Task DeleteExternalServiceByNameAsync(string tenantName, string name)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -140,7 +142,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return paginatedList;
         }
 
-        public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantsSortType sortType)
+        public async Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize,
+            TenantsSortType sortType)
         {
             var entities = from t in _mainEntityCoreContext.Tenants
                 select t;
@@ -195,10 +198,12 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<ExternalService>(entity);
                 tenantContext.ExternalServices.Add(newEntity);
             }
+
             await tenantContext.SaveChangesAsync();
         }
 
-        public async Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber, int pageSize, 
+        public async Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber,
+            int pageSize,
             ApiResourcesSortType sortType)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -262,6 +267,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<ApiResource>(entity);
                 tenantContext.ApiResources.Add(newEntity);
             }
+
             await tenantContext.SaveChangesAsync();
         }
 
@@ -329,7 +335,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
                 if (apiResourceInDb == null)
                 {
-                    throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+                    throw new System.Exception(
+                        $"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
                 }
 
 
@@ -373,13 +380,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .FirstOrDefaultAsync();
             if (apiResourceInDb == null)
             {
-                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+                throw new System.Exception(
+                    $"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
             }
+
             var result = apiResourceInDb.Secrets.FirstOrDefault(s => s.Id == id);
-            return result; 
+            return result;
         }
 
-       
+
 
         public async Task DeleteApiResourceBySecretIdAsync(string tenantName, int apiResourceId, int id)
         {
@@ -397,8 +406,10 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .FirstOrDefaultAsync();
             if (apiResourceInDb == null)
             {
-                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+                throw new System.Exception(
+                    $"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
             }
+
             var result = apiResourceInDb.Secrets.FirstOrDefault(s => s.Id == id);
             if (result != null)
             {
@@ -409,7 +420,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         }
 
         public async Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(
-                string tenantName, int apiResourceId, ApiResourceSecretsSortType sortType)
+            string tenantName, int apiResourceId, ApiResourceSecretsSortType sortType)
         {
             var tenantContext = GetTenantContext(tenantName);
 
@@ -417,10 +428,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 from apiResource in tenantContext.ApiResources
                 where apiResource.Id == apiResourceId
                 select apiResource;
- 
-            if (!query.Any() )
+
+            if (!query.Any())
             {
-                throw new System.Exception($"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
+                throw new System.Exception(
+                    $"Api Resource already exists tenant={tenantName}, apiResourceId={apiResourceId}");
             }
 
             var api = await query
@@ -432,9 +444,9 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .FirstOrDefaultAsync();
 
 
- 
+
             var entities = from t in api.Secrets
-                           select t;
+                select t;
             switch (sortType)
             {
                 case ApiResourceSecretsSortType.ExpirationDesc:
@@ -452,6 +464,113 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             }
 
             return entities;
+        }
+
+        public async Task UpsertClientAsync(string tenantName, ClientExtra entity)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.ClientId == entity.ClientId
+                select item;
+
+            var clientInDb = await query
+                .FirstOrDefaultAsync();
+
+            if (clientInDb != null)
+            {
+                _entityFrameworkMapperAccessor.MapperIgnoreBase.Map(entity, clientInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+            else
+            {
+                tenantContext.Clients.Add(entity);
+            }
+            await tenantContext.SaveChangesAsync();
+        }
+
+
+        public async Task<ClientExtra> GetClientByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.ClientId == name
+                select item;
+            var clientInDb = await query
+                .FirstOrDefaultAsync();
+            return clientInDb;
+        }
+
+        public async Task<ClientExtra> GetClientByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == id
+                select item;
+            var clientInDb = await query
+                .FirstOrDefaultAsync();
+            return clientInDb;
+        }
+
+        public async Task DeleteClientByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.ClientId == name
+                select item;
+            var clientInDb = await query
+                .FirstOrDefaultAsync();
+            if (clientInDb != null)
+            {
+                tenantContext.Clients.Remove(clientInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteClientByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == id
+                select item;
+            var clientInDb = await query
+                .FirstOrDefaultAsync();
+            if (clientInDb != null)
+            {
+                tenantContext.Clients.Remove(clientInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<PaginatedList<ClientExtra>> PageClientsAsync(string tenantName, int pageNumber, int pageSize, ClientsSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var entities = from t in tenantContext.Clients
+                select t;
+            switch (sortType)
+            {
+                case ClientsSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.ClientId);
+                    break;
+                case ClientsSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.ClientId);
+                    break;
+                case ClientsSortType.EnabledDesc:
+                    entities = entities.OrderByDescending(t => t.Enabled);
+                    break;
+                case ClientsSortType.EnabledAsc:
+                    entities = entities.OrderBy(t => t.Enabled);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<ClientExtra>
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
         }
     }
 }

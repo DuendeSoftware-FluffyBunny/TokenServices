@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         EnabledDesc,
         EnabledAsc
     }
-
+    public enum ClientsSortType
+    {
+        NameDesc,
+        NameAsc,
+        EnabledDesc,
+        EnabledAsc
+    }
     public enum ExternalServicesSortType
     {
         NameDesc,
@@ -69,10 +76,22 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         #endregion
 
+        #region ApiResourceSecrets
+
         Task UpsertApiResourceSecretAsync(string tenantName, int apiResourceId, ApiResourceSecret entity);
         Task<ApiResourceSecret> GetApiResourceSecretByIdAsync(string tenantName, int apiResourceId, int id);
         Task DeleteApiResourceBySecretIdAsync(string tenantName, int apiResourceId, int id);
-
         Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(string tenantName, int apiResourceId, ApiResourceSecretsSortType sortType);
+
+        #endregion
+
+        #region Clients
+        Task UpsertClientAsync(string tenantName, ClientExtra entity);
+        Task<ClientExtra> GetClientByNameAsync(string tenantName, string name);
+        Task<ClientExtra> GetClientByIdAsync(string tenantName, int id);
+        Task DeleteClientByNameAsync(string tenantName, string name);
+        Task DeleteClientByIdAsync(string tenantName, int id);
+        Task<PaginatedList<ClientExtra>> PageClientsAsync(string tenantName, int pageNumber, int pageSize, ClientsSortType sortType);
+        #endregion
     }
 }

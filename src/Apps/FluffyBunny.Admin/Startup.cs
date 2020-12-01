@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Options;
+using FluffyBunny.Admin.AutoMapper;
 using FluffyBunny.Admin.Model;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
@@ -49,6 +50,14 @@ namespace FluffyBunny.Admin
         {
             try
             {
+                var mapperOneToOne = MapperConfigurationBuilder.BuidOneToOneMapper;
+                var mapperIgnoreBase = MapperConfigurationBuilder.BuidIgnoreBaseMapper;
+                services.AddSingleton<IInputModelMapperAccessor>(new InputModelMapperAccessor
+                {
+                    MapperOneToOne = mapperOneToOne,
+                    MapperIgnoreBase = mapperIgnoreBase
+                });
+               
                 services.AddPasswordGenerator();
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<IPagingHelper, PagingHelper>();

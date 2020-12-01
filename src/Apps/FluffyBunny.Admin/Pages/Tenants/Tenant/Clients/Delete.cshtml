@@ -1,27 +1,29 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices.DeleteModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.DeleteModel
 @{
-    ViewData["Title"] = "Delete External Service";
+    ViewData["Title"] = "Delete Client";
 }
-
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
-        <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">External Services</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">Clients</a></li>
+
         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
     </ol>
 </nav>
+
 <form method="post">
     <div class="card">
         <div class="card-header">
-            Delete External Service
+            Delete Client
         </div>
         <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="Input.Id" class="form-control" />
         <div id="cardBodyId">
 
             <div class="card-body">
-             
+
                 <div class="form-group">
                     <table class="table">
 
@@ -32,35 +34,34 @@
                                 <td class="w-50">
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Enabled" />
+                                    <input disabled asp-for="Input.Enabled" />
                                     <label>Enabled</label>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Name)
+                                    @nameof(Model.Input.ClientId)
                                 </td>
                                 <td class="w-50">
-                                    <input hidden asp-for="Entity.Name" class="form-control" />
-                                    @Model.Entity.Name
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="w-50">
-                                    @nameof(Model.Entity.Description)
-                                </td>
-                                <td class="w-50">
-                                    <input disabled asp-for="Entity.Description" class="form-control" />
-                                    
+                                    @Model.Input.ClientId
                                 </td>
                             </tr>
                             <tr>
                                 <td class="w-50">
-                                    @nameof(Model.Entity.Authority)
+                                    @nameof(Model.Input.Description)
                                 </td>
                                 <td class="w-50">
-                                    <input disabled asp-for="Entity.Authority" class="form-control" />
-                                   
+                                    <input disabled asp-for="Input.Description" class="form-control" />
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.ClientName)
+                                </td>
+                                <td class="w-50">
+                                    <input disabled asp-for="Input.ClientName" class="form-control" />
+
                                 </td>
                             </tr>
                         <tbody>

@@ -1,0 +1,271 @@
+﻿@page
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.AddModel
+@{
+    ViewData["Title"] = "Add Client";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">Clients</a></li>
+
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+
+<form method="post">
+    <div class="card">
+        <div class="card-header">
+            Add Client
+        </div>
+        <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="Input.ClientId" class="form-control" />
+        <div id="cardBodyId">
+
+            <div class="card-body">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <table class="table">
+
+                        <tbody>
+
+                            <tr>
+
+                                <td class="w-50">
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.Enabled" />
+                                    <label>Enabled</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.ClientId)
+                                </td>
+                                <td class="w-50">
+                                    @Model.Input.ClientId
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.RequireClientSecret"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.RequireClientSecret" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.ClientName)
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.ClientName" class="form-control" />
+                                    <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.Description)
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.Description" class="form-control" />
+                                    <span asp-validation-for="Input.Description" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    @nameof(Model.Input.ProtocolType)
+                                </td>
+                                <td class="w-50">
+                                    <input hidden asp-for="Input.ProtocolType" class="form-control" />
+                                    <input disabled asp-for="Input.ProtocolType" class="form-control" />
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.AccessTokenType"></label>
+                                </td>
+                                <td class="w-50">
+                                    @foreach (var accessTokenType in Model.Input.AccessTokenTypes)
+                                    {
+                                        <input type="radio" asp-for="Input.AccessTokenType" value="@accessTokenType" /> @accessTokenType<br />
+                                    }
+                                    <span asp-validation-for="Input.AccessTokenType" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.AccessTokenLifetime"></label>
+                                </td>
+                                <td class="w-50">
+
+                                    <input asp-for="Input.AccessTokenLifetime" class="form-control" />
+                                    <span asp-validation-for="Input.AccessTokenLifetime" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.IdentityTokenLifetime"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.IdentityTokenLifetime" class="form-control" />
+                                    <span asp-validation-for="Input.IdentityTokenLifetime" class="text-danger"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.IncludeClientId"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.IncludeClientId" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.IncludeJwtId"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.IncludeJwtId" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.IncludeAmr"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.IncludeAmr" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.AllowGlobalSubjectRevocation"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.AllowGlobalSubjectRevocation" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">
+                                    <label asp-for="Input.AlwaysSendClientClaims"></label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="Input.AlwaysSendClientClaims" />
+                                    <label>Enable</label>
+                                </td>
+                            </tr>
+
+                        <thead>
+                            <tr>
+                                <th colspan="2">Refresh Token Settings</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Input.AllowOfflineAccess"></label>
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.AllowOfflineAccess" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Input.RefreshTokenUsage"></label>
+                            </td>
+                            <td class="w-50">
+                                @foreach (var refreshTokenUsage in Model.Input.RefreshTokenUsages)
+                                {
+                                    <input type="radio" asp-for="Input.RefreshTokenUsage" value="@refreshTokenUsage" /> @refreshTokenUsage<br />
+                                }
+                                <span asp-validation-for="Input.RefreshTokenUsage" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Input.RequireRefreshClientSecret"></label>
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.RequireRefreshClientSecret" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.AbsoluteRefreshTokenLifetime)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.AbsoluteRefreshTokenLifetime" class="form-control" />
+                                <span asp-validation-for="Input.AbsoluteRefreshTokenLifetime" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.SlidingRefreshTokenLifetime)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.SlidingRefreshTokenLifetime" class="form-control" />
+                                <span asp-validation-for="Input.SlidingRefreshTokenLifetime" class="text-danger"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Input.RefreshTokenExpiration"></label>
+                            </td>
+                            <td class="w-50">
+                                @foreach (var refreshTokenExpiration in Model.Input.RefreshTokenExpirations)
+                                {
+                                    <input type="radio" asp-for="Input.RefreshTokenExpiration" value="@refreshTokenExpiration" /> @refreshTokenExpiration<br />
+                                }
+                                <span asp-validation-for="Input.RefreshTokenExpiration" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Input.RefreshTokenGraceEnabled"></label>
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.RefreshTokenGraceEnabled" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.RefreshTokenGraceMaxAttempts)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.RefreshTokenGraceMaxAttempts" class="form-control" />
+                                <span asp-validation-for="Input.RefreshTokenGraceMaxAttempts" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.RefreshTokenGraceTTL)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.RefreshTokenGraceTTL" class="form-control" />
+                                <span asp-validation-for="Input.RefreshTokenGraceTTL" class="text-danger"></span>
+                            </td>
+                        </tr>
+
+                        <tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+}
