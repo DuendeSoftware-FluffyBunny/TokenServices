@@ -61,7 +61,7 @@ namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
-            return RedirectToPage("./ManageApiResources");
+            return RedirectToPage("./Index");
         }
     }
 }

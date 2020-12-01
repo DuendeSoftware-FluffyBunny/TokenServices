@@ -110,7 +110,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
         public async Task<IActionResult> OnPostSwitchAsync(string tenantName)
         {
             _sessionTenantAccessor.TenantId = tenantName;
-            return RedirectToPage("/Tenant/Index");
+            return RedirectToPage("/Tenants/Tenant/Index");
         }
         public async Task<IActionResult> OnPostPageSizeAsync( )
         {

@@ -8,7 +8,7 @@
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
         @if (!string.IsNullOrWhiteSpace(Model.TenantId))
         {
-            <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenant/Index">@Model.TenantId</a></li>
+            <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
 
         }
         else

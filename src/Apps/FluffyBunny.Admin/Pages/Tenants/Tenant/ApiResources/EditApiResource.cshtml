@@ -1,13 +1,13 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenant.ApiResources.AddApiResourceModel
+@model FluffyBunny.Admin.Pages.Tenant.ApiResources.EditApiResourceModel
 @{
-    ViewData["Title"] = "Add Api Resource";
+    ViewData["Title"] = "Edit Api Resource";
 }
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
-        <li class="breadcrumb-item"><a asp-area="" asp-page="./Index">@Model.TenantId</a></li>
-        <li class="breadcrumb-item"><a asp-area="" asp-page="./ManageApiResources">Api Resources</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/ApiResources/Index">Api Resources</a></li>
 
         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
     </ol>
@@ -16,9 +16,10 @@
 <form method="post">
     <div class="card">
         <div class="card-header">
-            Add Api Resource
+            Edit Api Resource
         </div>
         <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="Input.Id" class="form-control" />
         <div id="cardBodyId">
 
             <div class="card-body">
@@ -55,14 +56,14 @@
                                     <span asp-validation-for="Input.Description" class="text-danger"></span>
                                 </td>
                             </tr>
-                           
+
                         <tbody>
                     </table>
                 </div>
             </div>
         </div>
         <div class="card-footer text-muted">
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="submit" class="btn btn-primary">Update</button>
         </div>
     </div>
 </form>

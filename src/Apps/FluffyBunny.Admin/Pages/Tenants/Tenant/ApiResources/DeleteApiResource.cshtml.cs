@@ -59,7 +59,7 @@ namespace FluffyBunny.Admin.Pages.Tenant.ApiResources
                 return Page();
             }
 
-            return RedirectToPage("./ManageApiResources");
+            return RedirectToPage("./Index");
         }
     }
 }
