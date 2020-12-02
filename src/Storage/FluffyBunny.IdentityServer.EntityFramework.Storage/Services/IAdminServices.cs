@@ -38,6 +38,12 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         EnabledDesc,
         EnabledAsc
     }
+    public enum GrantTypesSortType
+    {
+        NameDesc,
+        NameAsc 
+    }
+     
     public enum SecretsSortType
     {
         DescriptionDesc,
@@ -94,10 +100,22 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<PaginatedList<ClientExtra>> PageClientsAsync(string tenantName, int pageNumber, int pageSize, ClientsSortType sortType);
         #endregion
 
+        #region ClientSecret
+
         Task UpsertClientSecretAsync(string tenantName, int clientId, ClientSecret entity);
         Task<ClientSecret> GetClientSecretByIdAsync(string tenantName, int clientId, int id);
         Task DeleteClientSecretByIdAsync(string tenantName, int clientId, int id);
-        Task<IEnumerable<ClientSecret>> GetAllClientSecretsAsync(string tenantName, int id, SecretsSortType expirationAsc);
+        Task<IEnumerable<ClientSecret>> GetAllClientSecretsAsync(string tenantName, int id, SecretsSortType sortType);
 
+        #endregion
+
+        #region ClientAllowedGrants
+        Task UpsertClientAllowedGrantTypesAsync(string tenantName, int clientId, ClientGrantType entity);
+        Task<ClientGrantType> GetClientGrantTypeByIdAsync(string tenantName, int clientId, int id);
+        Task DeleteClientGrantTypByIdAsync(string tenantName, int clientId, int id);
+        Task<IEnumerable<ClientGrantType>> GetAllClientAllowedGrantTypesAsync(string tenantName, int id, GrantTypesSortType sortType);
+
+
+        #endregion
     }
 }

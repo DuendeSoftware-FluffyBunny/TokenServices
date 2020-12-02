@@ -9,10 +9,9 @@ using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny4.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.Secrets
 {
     public class AddModel : PageModel
     {

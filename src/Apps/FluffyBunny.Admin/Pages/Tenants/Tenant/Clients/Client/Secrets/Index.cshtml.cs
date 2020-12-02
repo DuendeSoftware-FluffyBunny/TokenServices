@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.Secrets
 {
     public class IndexModel : PageModel
     {
@@ -27,7 +27,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
 
         [BindProperty]
         public string TenantId { get; set; }
-        public int ApiResourceId { get; private set; }
+        public int ClientId { get; private set; }
         
 
         [ViewData]
@@ -43,7 +43,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
         public async Task OnGetAsync(int id, SecretsSortType sortOrder)
         {
             TenantId = _sessionTenantAccessor.TenantId;
-            ApiResourceId = id;
+            ClientId = id;
             switch (sortOrder)
             {
 

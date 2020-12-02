@@ -276,6 +276,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Name == name);
             return entityInDb;
         }
@@ -285,6 +286,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
             return entityInDb;
         }
@@ -498,6 +500,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 where item.ClientId == name
                 select item;
             var clientInDb = await query
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
         }
@@ -510,6 +513,10 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 where item.Id == id
                 select item;
             var clientInDb = await query
+                .Include(x => x.ClientSecrets)
+                .Include(x => x.AllowedGrantTypes)
+                .Include(x => x.Claims)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
         }
@@ -613,6 +620,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
             var client = await query
                 .Include(x => x.ClientSecrets)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             if (client == null)
@@ -672,7 +680,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             if (client == null)
             {
                 throw new System.Exception(
-                    $"Client doesnot exist tenant={tenantName}, id={id}");
+                    $"Client does not exist tenant={tenantName}, id={id}");
             }
 
             var entities = from t in client.ClientSecrets
@@ -690,6 +698,133 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                     break;
                 case SecretsSortType.DescriptionAsc:
                     entities = entities.OrderBy(t => t.Description);
+                    break;
+            }
+
+            return entities;
+        }
+
+        public async Task UpsertClientAllowedGrantTypesAsync(string tenantName, int clientId, ClientGrantType entity)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.AllowedGrantTypes)
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+
+            var entityInDb = client.AllowedGrantTypes.FirstOrDefault(x => x.GrantType == entity.GrantType);
+            if (entityInDb != null && entityInDb.Id != entity.Id)
+            {
+                // we need to delete the ID as we are attempting to change a grant type to one that already exits.
+                entityInDb = client.AllowedGrantTypes.FirstOrDefault(x => x.Id == entity.Id);
+                if (entityInDb != null)
+                {
+                    client.AllowedGrantTypes.Remove(entityInDb);
+                    await tenantContext.SaveChangesAsync();
+                    return;
+                }
+            }
+
+            entityInDb = client.AllowedGrantTypes.FirstOrDefault(x => x.Id == entity.Id);
+            if (entityInDb != null)
+            {
+                entityInDb.GrantType = entity.GrantType;
+            }
+            else
+            {
+                client.AllowedGrantTypes.Add(entity);
+            }
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<ClientGrantType> GetClientGrantTypeByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.AllowedGrantTypes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+
+            return client.AllowedGrantTypes.FirstOrDefault(x => x.Id == id);
+
+        }
+
+        public async Task DeleteClientGrantTypByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == clientId
+                select item;
+
+            var client = await query
+                .Include(x => x.AllowedGrantTypes)
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, clientId={clientId}");
+            }
+
+            var entityInDb = client.AllowedGrantTypes.FirstOrDefault(x => x.Id == id);
+            if (entityInDb != null)
+            {
+                client.AllowedGrantTypes.Remove(entityInDb);
+            }
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ClientGrantType>> GetAllClientAllowedGrantTypesAsync(string tenantName, int id, GrantTypesSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var query =
+                from item in tenantContext.Clients
+                where item.Id == id
+                select item;
+
+            var client = await query
+                .Include(x => x.AllowedGrantTypes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                throw new System.Exception(
+                    $"Client does not exist tenant={tenantName}, id={id}");
+            }
+
+            var entities = from t in client.AllowedGrantTypes
+                select t;
+            switch (sortType)
+            {
+                case GrantTypesSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.GrantType);
+                    break;
+                case GrantTypesSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.GrantType);
                     break;
             }
 

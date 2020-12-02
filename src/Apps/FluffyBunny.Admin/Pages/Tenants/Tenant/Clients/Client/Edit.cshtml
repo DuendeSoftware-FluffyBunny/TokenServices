@@ -1,5 +1,5 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.EditModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.EditModel
 @{
     ViewData["Title"] = "Edit Client";
 }
@@ -19,6 +19,7 @@
             Add Client
         </div>
         <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="Input.Id" class="form-control" />
         <input hidden asp-for="Input.ClientId" class="form-control" />
         <div id="cardBodyId">
 

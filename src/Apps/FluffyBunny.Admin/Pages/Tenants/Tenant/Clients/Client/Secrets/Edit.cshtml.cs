@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.Secrets
 {
     public class EditModel : PageModel
     {

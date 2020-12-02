@@ -62,7 +62,9 @@ namespace FluffyBunny.Admin
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<IPagingHelper, PagingHelper>();
 
-               var appOptions = Configuration
+                services.Configure<IdentityServerDefaultOptions>(Configuration.GetSection("IdentityServerDefaultOptions"));
+
+                var appOptions = Configuration
                     .GetSection("AppOptions")
                     .Get<AppOptions>();
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));

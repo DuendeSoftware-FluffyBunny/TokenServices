@@ -1,16 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models;
 using FluffyBunny.Admin.Services;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client
 {
     public class DeleteModel : PageModel
     {
@@ -59,7 +56,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients
                 return Page();
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("../Index");
         }
     }
 }

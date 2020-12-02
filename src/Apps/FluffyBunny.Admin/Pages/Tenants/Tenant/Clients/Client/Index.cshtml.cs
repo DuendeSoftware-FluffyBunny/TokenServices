@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Duende.IdentityServer.Models;
 using FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
@@ -11,21 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client
 {
-    public class EditModel : PageModel
+    public class IndexModel : PageModel
     {
         private static string GuidS => Guid.NewGuid().ToString();
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private IInputModelMapperAccessor _inputModelMapperAccessor;
-        private ILogger<EditModel> _logger;
+        private ILogger<IndexModel> _logger;
 
-        public EditModel(
+        public IndexModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
             IInputModelMapperAccessor inputModelMapperAccessor,
-            ILogger<EditModel> logger)
+            ILogger<IndexModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
@@ -34,30 +33,14 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients
         }
         [BindProperty]
         public string TenantId { get; set; }
-
-        [BindProperty]
-        public ClientExtraInputModel Input { get; set; }
+        public ClientExtra Entity { get; set; }
+       
 
         public async Task OnGetAsync(int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
-            var entity = await _adminServices.GetClientByIdAsync(TenantId, id);
-            Input = _inputModelMapperAccessor.MapperIgnoreBase.Map<ClientExtraInputModel>(entity);
-        }
-        public async Task<IActionResult> OnPostAsync()
-        {
-            try
-            {
-
-                var entity = _inputModelMapperAccessor.MapperIgnoreBase.Map<ClientExtra>(Input);
-                await _adminServices.UpsertClientAsync(TenantId, entity);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return Page();
-            }
-            return RedirectToPage("./Index");
+            Entity = await _adminServices.GetClientByIdAsync(TenantId, id);
+ 
         }
     }
 }

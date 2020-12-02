@@ -21,4 +21,8 @@
     <ProjectReference Include="..\FluffyBunny4\FluffyBunny4.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Tenants\Tenant\Clients\Client\Claims\" />
+  </ItemGroup>
+
 </Project>
