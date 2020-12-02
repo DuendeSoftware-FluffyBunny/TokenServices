@@ -1,0 +1,50 @@
+[
+  {
+    "id": "798e1d16-5cd9-4531-9bf6-919584d62280",
+    "_schemaType": "apiScopeHandle:v1",
+    "tenantId": "zeke",
+    "required": true,
+    "emphasize": true,
+    "enabled": true,
+    "name": "api1",
+    "displayName": "Api1 Display Name",
+    "description": "Api1 Description",
+    "showInDiscoveryDocument": true,
+    "userClaims": [ "claim1" ],
+    "properties": {
+      "a": "b"
+    }
+  },
+  {
+    "id": "03fcf790-1e97-44b9-bdb6-f7615aabca6e",
+    "_schemaType": "apiScopeHandle:v1",
+    "tenantId": "herb",
+    "required": true,
+    "emphasize": true,
+    "enabled": true,
+    "name": "api1",
+    "displayName": "Api1 Display Name",
+    "description": "Api1 Description",
+    "showInDiscoveryDocument": true,
+    "userClaims": [ "claim2" ],
+    "properties": {
+      "b": "c"
+    }
+  },
+  {
+    "id": "904b0472-fc7a-406d-9aa5-84bd6b45bdee",
+    "_schemaType": "apiScopeHandle:v1",
+    "tenantId": "herb",
+    "required": true,
+    "emphasize": true,
+    "enabled": true,
+    "name": "api2",
+    "displayName": "api2 Display Name",
+    "description": "api2 Description",
+    "showInDiscoveryDocument": true,
+    "userClaims": [ "claim2" ],
+    "properties": {
+      "b": "c"
+    }
+  }
+]

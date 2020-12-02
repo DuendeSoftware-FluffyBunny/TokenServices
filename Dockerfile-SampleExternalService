@@ -1,0 +1,15 @@
+﻿FROM mcr.microsoft.com/dotnet/runtime:5.0
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+ 
+FROM fluffybunny4/build AS build
+WORKDIR /src
+RUN dotnet publish  ./src/Apps/SampleExternalService -c Release -o /out --no-restore --no-build
+RUN ls
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /out .
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+ENTRYPOINT ["dotnet", "SampleExternalService.dll"]

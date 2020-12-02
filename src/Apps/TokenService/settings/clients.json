@@ -1,0 +1,74 @@
+[
+  {
+    "refreshTokenGraceEnabled": true,
+    "refreshTokenGraceTtl": 300,
+    "refreshTokenGraceMaxAttempts": 10,
+    "requireRefreshClientSecret": false,
+    "includeClientId": false,
+    "includeAmr": false,
+    "tenantId": "zeke",
+    "enabled": true,
+    "clientId": "roclient",
+    "clientSecrets": [
+      {
+        "value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol\/pe\/Unols=",
+        "type": "SharedSecret"
+      }
+    ],
+    "requireClientSecret": true,
+    "allowedGrantTypes": [
+      "client_credentials",
+      "arbitrary_token"
+    ],
+    "allowOfflineAccess": true,
+    "allowedScopes": [
+      "api1",
+      "api2",
+      "api4.with.roles"
+    ],
+    "accessTokenLifetime": 3600,
+    "absoluteRefreshTokenLifetime": 3600,
+    "refreshTokenUsage": 1,
+    "refreshTokenExpiration": 1,
+    "protocolType": "oidc",
+    "accessTokenType": 0,
+    "includeJwtId": true,
+    "identityTokenLifetime": 30
+  },
+  {
+    "refreshTokenGraceEnabled": true,
+    "refreshTokenGraceTtl": 300,
+    "refreshTokenGraceMaxAttempts": 10,
+    "requireRefreshClientSecret": false,
+    "includeClientId": false,
+    "includeAmr": false,
+    "tenantId": "herb",
+    "enabled": true,
+    "clientId": "roclient",
+    "clientSecrets": [
+      {
+        "value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol\/pe\/Unols=",
+        "type": "SharedSecret"
+      }
+    ],
+    "requireClientSecret": true,
+    "allowedGrantTypes": [
+      "client_credentials",
+      "arbitrary_token"
+    ],
+    "allowOfflineAccess": true,
+    "allowedScopes": [
+      "api1",
+      "api2",
+      "api4.with.roles"
+    ],
+    "accessTokenLifetime": 3600,
+    "absoluteRefreshTokenLifetime": 3600,
+    "refreshTokenUsage": 1,
+    "refreshTokenExpiration": 1,
+    "protocolType": "oidc",
+    "accessTokenType": 0,
+    "includeJwtId": true,
+    "identityTokenLifetime": 30
+  }
+]

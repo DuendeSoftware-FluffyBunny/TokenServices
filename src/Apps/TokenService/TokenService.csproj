@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>8c367684-ed5b-44df-9aef-da65fce0f581</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CorrelationId" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0" NoWarn="NU1605" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.0" NoWarn="NU1605" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Storage\FluffyBunny.IdentityServer.EntityFramework.Storage\FluffyBunny.IdentityServer.EntityFramework.Storage.csproj" />
+    <ProjectReference Include="..\FluffyBunny4.Azure\FluffyBunny4.Azure.csproj" />
+    <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
+    <ProjectReference Include="..\FluffyBunny4\FluffyBunny4.csproj" />
+  </ItemGroup>
+
+</Project>

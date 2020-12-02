@@ -4,9 +4,11 @@ using System.Text;
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Interfaces;
 using Duende.IdentityServer.EntityFramework.Options;
+using Duende.IdentityServer.Stores;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -40,7 +42,74 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
             return services;
         }
 
- 
+        public static IIdentityServerBuilder AddEntityFrameworkStores(
+            this IIdentityServerBuilder builder)
+        {
+            builder.AddEntityFrameworkResourceStore();
+            builder.AddEntityFrameworkClientStore();
+            builder.AddEntityFrameworkTenantStore();
+            builder.AddEntityFrameworkExternalServicesStore();
+            return builder;
+        }
+        public static IIdentityServerBuilder AddEntityFrameworkExternalServicesStore(
+            this IIdentityServerBuilder builder)
+        {
+            builder.Services.AddEntityFrameworkExternalServicesStore();
+            return builder;
+        }
+        public static IServiceCollection AddEntityFrameworkExternalServicesStore(
+            this IServiceCollection services)
+        {
+            services.AddExternalServicesStoreCache<EntityFrameworkExternalServicesStore>();
+            return services;
+        }
+        public static IIdentityServerBuilder AddEntityFrameworkResourceStore(
+            this IIdentityServerBuilder builder)
+        {
+            return builder.AddResourceStoreCache<EntityFrameworkResourceStore>();
+        }
+        public static IServiceCollection AddEntityFrameworkResourceStore(
+            this IServiceCollection services)
+        {
+            return services.AddResourceStoreCache<EntityFrameworkResourceStore>();
+        }
+        public static IServiceCollection AddResourceStoreCache<T>(this IServiceCollection services)
+            where T : IResourceStore
+        {
+            services.TryAddTransient(typeof(T));
+            services.AddTransient<IResourceStore, CachingResourceStore<T>>();
+            return services;
+        }
+        public static IIdentityServerBuilder AddEntityFrameworkTenantStore(
+            this IIdentityServerBuilder builder)
+        {
+            builder.Services.AddEntityFrameworkTenantStore();
+            return builder;
+        }
+        public static IServiceCollection AddEntityFrameworkTenantStore(
+            this IServiceCollection services)
+        {
+            services.AddTenantStoreCache<EntityFrameworkTenantStore>();
+            return services;
+        }
+        public static IIdentityServerBuilder AddEntityFrameworkClientStore(
+            this IIdentityServerBuilder builder)
+        {
+            return builder.AddClientStoreCache<EntityFrameworkClientStore>();
+        }
+        public static IServiceCollection AddEntityFrameworkClientStore(
+            this IServiceCollection services)
+        {
+            return services.AddClientStoreCache<EntityFrameworkClientStore>();
+        }
+        public static IServiceCollection AddClientStoreCache<T>(this IServiceCollection services)
+            where T : IClientStore
+        {
+            services.TryAddTransient(typeof(T));
+            services.AddTransient<IClientStore, CachingClientStore<T>>();
+            return services;
+        }
+
         public static IServiceCollection AddDbContextTenantServices(this IServiceCollection services)
         {
             services.AddScoped<IAdminServices, AdminServices>();

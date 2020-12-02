@@ -61,7 +61,7 @@ namespace FluffyBunny.Admin
                 services.AddPasswordGenerator();
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<IPagingHelper, PagingHelper>();
-
+              
                 services.Configure<IdentityServerDefaultOptions>(Configuration.GetSection("IdentityServerDefaultOptions"));
 
                 var appOptions = Configuration

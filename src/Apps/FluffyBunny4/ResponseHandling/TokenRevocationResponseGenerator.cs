@@ -38,7 +38,7 @@ namespace FluffyBunny4.ResponseHandling
         public TokenRevocationResponseGenerator(
             IPersistedGrantStore persistedGrantStore,
             IBackgroundTaskQueue<Delete> taskQueueDelete,
-            TokenRevocationResponseGenerator idsTokenRevocationResponseGenerator,
+            Duende.IdentityServer.ResponseHandling.TokenRevocationResponseGenerator idsTokenRevocationResponseGenerator,
             ILogger<TokenRevocationResponseGenerator> logger)
         {
             _persistedGrantStore = persistedGrantStore;

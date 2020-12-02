@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Apps\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
+    <ProjectReference Include="..\..\Apps\FluffyBunny4\FluffyBunny4.csproj" />
   </ItemGroup>
 
   <ItemGroup>

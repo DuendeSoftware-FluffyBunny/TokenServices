@@ -60,7 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
             this IIdentityServerBuilder builder)
         {
             builder.Services.RemoveAll<ITokenRevocationResponseGenerator>();
-            builder.Services.AddTransient<TokenRevocationResponseGenerator>();
+            builder.Services.AddTransient<Duende.IdentityServer.ResponseHandling.TokenRevocationResponseGenerator>();
             builder.Services.TryAddTransient<ITokenRevocationResponseGenerator, FluffyBunny4.ResponseHandling.TokenRevocationResponseGenerator>();
             builder.Services.AddBackgroundServices<FluffyBunny4.ResponseHandling.TokenRevocationResponseGenerator.Delete>();
             return builder;

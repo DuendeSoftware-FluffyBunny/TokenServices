@@ -1,0 +1,49 @@
+[
+  {
+    "id": "3bbb48ba-92e4-40b1-b317-6aa339813e98",
+    "_schemaType": "apiResourceHandle:v1",
+    "tenantId": "zeke",
+    "apiSecrets": [
+      {
+        "value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol\/pe\/Unols=",
+        "type": "SharedSecret"
+      }
+    ],
+    "scopes": [ "090304ea0b50469bb6c99e23bca17ac6", "0b6f9b7337074075b7129e28d3317144" ],
+    "allowedAccessTokenSigningAlgorithms": [ "c42aa474ab5d457bbb4c100f14e1ea99", "3e50cfc9c83d4d4e92dd85a0df97fc96" ],
+    "enabled": true,
+    "name": "api1",
+    "displayName": "Api1 Display Name",
+    "description": "Api1 Description",
+    "showInDiscoveryDocument": true,
+    "userClaims": [ "ff2abe930bd14e1eb42a82e5d62f41c2", "32172e47a77a49cbaaef35197c902100" ],
+    "properties": {
+      "a": "28d60237d672450bae7a5975731681db",
+      "b": "470d1ee904724cf284b67e4d781fdfec"
+    }
+  },
+  {
+    "id": "82e874b2-b48b-4a6f-a269-2e577f8bb4e8",
+    "_schemaType": "apiResourceHandle:v1",
+    "tenantId": "herb",
+    "apiSecrets": [
+      {
+        "value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol\/pe\/Unols=",
+        "type": "SharedSecret"
+      }
+    ],
+    "scopes": [ "090304ea0b50469bb6c99e23bca17ac6", "0b6f9b7337074075b7129e28d3317144" ],
+    "allowedAccessTokenSigningAlgorithms": [ "c42aa474ab5d457bbb4c100f14e1ea99", "3e50cfc9c83d4d4e92dd85a0df97fc96" ],
+    "enabled": true,
+    "name": "api1",
+    "displayName": "Api1 Display Name",
+    "description": "Api1 Description",
+    "showInDiscoveryDocument": true,
+    "userClaims": [ "ff2abe930bd14e1eb42a82e5d62f41c2", "32172e47a77a49cbaaef35197c902100" ],
+    "properties": {
+      "a": "28d60237d672450bae7a5975731681db",
+      "b": "470d1ee904724cf284b67e4d781fdfec"
+    }
+  }
+]
+

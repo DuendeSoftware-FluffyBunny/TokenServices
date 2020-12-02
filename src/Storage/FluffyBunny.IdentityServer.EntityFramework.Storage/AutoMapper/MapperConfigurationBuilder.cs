@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using AutoMapper;
-using Duende.IdentityServer.EntityFramework.Entities;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
 using FluffyBunny4.DotNetCore.Extensions;
+ 
 
 namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
 {
@@ -13,13 +12,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
         public static IMapper BuidIgnoreBaseMapper => BuidIgnoreBaseMapperConfiguration.CreateMapper();
         public static MapperConfiguration BuidIgnoreBaseMapperConfiguration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ExternalService, ExternalService>()
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService>()
                 .Ignore(record => record.Id);
 
-            cfg.CreateMap<Tenant, Tenant>()
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant>()
                 .Ignore(record => record.Id);
 
-            cfg.CreateMap<ClientExtra, ClientExtra>()
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>()
                 .Ignore(record => record.Id)
                 .Ignore(record => record.ClientSecrets)
                 .Ignore(record => record.AllowedGrantTypes)
@@ -31,7 +30,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                 .Ignore(record => record.AllowedCorsOrigins)
                 .Ignore(record => record.Properties);
 
-            cfg.CreateMap<ApiResource, ApiResource>()
+            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource, Duende.IdentityServer.EntityFramework.Entities.ApiResource>()
                 .Ignore(record => record.Id)
                 .Ignore(record => record.Properties)
                 .Ignore(record => record.Scopes)
@@ -43,10 +42,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
         public static IMapper BuidOneToOneMapper => BuidOneToOneMapperConfiguration.CreateMapper();
         public static MapperConfiguration BuidOneToOneMapperConfiguration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<ExternalService, ExternalService>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService, FluffyBunny4.Models.ExternalService>();
 
-            cfg.CreateMap<Tenant, Tenant>();
-            cfg.CreateMap<ClientExtra, ClientExtra>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant, FluffyBunny4.Models.TenantHandle>();
+
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny4.Models.ClientExtra>();
+
+
+            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource, Duende.IdentityServer.EntityFramework.Entities.ApiResource>();
+            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource, Duende.IdentityServer.Models.ApiResource>();
 
         });
     }

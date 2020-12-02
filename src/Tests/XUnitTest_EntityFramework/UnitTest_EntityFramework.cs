@@ -50,22 +50,7 @@ namespace XUnitTest_EntityFramework
             }
         }
       
-        [Fact]
-        public async Task Ensure_ITenantAwareDbContextAccessor_ensure_database_Async()
-        {
-            var serviceProvider = _factory.Server.Services;
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var sp = scope.ServiceProvider;
-                var tenantAwareDbContextAccessor = sp.GetRequiredService<ITenantAwareConfigurationDbContextAccessor>();
-                tenantAwareDbContextAccessor.Should().NotBeNull();
-                var tenantContext = tenantAwareDbContextAccessor.GetTenantAwareConfigurationDbContext("test2");
-                tenantContext.Should().NotBeNull();
-                var  result = await tenantContext.DbContext.Database.EnsureCreatedAsync();
-                result.Should().BeTrue();
-
-            }
-        }
+         
         [Fact]
         public async Task Ensure_ITenantAwareDbContextAccessor_create_client_Async()
         {
@@ -100,8 +85,7 @@ namespace XUnitTest_EntityFramework
                 var sp = scope.ServiceProvider;
                 var mainEntityCoreContext = sp.GetRequiredService<IMainEntityCoreContext>();
                 mainEntityCoreContext.Should().NotBeNull(); 
-                await mainEntityCoreContext.DbContext.Database.MigrateAsync();
-
+          
                 var tenantEntity = new Tenant()
                 {
                     Name = "bob",

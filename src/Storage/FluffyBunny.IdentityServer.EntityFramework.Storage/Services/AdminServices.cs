@@ -113,7 +113,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Name == tenantId);
         }
-
+        public async Task<List<ExternalService>> GetAllExternalServicesAsync(string tenantName)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entities = from t in tenantContext.ExternalServices
+                select t;
+            return entities.ToList();
+        }
         public async Task<PaginatedList<ExternalService>> PageExternalServicesAsync(
             string tenantName, int pageNumber, int pageSize, ExternalServicesSortType sortType)
         {
@@ -201,7 +207,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
             await tenantContext.SaveChangesAsync();
         }
+        public async Task<List<ApiResource>> GetAllApiResourcesAsync(string tenantName)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entities = from t in tenantContext.ApiResources
+                select t;
+            return entities.ToList();
+        }
 
+        public Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName)
+        {
+            throw new NotImplementedException();
+        }
         public async Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber,
             int pageSize,
             ApiResourcesSortType sortType)
@@ -504,7 +521,21 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .FirstOrDefaultAsync();
             return clientInDb;
         }
-
+        public async Task<ClientExtra> GetClientByClientIdAsync(string tenantName, string clientId)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from item in tenantContext.Clients
+                where item.ClientId == clientId
+                select item;
+            var clientInDb = await query
+                .Include(x => x.ClientSecrets)
+                .Include(x => x.AllowedGrantTypes)
+                .Include(x => x.Claims)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            return clientInDb;
+        }
         public async Task<ClientExtra> GetClientByIdAsync(string tenantName, int id)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -830,5 +861,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
             return entities;
         }
+
+        
     }
 }

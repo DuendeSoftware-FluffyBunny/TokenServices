@@ -58,6 +58,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<IEnumerable<Tenant>> GetAllTenantsAsync();
         Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantsSortType sortType);
         Task<Tenant> GetTenantByNameAsync(string tenantId);
+    
         Task UpdateTenantAsync(Tenant tenant);
 
         #endregion
@@ -66,6 +67,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task UpsertExternalServiceAsync(string tenantName, ExternalService entity);
         Task<ExternalService> GetExternalServiceByNameAsync(string tenantName, string name);
         Task<ExternalService> GetExternalServiceByIdAsync(string tenantName, int id);
+        Task<List<ExternalService>> GetAllExternalServicesAsync(string tenantName);
         Task DeleteExternalServiceByNameAsync(string tenantName, string name);
         Task DeleteExternalServiceByIdAsync(string tenantName, int id);
         Task<PaginatedList<ExternalService>> PageExternalServicesAsync(string tenantName, int pageNumber, int pageSize, ExternalServicesSortType sortType);
@@ -79,12 +81,14 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task DeleteApiResourceByNameAsync(string tenantName, string name);
         Task DeleteApiResourceByIdAsync(string tenantName, int id);
         Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber, int pageSize, ApiResourcesSortType sortType);
-
+        Task<List<ApiResource>> GetAllApiResourcesAsync(string tenantName);
+        Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName);
         #endregion
 
         #region ApiResourceSecrets
 
         Task UpsertApiResourceSecretAsync(string tenantName, int apiResourceId, ApiResourceSecret entity);
+
         Task<ApiResourceSecret> GetApiResourceSecretByIdAsync(string tenantName, int apiResourceId, int id);
         Task DeleteApiResourceBySecretIdAsync(string tenantName, int apiResourceId, int id);
         Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(string tenantName, int apiResourceId, SecretsSortType sortType);
@@ -95,6 +99,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task UpsertClientAsync(string tenantName, ClientExtra entity);
         Task<ClientExtra> GetClientByNameAsync(string tenantName, string name);
         Task<ClientExtra> GetClientByIdAsync(string tenantName, int id);
+        Task<ClientExtra> GetClientByClientIdAsync(string tenantName, string clientId);
+
         Task DeleteClientByNameAsync(string tenantName, string name);
         Task DeleteClientByIdAsync(string tenantName, int id);
         Task<PaginatedList<ClientExtra>> PageClientsAsync(string tenantName, int pageNumber, int pageSize, ClientsSortType sortType);
@@ -117,5 +123,6 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
 
         #endregion
+
     }
 }

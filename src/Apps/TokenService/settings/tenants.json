@@ -1,0 +1,38 @@
+[
+  {
+    "id": "c4d4074b-4476-41ff-8a98-3d12a8452cdb",
+    "_schemaType": "tenant:v1",
+    "tenantId": "zeke",
+    "name": "zeke's Tenant",
+    "enabled": true,
+    "properties": {
+      "cosmos:operational:databaseName": "zeke-database",
+      "cosmos:operational:containerName": "zeke-operational",
+      "cosmos:clients:databaseName": "identityserver",
+      "cosmos:clients:containerName": "zeke-tenant",
+      "cosmos:apiResources:databaseName": "identityserver",
+      "cosmos:apiResources:containerName": "zeke-tenant",
+      "cosmos:apiScopes:databaseName": "identityserver",
+      "cosmos:apiScopes:containerName": "zeke-tenant"
+    }
+  },
+  {
+    "id": "fe4eb67a-cc17-4c16-a2f1-3aaaf88a1b45",
+    "_schemaType": "tenant:v1",
+    "tenantId": "herb",
+    "name": "herb's Tenant",
+    "enabled": true,
+    "properties": {
+      "cosmos:operational:databaseName": "herb-database",
+      "cosmos:operational:containerName": "herb-operational",
+      "cosmos:clients:databaseName": "identityserver",
+      "cosmos:clients:containerName": "herb-tenant",
+      "cosmos:apiResources:databaseName": "identityserver",
+      "cosmos:apiResources:containerName": "herb-tenant",
+      "cosmos:apiScopes:databaseName": "identityserver",
+      "cosmos:apiScopes:containerName": "herb-tenant"
+    }
+  }
+] 
+ 
+ 
