@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AutoMapper;
+using Duende.IdentityServer.Models;
 using FluffyBunny4.DotNetCore.Extensions;
  
 
@@ -48,12 +49,26 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
             cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant>();
             cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant, FluffyBunny4.Models.TenantHandle>();
 
+
+            
+            cfg.CreateMap< Duende.IdentityServer.EntityFramework.Entities.ClientSecret, Duende.IdentityServer.Models.Secret>();
+            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResourceSecret, Duende.IdentityServer.Models.Secret>();
+
+
             cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>();
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny4.Models.ClientExtra>();
+            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny4.Models.ClientExtra>()
+                .ForMember(dest => dest.AllowedGrantTypes, opt => opt.ConvertUsing(new ClientGrantTypeConverter()));
+
+                
 
 
             cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource, Duende.IdentityServer.EntityFramework.Entities.ApiResource>();
-            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource, Duende.IdentityServer.Models.ApiResource>();
+            cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource,
+                    Duende.IdentityServer.Models.ApiResource>(MemberList.Destination)
+                .ConstructUsing(src => new Duende.IdentityServer.Models.ApiResource())
+                .ForMember(x => x.ApiSecrets, opts => opts.MapFrom(x => x.Secrets));
+
+
 
         });
     }

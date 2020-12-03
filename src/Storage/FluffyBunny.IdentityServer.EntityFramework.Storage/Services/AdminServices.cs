@@ -210,9 +210,17 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         public async Task<List<ApiResource>> GetAllApiResourcesAsync(string tenantName)
         {
             var tenantContext = GetTenantContext(tenantName);
-            var entities = from t in tenantContext.ApiResources
+            var query = from t in tenantContext.ApiResources
                 select t;
-            return entities.ToList();
+
+            var apiResources = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
+                .ToListAsync();
+
+            return apiResources;
         }
 
         public Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName)
