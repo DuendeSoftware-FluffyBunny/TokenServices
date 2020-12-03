@@ -1,4 +1,52 @@
 ﻿@page
 @model FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.ApiResource.Scopes.Scope.DeleteModel
 @{
+    ViewData["Title"] = "Delete Api Resource Scope";
 }
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/ApiResources/Index">Api Resources</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/ApiResources/ApiResource/Index" asp-route-id="@Model.ApiResourceId">Api Resource</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/ApiResources/ApiResource/Scopes/Index" asp-route-id="@Model.ApiResourceId">Scopes</a></li>
+
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+
+<form method="post">
+    <div class="card">
+        <div class="card-header">
+            Add Api Resource Scope
+        </div>
+        <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="ApiResourceId" class="form-control" />
+        <input hidden asp-for="Input.Id" class="form-control" />
+        <input hidden asp-for="Input.PrependName" class="form-control" />
+
+        <div class="card-body">
+            <div class="form-group">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td class="w-50">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon3">@Model.Input.PrependName.</span>
+                                </div>
+                                <input disabled asp-for="Input.Scope" class="form-control" placeholder="subscope">
+                            </div>
+                        </td>
+                    </tr>
+                    <tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer text-muted">
+            <button type="submit" class="btn btn-primary" name="submit" value="Delete">Delete</button>
+            <button type="submit" class="btn btn-primary" name="submit" value="Cancel">Cancel</button>
+        </div>
+    </div>
+</form>

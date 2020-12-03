@@ -323,26 +323,42 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task<ApiResource> GetApiResourceByNameAsync(string tenantName, string name)
         {
-           
             name = name.ToLower();
-
             var tenantContext = GetTenantContext(tenantName);
-            var entityInDb = await tenantContext
-                .ApiResources
+
+            var query = from item in tenantContext.ApiResources
+                where item.Name == name
+                select item;
+            var apiResourceInDb = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Name == name);
-            return entityInDb;
+                .FirstOrDefaultAsync();
+
+
+            return apiResourceInDb;
+
         }
 
         public async Task<ApiResource> GetApiResourceByIdAsync(string tenantName, int id)
         {
 
             var tenantContext = GetTenantContext(tenantName);
-            var entityInDb = await tenantContext
-                .ApiResources
+            var query = from item in tenantContext.ApiResources
+                        where item.Id == id
+                        select item;
+            var apiResourceInDb = await query
+                .Include(x => x.Secrets)
+                .Include(x => x.Scopes)
+                .Include(x => x.UserClaims)
+                .Include(x => x.Properties)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
-            return entityInDb;
+                .FirstOrDefaultAsync();
+
+ 
+            return apiResourceInDb;
         }
 
         public async Task DeleteApiResourceByNameAsync(string tenantName, string name)

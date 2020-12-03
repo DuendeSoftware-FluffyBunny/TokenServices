@@ -48,20 +48,24 @@
                            
 
                             <td class="w-50">
-                                <div class="btn-group ">
+                                @if (entity.Scope.Contains('.'))
+                                {
+                                    <div class="btn-group ">
 
-                                    <a style="border-left-color: white;"
-                                       class="btn btn-primary btn-sm active "
-                                       role="button" aria-pressed="true"
-                                       asp-page="./Scope/Edit"
-                                       asp-route-apiResourceId="@Model.ApiResourceId"
-                                       asp-route-id="@entity.Id">Edit</a>
-                                    <a style="border-left-color: white;"
-                                       class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
-                                       asp-page="./Scope/Delete"
-                                       asp-route-apiResourceId="@Model.ApiResourceId"
-                                       asp-route-id="@entity.Id">Delete</a>
-                                </div>
+                                        <a style="border-left-color: white;"
+                                           class="btn btn-primary btn-sm active "
+                                           role="button" aria-pressed="true"
+                                           asp-page="./Scope/Edit"
+                                           asp-route-apiResourceId="@Model.ApiResourceId"
+                                           asp-route-id="@entity.Id">Edit</a>
+                                        <a style="border-left-color: white;"
+                                           class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
+                                           asp-page="./Scope/Delete"
+                                           asp-route-apiResourceId="@Model.ApiResourceId"
+                                           asp-route-id="@entity.Id">Delete</a>
+                                    </div>
+
+                                }
 
                             </td>
                         </tr>
