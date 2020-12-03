@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.ApiResource.Secrets
 {
     public class EditModel : PageModel
     {
@@ -39,18 +39,22 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
 
         [BindProperty]
         public SecretModel Input { get; set; }
-        public async Task OnGetAsync(int apiResourceId, int id)
+        public async Task<IActionResult> OnGetAsync(int apiResourceId, int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
             ApiResourceId = apiResourceId;
             SecretId = id;
             Secret = await _adminServices.GetApiResourceSecretByIdAsync(TenantId, ApiResourceId, SecretId);
-
+            if (Secret == null)
+            {
+                return RedirectToPage("./Index", new { id = ApiResourceId });
+            }
             Input = new SecretModel
             {
                CurrentExpiration = Secret.Expiration,
                SecretExpiration = SecretModel.ExpirationTypes.DoNotChange
             };
+            return Page();
         }
         public async Task<IActionResult> OnPostAsync()
         {

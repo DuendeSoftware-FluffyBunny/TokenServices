@@ -1,0 +1,68 @@
+﻿@page
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.ApiResource.IndexModel
+@{
+    ViewData["Title"] = "Api Resource";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/ApiResources/Index">Api Resources</a></li>
+
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header">
+        <a class="btn btn-sm btn-primary" asp-page="./Edit" asp-route-id="@Model.Entity.Id">Edit</a>
+        <a class="btn btn-sm btn-primary" asp-page="./Delete" asp-route-id="@Model.Entity.Id">Delete</a>
+        <a class="btn btn-sm btn-primary" asp-page="./Secrets/Index" asp-route-id="@Model.Entity.Id">Secrets</a>
+        <a class="btn btn-sm btn-primary" asp-page="./Scopes/Index" asp-route-id="@Model.Entity.Id">Scopes</a>
+ 
+    </div>
+    
+    <div id="cardBodyId">
+       
+        <div class="card-body">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <table class="table">
+
+                    <tbody>
+
+                        <tr>
+
+                            <td class="w-50">
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.Enabled" />
+                                <label>Enabled</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.Name)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.Name" class="form-control" />
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.Description)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.Description" class="form-control" />
+
+                            </td>
+                        </tr>
+
+                    <tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+     
+</div>

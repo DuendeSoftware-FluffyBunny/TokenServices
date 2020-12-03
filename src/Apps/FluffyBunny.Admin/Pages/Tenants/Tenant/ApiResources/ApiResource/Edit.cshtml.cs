@@ -1,26 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.ApiResource
 {
-    public class AddModel : PageModel
+    public class EditModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<AddModel> _logger;
+        private ILogger<EditModel> _logger;
 
-        public AddModel(
+        public EditModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<AddModel> logger)
+            ILogger<EditModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
@@ -32,6 +30,8 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources
         public class InputModel
         {
             [Required]
+            public int Id { get; set; }
+            [Required]
             public bool Enabled { get; set; }
             [Required]
             public string Name { get; set; }  // service name
@@ -40,48 +40,42 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
+            var entity = await _adminServices.GetApiResourceByIdAsync(TenantId, id);
+            if (entity == null)
+            {
+                return RedirectToPage("../Index");
+            }
+            Input = new InputModel()
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                Description = entity.Description,
+                Enabled = entity.Enabled
+            };
+            return Page();
         }
         public async Task<IActionResult> OnPostAsync()
         {
             try
             {
-                var existingEntity = await _adminServices.GetApiResourceByNameAsync(TenantId, Input.Name);
-                if (existingEntity != null)
-                {
-                    ModelState.AddModelError(string.Empty,$"ApiResource {Input.Name} already exists, please pick another name.");
-                    return Page();
-                }
                 var entity = new Duende.IdentityServer.EntityFramework.Entities.ApiResource()
                 {
+                    Id = Input.Id,
                     Name = Input.Name,
                     Description = Input.Description,
-                    Enabled = Input.Enabled,
-                    Scopes = new List<ApiResourceScope>()
-                    {
-                        new ApiResourceScope()
-                        {
-                            Scope = Input.Name
-                        }
-                    }
+                    Enabled = Input.Enabled
                 };
                 await _adminServices.UpsertApiResourceAsync(TenantId, entity);
-                var entityInDb = await _adminServices.GetApiResourceByNameAsync(TenantId, Input.Name);
-
-                await _adminServices.UpsertApiResourceScopeAsync(TenantId, entityInDb.Id, new ApiResourceScope()
-                {
-                    Scope = Input.Name
-                }); 
-                return RedirectToPage("./ApiResource/Index", new { id = entityInDb.Id});
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
-           
+            return RedirectToPage("./Index",new {id=Input.Id});
         }
     }
 }

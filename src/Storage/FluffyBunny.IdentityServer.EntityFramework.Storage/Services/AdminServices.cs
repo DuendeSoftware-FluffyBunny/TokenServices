@@ -55,8 +55,12 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             }
         }
 
-        ITenantAwareConfigurationDbContext GetTenantContext(string name) =>
-            _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
+        ITenantAwareConfigurationDbContext GetTenantContext(string name)
+        {
+            name = name.ToLower();
+            return _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
+        }
+            
 
         public async Task DeleteExternalServiceByIdAsync(string tenantName, int id)
         {
@@ -71,6 +75,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task DeleteExternalServiceByNameAsync(string tenantName, string name)
         {
+            name = name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext.ExternalServices.FirstOrDefaultAsync(e => e.Name == name);
             if (entityInDb != null)
@@ -99,6 +104,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task<ExternalService> GetExternalServiceByNameAsync(string tenantName, string name)
         {
+            name = name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext.ExternalServices
                 .AsNoTracking()
@@ -106,12 +112,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return entityInDb;
         }
 
-        public async Task<Tenant> GetTenantByNameAsync(string tenantId)
+        public async Task<Tenant> GetTenantByNameAsync(string name)
         {
+            name = name.ToLower();
             return await _mainEntityCoreContext
                 .Tenants
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Name == tenantId);
+                .FirstOrDefaultAsync(x => x.Name == name);
         }
         public async Task<List<ExternalService>> GetAllExternalServicesAsync(string tenantName)
         {
@@ -189,6 +196,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task UpsertExternalServiceAsync(string tenantName, ExternalService entity)
         {
+            entity.Name = entity.Name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ExternalServices
@@ -223,10 +231,26 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return apiResources;
         }
 
-        public Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName)
+        public async Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName, ClientScopesSortType sortType)
         {
-            throw new NotImplementedException();
+            var apiResources = await GetAllApiResourcesAsync(tenantName);
+
+            var query = from item in apiResources
+                from scope in item.Scopes
+                select scope;
+            switch (sortType)
+            {
+                case ClientScopesSortType.NameDesc:
+                    query = query.OrderByDescending(t => t.Scope);
+                    break;
+                case ClientScopesSortType.NameAsc:
+                    query = query.OrderBy(t => t.Scope);
+                    break;
+                
+            }
+            return query.ToList();
         }
+
         public async Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber,
             int pageSize,
             ApiResourcesSortType sortType)
@@ -258,6 +282,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task UpsertApiResourceAsync(string tenantName, ApiResource entity)
         {
+            entity.Name = entity.Name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
@@ -298,6 +323,9 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task<ApiResource> GetApiResourceByNameAsync(string tenantName, string name)
         {
+           
+            name = name.ToLower();
+
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
@@ -308,6 +336,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task<ApiResource> GetApiResourceByIdAsync(string tenantName, int id)
         {
+
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
@@ -318,6 +347,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task DeleteApiResourceByNameAsync(string tenantName, string name)
         {
+            name = name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var entityInDb = await tenantContext
                 .ApiResources
@@ -493,8 +523,137 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return entities;
         }
 
+        public async Task UpsertApiResourceScopeAsync(string tenantName, int apiResourceId, ApiResourceScope entity)
+        {
+            entity.Scope = entity.Scope.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Scopes)
+                .FirstOrDefaultAsync();
+
+            var existingScope = (from item in apiResourceInDb.Scopes
+                where item.Scope == entity.Scope
+                select item).FirstOrDefault();
+            if (existingScope != null)
+            {
+                return; // already here
+            }
+            existingScope = (from item in apiResourceInDb.Scopes
+                where item.Id == entity.Id
+                select item).FirstOrDefault();
+
+            if (existingScope != null)
+            {
+                // name update
+                existingScope.Scope = entity.Scope;
+            }
+            else
+            {
+                // brand new
+                apiResourceInDb.Scopes.Add(entity);
+            }
+          
+            await tenantContext.SaveChangesAsync();
+        }
+        
+        public async Task<ApiResourceScope> GetApiResourceScopeByNameAsync(string tenantName, int apiResourceId, string name)
+        {
+            name = name.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Scopes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var existingScope = (from item in apiResourceInDb.Scopes
+                where item.Scope == name
+                                 select item).FirstOrDefault();
+            return existingScope;
+        }
+        public async Task<ApiResourceScope> GetApiResourceScopeByIdAsync(string tenantName, int apiResourceId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Scopes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var existingScope = (from item in apiResourceInDb.Scopes
+                where item.Id == id
+                select item).FirstOrDefault();
+            return existingScope;
+        }
+
+        public async Task DeleteApiResourceByScopeIdAsync(string tenantName, int apiResourceId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+
+            var apiResourceInDb = await query
+                .Include(x => x.Scopes)
+                .FirstOrDefaultAsync();
+
+            var existingScope = (from item in apiResourceInDb.Scopes
+                where item.Id == id
+                select item).FirstOrDefault();
+            if (existingScope != null)
+            {
+                apiResourceInDb.Scopes.Remove(existingScope);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName, int apiResourceId,
+            ApiResourceScopesSortType sortType = ApiResourceScopesSortType.NameDesc)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from apiResource in tenantContext.ApiResources
+                where apiResource.Id == apiResourceId
+                select apiResource;
+            var apiResourceInDb = await query
+                .Include(x => x.Scopes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var entities = from item in apiResourceInDb.Scopes
+                select item;
+            switch (sortType)
+            {
+                case ApiResourceScopesSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.Scope);
+                    break;
+                case ApiResourceScopesSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.Scope);
+                    break;
+               
+            }
+
+            return entities;
+
+        }
+
         public async Task UpsertClientAsync(string tenantName, ClientExtra entity)
         {
+            entity.ClientId = entity.ClientId.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var query =
                 from item in tenantContext.Clients
@@ -517,20 +676,10 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         }
 
 
-        public async Task<ClientExtra> GetClientByNameAsync(string tenantName, string name)
-        {
-            var tenantContext = GetTenantContext(tenantName);
-            var query =
-                from item in tenantContext.Clients
-                where item.ClientId == name
-                select item;
-            var clientInDb = await query
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
-            return clientInDb;
-        }
+      
         public async Task<ClientExtra> GetClientByClientIdAsync(string tenantName, string clientId)
         {
+            clientId = clientId.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var query =
                 from item in tenantContext.Clients
@@ -553,6 +702,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 select item;
             var clientInDb = await query
                 .Include(x => x.ClientSecrets)
+                .Include(x => x.AllowedScopes)
                 .Include(x => x.AllowedGrantTypes)
                 .Include(x => x.Claims)
                 .AsNoTracking()
@@ -562,6 +712,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task DeleteClientByNameAsync(string tenantName, string name)
         {
+            name = name.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var query =
                 from item in tenantContext.Clients
@@ -745,6 +896,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
         public async Task UpsertClientAllowedGrantTypesAsync(string tenantName, int clientId, ClientGrantType entity)
         {
+            entity.GrantType = entity.GrantType.ToLower();
             var tenantContext = GetTenantContext(tenantName);
             var query =
                 from item in tenantContext.Clients

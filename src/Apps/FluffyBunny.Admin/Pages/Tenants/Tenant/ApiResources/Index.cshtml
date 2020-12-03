@@ -63,20 +63,11 @@
                                 <div class="btn-group ">
                                     <a 
                                        
-                                       class="btn btn-primary btn-sm active "
-                                       role="button" aria-pressed="true"
-                                       asp-page="./Secrets/Index"
-                                       asp-route-id="@Model.PagedEntities[i].Id">Secrets</a>
-                                    <a 
-                                        style="border-left-color: white;"
-                                       class="btn btn-primary btn-sm active "
-                                       role="button" aria-pressed="true"
-                                       asp-page="./Edit"
-                                       asp-route-id="@Model.PagedEntities[i].Id">Edit</a>
-                                    <a style="border-left-color: white;"
-                                       class="btn btn-primary btn-sm active " role="button" aria-pressed="true"
-                                       asp-page="./Delete"
-                                       asp-route-id="@Model.PagedEntities[i].Id">Delete</a>
+                                        class="btn btn-primary btn-sm active "
+                                        role="button" aria-pressed="true"
+                                        asp-page="./ApiResource/Index"
+                                        asp-route-id="@Model.PagedEntities[i].Id">Details</a>
+                                     
                                 </div>
 
                             </td>

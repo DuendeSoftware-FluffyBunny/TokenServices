@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.ApiResource.Secrets
 {
     public class DeleteModel : PageModel
     {
@@ -37,12 +37,17 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources.Secrets
         public ApiResourceSecret Secret { get; set; }
 
 
-        public async Task OnGetAsync(int apiResourceId, int id)
+        public async Task<IActionResult> OnGetAsync(int apiResourceId, int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
             ApiResourceId = apiResourceId;
             SecretId = id;
             Secret = await _adminServices.GetApiResourceSecretByIdAsync(TenantId, ApiResourceId, SecretId);
+            if (Secret == null)
+            {
+                return RedirectToPage("./Index", new { id = ApiResourceId });
+            }
+            return Page();
         }
         public async Task<IActionResult> OnPostAsync(string submit)
         {

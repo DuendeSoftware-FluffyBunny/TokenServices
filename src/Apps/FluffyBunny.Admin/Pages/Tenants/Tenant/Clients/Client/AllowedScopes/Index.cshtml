@@ -1,7 +1,7 @@
 ﻿@page
-@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.AllowedGrantTypes.IndexModel
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.AllowedScopes.IndexModel
 @{
-    ViewData["Title"] = "Allowed Grant Types";
+    ViewData["Title"] = "Allowed Scopes";
 }
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -12,34 +12,34 @@
         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
     </ol>
 </nav>
- 
+
 
 <div class="card">
- 
+
     <form id="manage-client-allowed-scopes" method="post">
-        <input hidden asp-for="TenantId" class="form-control"/>
-        <input hidden asp-for="ClientId" class="form-control"/>
+        <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="ClientId" class="form-control" />
         <div class="card">
 
-            @if (Model.GrantTypeContainers.Any())
+            @if (Model.ApiResourceScopeContainers.Any())
             {
                 <div class="card-body">
                     <table class="table">
-  
+
                         <tbody class="table-body ">
-                        @for (int i = 0; i < Model.GrantTypeContainers.Count; i++)
-                        {
-                            <tr>
-                                <td class="w-50">
-                                    <label>@Model.GrantTypeContainers[i].ClientGrantType.GrantType</label>
-                                </td>
-                                <td class="w-50">
-                                    <input asp-for="GrantTypeContainers[i].ClientGrantType.GrantType" hidden class="form-control"/>
-                                    <input asp-for="GrantTypeContainers[i].Enabled"/>
-                                    <label>Allow</label>
-                                </td>
-                            </tr>
-                        }
+                            @for (int i = 0; i < Model.ApiResourceScopeContainers.Count; i++)
+                            {
+                                <tr>
+                                    <td class="w-50">
+                                        <label>@Model.ApiResourceScopeContainers[i].ApiResourceScope.Scope</label>
+                                    </td>
+                                    <td class="w-50">
+                                        <input asp-for="ApiResourceScopeContainers[i].ApiResourceScope.Scope" hidden class="form-control" />
+                                        <input asp-for="ApiResourceScopeContainers[i].Enabled" />
+                                        <label>Allow</label>
+                                    </td>
+                                </tr>
+                            }
 
                         </tbody>
                     </table>

@@ -37,7 +37,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ApiResources
 
         [ViewData]
         public ApiResourcesSortType NameSortType { get; set; }
-        public PaginatedList<ApiResource> PagedEntities { get; private set; }
+        public PaginatedList<Duende.IdentityServer.EntityFramework.Entities.ApiResource> PagedEntities { get; private set; }
         [ViewData]
         public ApiResourcesSortType EnabledSortType { get; set; }
         [ViewData]

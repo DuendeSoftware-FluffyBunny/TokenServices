@@ -23,7 +23,8 @@
             <a class="btn btn-sm btn-primary" asp-page="./Edit" asp-route-id="@Model.Entity.Id">Edit</a>
             <a class="btn btn-sm btn-primary" asp-page="./Delete" asp-route-id="@Model.Entity.Id">Delete</a>
             <a class="btn btn-sm btn-primary" asp-page="./Secrets/Index" asp-route-id="@Model.Entity.Id">Secrets</a>
-            <a class="btn btn-sm btn-primary" asp-page="./AllowedGrantTypes/Index" asp-route-id="@Model.Entity.Id">Grant Types</a>
+            <a class="btn btn-sm btn-primary" asp-page="./AllowedGrantTypes/Index" asp-route-id="@Model.Entity.Id">Allowed Grant Types</a>
+            <a class="btn btn-sm btn-primary" asp-page="./AllowedScopes/Index" asp-route-id="@Model.Entity.Id">Allowed Scopes</a>
         </div>
         <div class="card-body">
            
@@ -66,28 +67,42 @@
                                 <input disabled asp-for="Entity.ClientName" class="form-control" />
                             </td>
                         </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.Description)
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.Description" class="form-control" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.AllowedGrantTypes)
-                        </td>
-                        <td class="w-50">
-                            @foreach (var allowedGrantType in Model.Entity.AllowedGrantTypes)
-                            {
-                                <div class="checkbox">
-                                    @allowedGrantType.GrantType
-                                </div>
-                            }
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.Description)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.Description" class="form-control" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.AllowedGrantTypes)
+                            </td>
+                            <td class="w-50">
+                                @foreach (var allowedGrantType in Model.Entity.AllowedGrantTypes)
+                                {
+                                    <div class="checkbox">
+                                        @allowedGrantType.GrantType
+                                    </div>
+                                }
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.AllowedScopes)
+                            </td>
+                            <td class="w-50">
+                                @foreach (var allowedGrantType in Model.Entity.AllowedScopes)
+                                {
+                                    <div class="checkbox">
+                                        @allowedGrantType.Scope
+                                    </div>
+                                }
+
+                            </td>
+                        </tr>
                         <tr>
                             <td class="w-50">
                                 @nameof(Model.Entity.ProtocolType)
@@ -104,10 +119,10 @@
                             </td>
                             <td class="w-50">
                                 @{
-                                    AccessTokenType accessTokenType = (AccessTokenType) Model.Entity.AccessTokenType;
-                                } 
+                                    AccessTokenType accessTokenType = (AccessTokenType)Model.Entity.AccessTokenType;
+                                }
                                 @accessTokenType
-                               
+
                             </td>
                         </tr>
                         <tr>
@@ -117,7 +132,7 @@
                             <td class="w-50">
 
                                 <input disabled asp-for="Entity.AccessTokenLifetime" class="form-control" />
-                                
+
                             </td>
                         </tr>
                         <tr>
@@ -126,7 +141,7 @@
                             </td>
                             <td class="w-50">
                                 <input disabled asp-for="Entity.IdentityTokenLifetime" class="form-control" />
-                                
+
                             </td>
                         </tr>
                         <tr>
@@ -175,97 +190,97 @@
                             </td>
                         </tr>
 
-                   
-                    <tr>
-                        <td class="w-50">
-                            <label asp-for="Entity.AllowOfflineAccess"></label>
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.AllowOfflineAccess" />
-                            <label>Enable</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            <label asp-for="Entity.RefreshTokenUsage"></label>
-                        </td>
-                        <td class="w-50">
-                            @{
-                                TokenUsage refreshTokenUsage = (TokenUsage) Model.Entity.RefreshTokenUsage;
-                            } 
-                            @refreshTokenUsage
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            <label asp-for="Entity.RequireRefreshClientSecret"></label>
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.RequireRefreshClientSecret" />
-                            <label>Enable</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.AbsoluteRefreshTokenLifetime)
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.AbsoluteRefreshTokenLifetime" class="form-control" />
-                           
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.SlidingRefreshTokenLifetime)
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.SlidingRefreshTokenLifetime" class="form-control" />
-                          
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td class="w-50">
-                            <label asp-for="Entity.RefreshTokenExpiration"></label>
-                        </td>
-                        <td class="w-50">
-                            @{
-                                TokenExpiration refreshTokenExpiration = (TokenExpiration) Model.Entity.RefreshTokenExpiration;
-                            } 
-                            @refreshTokenExpiration
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Entity.AllowOfflineAccess"></label>
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.AllowOfflineAccess" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Entity.RefreshTokenUsage"></label>
+                            </td>
+                            <td class="w-50">
+                                @{
+                                    TokenUsage refreshTokenUsage = (TokenUsage)Model.Entity.RefreshTokenUsage;
+                                }
+                                @refreshTokenUsage
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Entity.RequireRefreshClientSecret"></label>
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.RequireRefreshClientSecret" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.AbsoluteRefreshTokenLifetime)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.AbsoluteRefreshTokenLifetime" class="form-control" />
 
-                           
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            <label asp-for="Entity.RefreshTokenGraceEnabled"></label>
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.RefreshTokenGraceEnabled" />
-                            <label>Enable</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.RefreshTokenGraceMaxAttempts)
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.RefreshTokenGraceMaxAttempts" class="form-control" />
-                            
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="w-50">
-                            @nameof(Model.Entity.RefreshTokenGraceTTL)
-                        </td>
-                        <td class="w-50">
-                            <input disabled asp-for="Entity.RefreshTokenGraceTTL" class="form-control" />
-                        
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.SlidingRefreshTokenLifetime)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.SlidingRefreshTokenLifetime" class="form-control" />
 
-                    <tbody>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Entity.RefreshTokenExpiration"></label>
+                            </td>
+                            <td class="w-50">
+                                @{
+                                    TokenExpiration refreshTokenExpiration = (TokenExpiration)Model.Entity.RefreshTokenExpiration;
+                                }
+                                @refreshTokenExpiration
+
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                <label asp-for="Entity.RefreshTokenGraceEnabled"></label>
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.RefreshTokenGraceEnabled" />
+                                <label>Enable</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.RefreshTokenGraceMaxAttempts)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.RefreshTokenGraceMaxAttempts" class="form-control" />
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Entity.RefreshTokenGraceTTL)
+                            </td>
+                            <td class="w-50">
+                                <input disabled asp-for="Entity.RefreshTokenGraceTTL" class="form-control" />
+
+                            </td>
+                        </tr>
+
+<tbody>
                 </table>
             </div>
         </div>

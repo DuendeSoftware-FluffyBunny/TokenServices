@@ -40,6 +40,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client
             TenantId = _sessionTenantAccessor.TenantId;
             var entity = await _adminServices.GetClientByIdAsync(TenantId, id);
             Input = _inputModelMapperAccessor.MapperIgnoreBase.Map<ClientExtraInputModel>(entity);
+            Input.Id = id;
         }
         public async Task<IActionResult> OnPostAsync()
         {

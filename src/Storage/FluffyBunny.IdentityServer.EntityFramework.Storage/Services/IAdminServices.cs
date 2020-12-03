@@ -43,7 +43,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         NameDesc,
         NameAsc 
     }
-     
+    public enum ClientScopesSortType
+    {
+        NameDesc,
+        NameAsc
+    }
+    public enum ApiResourceScopesSortType
+    {
+        NameDesc,
+        NameAsc
+    }
     public enum SecretsSortType
     {
         DescriptionDesc,
@@ -82,7 +91,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task DeleteApiResourceByIdAsync(string tenantName, int id);
         Task<PaginatedList<ApiResource>> PageApiResourcesAsync(string tenantName, int pageNumber, int pageSize, ApiResourcesSortType sortType);
         Task<List<ApiResource>> GetAllApiResourcesAsync(string tenantName);
-        Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName);
+        Task<List<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName, ClientScopesSortType sortType);
         #endregion
 
         #region ApiResourceSecrets
@@ -94,10 +103,17 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<IEnumerable<ApiResourceSecret>> GetAllApiResourceSecretsAsync(string tenantName, int apiResourceId, SecretsSortType sortType);
 
         #endregion
+        #region ApiResourceScopes
+        Task UpsertApiResourceScopeAsync(string tenantName, int apiResourceId, ApiResourceScope entity);
 
+        Task<ApiResourceScope> GetApiResourceScopeByIdAsync(string tenantName, int apiResourceId, int id);
+        Task<ApiResourceScope> GetApiResourceScopeByNameAsync(string tenantName, int apiResourceId, string name);
+        Task DeleteApiResourceByScopeIdAsync(string tenantName, int apiResourceId, int id);
+        Task<IEnumerable<ApiResourceScope>> GetAllApiResourceScopesAsync(string tenantName, int apiResourceId, ApiResourceScopesSortType sortType = ApiResourceScopesSortType.NameDesc);
+        #endregion
         #region Clients
         Task UpsertClientAsync(string tenantName, ClientExtra entity);
-        Task<ClientExtra> GetClientByNameAsync(string tenantName, string name);
+ 
         Task<ClientExtra> GetClientByIdAsync(string tenantName, int id);
         Task<ClientExtra> GetClientByClientIdAsync(string tenantName, string clientId);
 
