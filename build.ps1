@@ -34,6 +34,13 @@ Check "docker build (application)"
 # docker build -f ./IdentityServer4WithGrace/Dockerfile -t fluffybunny4/app .
 docker build -f ./Dockerfile-SampleExternalService -t fluffybunny4/sampleexternalservice .
 docker tag  fluffybunny4/sampleexternalservice:latest ghstahl/sampleexternalservice:latest
+
+docker build -f ./Dockerfile-FluffyBunny.Admin -t fluffybunny4/fluffybunny.admin .
+docker tag  fluffybunny4/fluffybunny.admin:latest ghstahl/fluffybunny.admin:latest
+ 
+docker build -f ./Dockerfile-TokenService -t fluffybunny4/tokenservice .
+docker tag  fluffybunny4/tokenservice:latest ghstahl/tokenservice:latest
+
 # push to docker hub.
 # docker push ghstahl/sampleexternalservice:latest
 

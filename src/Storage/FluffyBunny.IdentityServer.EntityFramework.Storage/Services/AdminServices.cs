@@ -28,7 +28,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
         }
-
+        public async Task EnsureTenantDatabaseAsync()
+        {
+            await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
+            await _mainEntityCoreContext.DbContext.Database.MigrateAsync();
+        }
         public async Task CreateTenantAsync(string name)
         {
             Guard.ArgumentNotNullOrEmpty(nameof(name), name);
@@ -1040,6 +1044,6 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return entities;
         }
 
-        
+       
     }
 }

@@ -5,11 +5,11 @@ EXPOSE 443
  
 FROM fluffybunny4/build AS build
 WORKDIR /src
-RUN dotnet publish  ./src/Apps/SampleExternalService -c Release -o /out --no-restore --no-build
+RUN dotnet publish  ./src/Apps/FluffyBunny.Admin -c Release -o /out --no-restore --no-build
 RUN ls
 
 FROM base AS final
 WORKDIR /app
 COPY --from=build /out .
 ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
-ENTRYPOINT ["dotnet", "SampleExternalService.dll"]
+ENTRYPOINT ["dotnet", "FluffyBunny.Admin.dll"]

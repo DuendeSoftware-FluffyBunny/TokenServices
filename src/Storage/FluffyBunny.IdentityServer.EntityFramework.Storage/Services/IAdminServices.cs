@@ -63,6 +63,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
     public interface IAdminServices
     {
         #region Tenant
+
+        Task EnsureTenantDatabaseAsync();
         Task CreateTenantAsync(string name);
         Task<IEnumerable<Tenant>> GetAllTenantsAsync();
         Task<PaginatedList<Tenant>> PageTenantsAsync(int pageNumber, int pageSize, TenantsSortType sortType);

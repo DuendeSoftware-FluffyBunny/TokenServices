@@ -23,6 +23,7 @@ using FluffyBunny4.DotNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny.Admin
@@ -50,6 +51,7 @@ namespace FluffyBunny.Admin
         {
             try
             {
+                services.AddSingleton<IEmailSender, NullEmailSender>();
                 var mapperOneToOne = MapperConfigurationBuilder.BuidOneToOneMapper;
                 var mapperIgnoreBase = MapperConfigurationBuilder.BuidIgnoreBaseMapper;
                 services.AddSingleton<IInputModelMapperAccessor>(new InputModelMapperAccessor
