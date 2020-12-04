@@ -226,6 +226,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.Scopes)
                 .Include(x => x.UserClaims)
                 .Include(x => x.Properties)
+                .AsNoTracking()
                 .ToListAsync();
 
             return apiResources;
@@ -704,6 +705,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             var clientInDb = await query
                 .Include(x => x.ClientSecrets)
                 .Include(x => x.AllowedGrantTypes)
+                .Include(x => x.AllowedScopes)
                 .Include(x => x.Claims)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();

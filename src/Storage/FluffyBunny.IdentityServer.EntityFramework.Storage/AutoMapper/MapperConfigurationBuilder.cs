@@ -57,6 +57,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
 
             cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>();
             cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra, FluffyBunny4.Models.ClientExtra>()
+                .ForMember(dest => dest.AllowedScopes, opt => opt.ConvertUsing(new ClientScopeConverter()))
                 .ForMember(dest => dest.AllowedGrantTypes, opt => opt.ConvertUsing(new ClientGrantTypeConverter()));
 
                 
@@ -66,6 +67,12 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
             cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource,
                     Duende.IdentityServer.Models.ApiResource>(MemberList.Destination)
                 .ConstructUsing(src => new Duende.IdentityServer.Models.ApiResource())
+                .ForMember(dest => dest.Scopes, 
+                    opt =>
+                    {
+                        opt.MapFrom(src => src.Scopes);
+                        opt.ConvertUsing(new ApiResourceScopeConverter());
+                    })
                 .ForMember(x => x.ApiSecrets, opts => opts.MapFrom(x => x.Secrets));
 
 

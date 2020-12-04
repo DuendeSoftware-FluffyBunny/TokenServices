@@ -62,9 +62,24 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
             return finalList;
         }
 
-        public Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
+        public async Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
         {
-            return Task.FromResult(Enumerable.Empty<ApiScope>());
+            var tenantName = _tenantRequestContext.TenantId;
+            var apiResourceScopes = await _adminServices.GetAllApiResourceScopesAsync(tenantName, ClientScopesSortType.NameDesc);
+
+            var apiResourceScopeNames = (from item in apiResourceScopes
+                                         select item.Scope).ToList();
+
+
+            var finalList = new List<ApiScope>();
+
+            var duplicates = scopeNames.Intersect(apiResourceScopeNames);
+            var query = from item in duplicates
+                let c = new ApiScope(item)
+                select c;
+            return query;
+
+ 
         }
 
         public Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeNameAsync(IEnumerable<string> scopeNames)

@@ -23,5 +23,4 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
             return secrets;
         }
     }
-
 }
