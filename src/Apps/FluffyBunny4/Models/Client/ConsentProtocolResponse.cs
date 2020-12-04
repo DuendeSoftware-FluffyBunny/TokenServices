@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
-using IdentityModel.Client;
+ 
 using System.Net.Http;
 using System.Net;
 using FluffyBunny4.DotNetCore.Client;
 using Microsoft.AspNetCore.Mvc;
 using FluffyBunny4.Models.Internal;
 using IdentityModel;
+using IdentityModel.Client;
 
 namespace FluffyBunny4.Models.Client
 {
@@ -216,6 +217,6 @@ namespace FluffyBunny4.Models.Client
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public string TryGet(string name) => Json.TryGetString(name);
+        public string TryGet(string name) => FluffyBunny4.DotNetCore.Client.JObjectExtensions.TryGetString(Json,name);
     }
 }
