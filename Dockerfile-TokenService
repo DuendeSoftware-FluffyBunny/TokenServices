@@ -10,6 +10,13 @@ RUN ls
 
 FROM base AS final
 WORKDIR /app
+
+# copy the SSL certificate
+ADD cert/* /tmp/cert/
+RUN apt-get install ca-certificates 
+RUN cp -R /tmp/cert/cosmos-host.docker.internal.cer /usr/local/share/ca-certificates 
+RUN update-ca-certificates
+
 COPY --from=build /out .
 ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 ENTRYPOINT ["dotnet", "TokenService.dll"]

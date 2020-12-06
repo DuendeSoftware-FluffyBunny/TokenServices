@@ -15,6 +15,7 @@ namespace TokenService.Models
             SqlServer
         }
         public DatabaseTypes DatabaseType { get; set; }
+        public DatabaseTypes OperationalStoreType { get; set; }
 
     }
 }

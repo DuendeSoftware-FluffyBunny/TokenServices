@@ -256,5 +256,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimsService, T>();
             return services;
         }
+
+        public static IServiceCollection AddInMemoryTenantAwarePersistedGrantStoreOperationalStore(
+            this IServiceCollection services)
+        {
+            services.AddScoped<IPersistedGrantStore, InMemoryTenantAwarePersistedGrantStore>();
+            return services;
+        }
     }
 }

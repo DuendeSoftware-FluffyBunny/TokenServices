@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FluffyBunny4.Azure.Configuration.CosmosDB;
@@ -52,10 +53,31 @@ namespace FluffyBunny4.Azure.Abstracts
 
             var serviceEndPoint = new Uri(settings.Value.EndPointUrl);
 
-            CosmosClientBuilder configurationBuilder = new CosmosClientBuilder(serviceEndPoint.AbsoluteUri, settings.Value.PrimaryKey);
-            CosmosClient = configurationBuilder.Build();
-            DocumentClient = new DocumentClient(serviceEndPoint, settings.Value.PrimaryKey,
-                connectionPolicy ?? ConnectionPolicy.Default);
+            if (Configuration.DangerousAcceptAnyServerCertificateValidator)
+            {
+                CosmosClientOptions cosmosClientOptions = new CosmosClientOptions()
+                {
+                    HttpClientFactory = () =>
+                    {
+                        HttpMessageHandler httpMessageHandler = new HttpClientHandler()
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+
+                        return new HttpClient(httpMessageHandler);
+                    },
+                    ConnectionMode = Microsoft.Azure.Cosmos.ConnectionMode.Gateway
+                };
+                CosmosClient = new CosmosClient(serviceEndPoint.AbsoluteUri, settings.Value.PrimaryKey, cosmosClientOptions);
+            }
+            else
+            {
+
+                CosmosClientBuilder configurationBuilder = new CosmosClientBuilder(serviceEndPoint.AbsoluteUri, settings.Value.PrimaryKey);
+                CosmosClient = configurationBuilder.Build();
+            }
+
+   //         DocumentClient = new DocumentClient(serviceEndPoint, settings.Value.PrimaryKey,connectionPolicy ?? ConnectionPolicy.Default);
 
 //            EnsureDatabaseCreated(Configuration.DatabaseName).Wait();
         }
@@ -65,7 +87,7 @@ namespace FluffyBunny4.Azure.Abstracts
         /// <summary>
         ///     CosmosDb Document Client.
         /// </summary>
-        public DocumentClient DocumentClient { get; }
+ //       public DocumentClient DocumentClient { get; }
 
         /// <summary>
         ///     Instance of CosmosDb Database.

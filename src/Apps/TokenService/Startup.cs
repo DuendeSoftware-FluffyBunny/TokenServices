@@ -90,12 +90,19 @@ namespace TokenService
                 var appOptions = Configuration
                     .GetSection("AppOptions")
                     .Get<AppOptions>();
-                _logger.LogInformation($"appOptions:{ToJson(appOptions)}");
+                _logger.LogDebug($"appOptions:{ToJson(appOptions)}");
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));
                 var keyVaultSigningOptions = Configuration
                     .GetSection("KeyVaultSigningOptions")
                     .Get<KeyVaultSigningOptions>();
-                _logger.LogInformation($"keyVaultName:{ToJson(keyVaultSigningOptions)}");
+                _logger.LogDebug($"keyVaultName:{ToJson(keyVaultSigningOptions)}");
+
+                var cosmosDbConfiguration = Configuration
+                    .GetSection("CosmosDbConfiguration")
+                    .Get<CosmosDbConfiguration>();
+                _logger.LogDebug($"cosmosDbConfiguration:{ToJson(cosmosDbConfiguration)}");
+
+
 
                 services.Configure<IdentityServerOptions>(Configuration.GetSection("IdentityServer"));
                 services.Configure<KeyVaultSigningOptions>(Configuration.GetSection("KeyVaultSigningOptions"));
@@ -218,7 +225,7 @@ namespace TokenService
                 services.Configure<EntityFrameworkConnectionOptions>(Configuration.GetSection("EntityFrameworkConnectionOptions"));
                 if (HostingEnvironment.IsDevelopment())
                 {
-                    _logger.LogInformation(
+                    _logger.LogDebug(
                         $"entityFrameworkConnectionOptions:{ToJson(entityFrameworkConnectionOptions)}");
                 }
 
@@ -314,7 +321,17 @@ namespace TokenService
                         throw new Exception("Need a SigningType!");
                 }
 
-                services.AddCosmosOperationalStore();
+                switch (appOptions.OperationalStoreType)
+                {
+                    default:
+                    case AppOptions.DatabaseTypes.InMemory:
+                        services.AddInMemoryTenantAwarePersistedGrantStoreOperationalStore();
+                        break;
+                    case AppOptions.DatabaseTypes.CosmosDB:
+                        services.AddCosmosOperationalStore();
+                        break;
+                }
+
                 services.AddConsentDiscoveryCacheAccessor();
                 services.AddDiscoveryCacheAccessor();
 

@@ -105,7 +105,9 @@ namespace FluffyBunny4.Azure.DbContext
 
         public async Task<Document> ReplaceItemAsync(string id, T item)
         {
-            return await DocumentClient.ReplaceDocumentAsync(DocumentCollectionUri, item);
+            throw new NotImplementedException();
+
+        //    return await DocumentClient.ReplaceDocumentAsync(DocumentCollectionUri, item);
         }
 
         public async Task<ItemResponse<T>> DeleteItemAsync(string id)

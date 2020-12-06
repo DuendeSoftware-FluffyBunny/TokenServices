@@ -21,5 +21,7 @@ namespace FluffyBunny4.Azure.Configuration.CosmosDB
         ///     Database name for the control data.
         /// </summary>
         public string DatabaseName { get; set; }
+
+        public bool DangerousAcceptAnyServerCertificateValidator { get; set; } = false;
     }
 }
