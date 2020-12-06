@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  sqlserver-microservice:
+        image: "mcr.microsoft.com/mssql/server"
+        environment:
+            SA_PASSWORD: "Your_password123"
+            ACCEPT_EULA: "Y"
+        ports:
+        - "11143:1433"
+        volumes:
+        - C:\Docker\DockerVolumes\sqlserver:/var/opt/mssql/data 
+
+  fluffybunnyadmin-microservice:
+    image: ghstahl/fluffybunny.admin:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 7200:80
+      - 7201:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=7201
+      - BLAH_ConnectionStrings__DefaultConnection=Server=(sqlserver-microservice)\\mssqllocaldb;Database=aspnet-FluffyBunny.Admin-53bc9b9d-9d6a-45d4-8429-2a2761773502;Trusted_Connection=True;MultipleActiveResultSets=true
+      - ConnectionStrings__DefaultConnection=Server=sqlserver-microservice;Database=myDataBase;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+      - EntityFrameworkConnectionOptions__ConnectionString=Server=sqlserver-microservice;Database=fluffybunny;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+      - EntityFrameworkConnectionOptions__ConnectionStringDatabaseTemplate=Server=sqlserver-microservice;Database={{Database}};User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+    depends_on:
+      - sqlserver-microservice
+
+  externalservice-microservice:
+    image: ghstahl/sampleexternalservice:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 7300:80
+      - 7301:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=7301
+    
+
+volumes:
+  sqlsystem:
+  sqldata:
+  sqllog:
+  sqlbackup:
