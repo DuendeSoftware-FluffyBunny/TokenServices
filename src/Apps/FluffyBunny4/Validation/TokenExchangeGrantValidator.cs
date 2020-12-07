@@ -36,7 +36,7 @@ namespace FluffyBunny4.Validation
         private IScopedOptionalClaims _scopedOptionalClaims;
         private IConsentExternalService _consentExternalService;
         private IExternalServicesStore _externalServicesStore;
-        private IOverrideRawScopeValues _overrideRawScopeValues;
+        private IScopedOverrideRawScopeValues _scopedOverrideRawScopeValues;
         private IConsentDiscoveryCacheAccessor _consentDiscoveryCacheAccessor;
         private TokenExchangeOptions _tokenExchangeOptions;
         private IIdentityTokenValidator _identityTokenValidator;
@@ -53,7 +53,7 @@ namespace FluffyBunny4.Validation
             IScopedOptionalClaims scopedOptionalClaims,
             IConsentExternalService consentExternalService,
             IExternalServicesStore externalServicesStore,
-            IOverrideRawScopeValues overrideRawScopeValues,
+            IScopedOverrideRawScopeValues scopedOverrideRawScopeValues,
             ISerializer serializer,
             IConsentDiscoveryCacheAccessor consentDiscoveryCacheAccessor,
             IOptions<TokenExchangeOptions> tokenExchangeOptions,
@@ -65,7 +65,7 @@ namespace FluffyBunny4.Validation
             _scopedOptionalClaims = scopedOptionalClaims;
             _consentExternalService = consentExternalService;
             _externalServicesStore = externalServicesStore;
-            _overrideRawScopeValues = overrideRawScopeValues;
+            _scopedOverrideRawScopeValues = scopedOverrideRawScopeValues;
             _consentDiscoveryCacheAccessor = consentDiscoveryCacheAccessor;
             _tokenExchangeOptions = tokenExchangeOptions.Value;
             _identityTokenValidator = identityTokenValidator;
@@ -196,7 +196,7 @@ namespace FluffyBunny4.Validation
 
                 if (doco.AuthorizationType == Constants.AuthorizationTypes.Implicit)
                 {
-                    _overrideRawScopeValues.Scopes.AddRange(serviceScopeSet.Value);
+                    _scopedOverrideRawScopeValues.Scopes.AddRange(serviceScopeSet.Value);
                 }
                 else
                 {
@@ -218,7 +218,7 @@ namespace FluffyBunny4.Validation
                                 var query = (from item in response.Scopes
                                     where item.StartsWith(serviceRoot)
                                     select item);
-                                _overrideRawScopeValues.Scopes.AddRange(query);
+                                _scopedOverrideRawScopeValues.Scopes.AddRange(query);
                                 if (response.Claims != null && response.Claims.Any())
                                 {
                                     foreach (var cac in response.Claims)

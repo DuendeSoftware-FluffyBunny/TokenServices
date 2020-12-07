@@ -11,25 +11,25 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     public class EntityFrameworkExternalServicesStore : IExternalServicesStore
     {
-        private ITenantRequestContext _tenantRequestContext;
+        private IScopedTenantRequestContext _scopedTenantRequestContext;
         private IAdminServices _adminServices;
         private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
         private ILogger<EntityFrameworkExternalServicesStore> _logger;
 
         public EntityFrameworkExternalServicesStore(
-            ITenantRequestContext tenantRequestContext,
+            IScopedTenantRequestContext scopedTenantRequestContext,
             IAdminServices adminServices,
             IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ILogger<EntityFrameworkExternalServicesStore> logger)
         {
-            _tenantRequestContext = tenantRequestContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _adminServices = adminServices;
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
         }
         public async Task<ExternalService> GetExternalServiceByNameAsync(string serviceName)
         {
-            var tenantId = _tenantRequestContext.TenantId;
+            var tenantId = _scopedTenantRequestContext.TenantId;
             var entity = await _adminServices.GetExternalServiceByNameAsync(tenantId, serviceName);
             var result = _entityFrameworkMapperAccessor.MapperOneToOne.Map<ExternalService>(entity);
             return result;
@@ -37,7 +37,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
         public async Task<List<ExternalService>> GetExternalServicesAsync()
         {
-            var tenantId = _tenantRequestContext.TenantId;
+            var tenantId = _scopedTenantRequestContext.TenantId;
             var entities = await _adminServices.GetAllExternalServicesAsync(tenantId);
             var result = (from item in entities
                 let c = _entityFrameworkMapperAccessor.MapperOneToOne.Map<ExternalService>(item)

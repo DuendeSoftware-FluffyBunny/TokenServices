@@ -14,19 +14,19 @@ namespace FluffyBunny4.Stores
     {
         static ConcurrentDictionary<string, IPersistedGrantStore> _tenantStores = new ConcurrentDictionary<string, IPersistedGrantStore>();
         
-        private ITenantRequestContext _tenantRequestContext;
+        private IScopedTenantRequestContext _scopedTenantRequestContext;
         private IPersistedGrantStore _innerPersistedGrantStore;
-        public InMemoryTenantAwarePersistedGrantStore(ITenantRequestContext tenantRequestContext)
+        public InMemoryTenantAwarePersistedGrantStore(IScopedTenantRequestContext scopedTenantRequestContext)
         {
-            _tenantRequestContext = tenantRequestContext;
-            if (!string.IsNullOrWhiteSpace(_tenantRequestContext.TenantId))
+            _scopedTenantRequestContext = scopedTenantRequestContext;
+            if (!string.IsNullOrWhiteSpace(_scopedTenantRequestContext.TenantId))
             {
-                if (!_tenantStores.ContainsKey(_tenantRequestContext.TenantId))
+                if (!_tenantStores.ContainsKey(_scopedTenantRequestContext.TenantId))
                 {
-                    _tenantStores.TryAdd(_tenantRequestContext.TenantId, new InMemoryPersistedGrantStore());
+                    _tenantStores.TryAdd(_scopedTenantRequestContext.TenantId, new InMemoryPersistedGrantStore());
                 }
 
-                _tenantStores.TryGetValue(_tenantRequestContext.TenantId, out _innerPersistedGrantStore);
+                _tenantStores.TryGetValue(_scopedTenantRequestContext.TenantId, out _innerPersistedGrantStore);
 
             }
         }

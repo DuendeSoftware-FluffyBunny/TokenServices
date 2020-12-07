@@ -18,17 +18,17 @@ namespace FluffyBunny4.Services.Default
 
     public class GraceRefreshTokenService : DefaultRefreshTokenService
     {
-        private ITenantRequestContext _tenantRequestContext;
+        private IScopedTenantRequestContext _scopedTenantRequestContext;
 
         public GraceRefreshTokenService(
             IRefreshTokenStore refreshTokenStore,
             IProfileService profile,
-            ITenantRequestContext tenantRequestContext,
+            IScopedTenantRequestContext scopedTenantRequestContext,
             ISystemClock clock,
             ILogger<DefaultRefreshTokenService> logger) :
             base(refreshTokenStore, profile, clock, logger)
         {
-            _tenantRequestContext = tenantRequestContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
         }
         public override async Task<string> CreateRefreshTokenAsync(
             ClaimsPrincipal subject, Token accessToken, Client client)

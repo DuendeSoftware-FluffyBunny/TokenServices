@@ -212,15 +212,14 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection AddTenantServices(this IServiceCollection services)
         {
-           
-            services.AddScoped<ITenantRequestContext, TenantRequestContext>();
+            services.AddScoped<IScopedTenantRequestContext, ScopedTenantRequestContext>();
             return services;
         }
         public static IServiceCollection AddScopedServices(this IServiceCollection services)
         {
-            services.AddScoped<IHttpContextRequestForm, HttpContextRequestForm>();
+            services.AddScoped<IScopedHttpContextRequestForm, ScopedHttpContextRequestForm>();
             services.AddScoped<IScopedOptionalClaims, ScopedOptionalClaims>();
-            services.AddScoped<IOverrideRawScopeValues, OverrideRawScopeValues>();
+            services.AddScoped<IScopedOverrideRawScopeValues, ScopedOverrideRawScopeValues>();
             return services;
         }
 
