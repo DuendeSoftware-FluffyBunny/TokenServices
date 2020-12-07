@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace FluffyBunny4.Services
 {
-    public interface IOptionalClaims
+    public interface IScopedOptionalClaims
     {
         List<Claim> Claims { get; }
     }

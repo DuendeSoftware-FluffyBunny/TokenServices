@@ -219,7 +219,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddScopedServices(this IServiceCollection services)
         {
             services.AddScoped<IHttpContextRequestForm, HttpContextRequestForm>();
-            services.AddScoped<IOptionalClaims, OptionalClaims>();
+            services.AddScoped<IScopedOptionalClaims, ScopedOptionalClaims>();
             services.AddScoped<IOverrideRawScopeValues, OverrideRawScopeValues>();
             return services;
         }

@@ -15,7 +15,7 @@ namespace FluffyBunny4.Stores
         private readonly IdentityServerOptions _options;
         private readonly ICache<Client> _cache;
         private readonly IClientStore _inner;
-        private readonly ITenantRequestContext _tenantRequestContext;
+        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -28,13 +28,13 @@ namespace FluffyBunny4.Stores
         public CachingTenantClientStore(
             IdentityServerOptions options, 
             T inner, 
-            ITenantRequestContext tenantRequestContext,
+            IScopedTenantRequestContext scopedTenantRequestContext,
             ICache<Client> cache, 
             ILogger<CachingTenantClientStore<T>> logger)
         {
             _options = options;
             _inner = inner;
-            _tenantRequestContext = tenantRequestContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _cache = cache;
             _logger = logger;
         }
@@ -48,7 +48,7 @@ namespace FluffyBunny4.Stores
         /// </returns>
         public async Task<Client> FindClientByIdAsync(string clientId)
         {
-            var key = $"{_tenantRequestContext.TenantId}.{clientId}";
+            var key = $"{_scopedTenantRequestContext.TenantId}.{clientId}";
             var client = await _cache.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.FindClientByIdAsync(clientId),

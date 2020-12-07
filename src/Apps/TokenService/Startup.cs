@@ -20,6 +20,8 @@ using CorrelationId.HttpClient;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.EntityFramework.Options;
+using Duende.IdentityServer.ResponseHandling;
+using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions;
@@ -32,6 +34,7 @@ using FluffyBunny4.Validation;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.HttpOverrides;
 using FluffyBunny4.Azure.Configuration.CosmosDB;
+using FluffyBunny4.Stores;
 
 namespace TokenService
 {
@@ -202,6 +205,9 @@ namespace TokenService
                 services.AddSingleton<IConsentExternalService, ConsentExternalService>();
 
                 _logger.LogInformation("ConfigureServices - AddIdentityServer ");
+
+                services.AddSingleton<IHashFixer, HashFixer>();
+                services.AddTransient<ITokenResponseGenerator, MyTokenResponseGenerator>();
                 var builder = services.AddIdentityServer()
                     .AddInMemoryIdentityResources(Config.IdentityResources)
                     .AddTenantAwareInMemoryApiScopes(jsonApiScopesFile, jsonApiResourcesFile)

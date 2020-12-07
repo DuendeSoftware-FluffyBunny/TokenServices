@@ -8,13 +8,15 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Stores.Serialization;
+using FluffyBunny4.Services;
 
 namespace FluffyBunny4.Stores
 {
 
     public class MyDefaultRefreshTokenStore :
-        DefaultGrantStore<RefreshTokenExtra>, IRefreshTokenStore
+        DefaultGrantStore<RefreshTokenExtra>, IRefreshTokenStore, IGrantStoreHashAccessor
     {
+        private IHashFixer _hashFixer;
         private IBackgroundTaskQueue<Delete> _taskQueueDelete;
         private IBackgroundTaskQueue<Write> _taskQueueWrite;
 
@@ -26,6 +28,7 @@ namespace FluffyBunny4.Stores
         /// <param name="handleGenerationService">The handle generation service.</param>
         /// <param name="logger">The logger.</param>
         public MyDefaultRefreshTokenStore(
+            IHashFixer hashFixer,
             IPersistedGrantStore store,
             IPersistentGrantSerializer serializer,
             IHandleGenerationService handleGenerationService,
@@ -34,6 +37,7 @@ namespace FluffyBunny4.Stores
             ILogger<DefaultRefreshTokenStore> logger)
             : base(IdentityServerConstants.PersistedGrantTypes.RefreshToken, store, serializer, handleGenerationService, logger)
         {
+            _hashFixer = hashFixer;
             _taskQueueDelete = taskQueueDelete;
             _taskQueueWrite = taskQueueWrite;
         }
@@ -104,10 +108,12 @@ namespace FluffyBunny4.Stores
         }
         protected override string GetHashedKey(string value)
         {
-            var ori = base.GetHashedKey(value);
-            ori = ori.Replace('/', '_');
-            ori = ori.Replace('-', '+');
-            return ori;
+            var hash = base.GetHashedKey(value);
+            return _hashFixer.FixHash(hash);
+        }
+        string IGrantStoreHashAccessor.GetHashedKey(string value)
+        {
+            return GetHashedKey(value);
         }
         private void DeferRemoveRefreshTokensAsync(string subjectId, string clientId)
         {
@@ -123,6 +129,8 @@ namespace FluffyBunny4.Stores
                 return RemoveItemAsync(refresh_token);
             });
         }
+
+       
 
         public class Delete
         {

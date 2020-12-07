@@ -2,7 +2,7 @@
 
 namespace FluffyBunny4.Services
 {
-    public interface IOverrideRawScopeValues
+    public interface IScopedOverrideRawScopeValues
     {
         List<string> Scopes { get; }
     }

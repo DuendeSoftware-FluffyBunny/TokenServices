@@ -6,11 +6,11 @@ using Duende.IdentityServer.Extensions;
 
 namespace FluffyBunny4.Services
 {
-    public class HttpContextRequestForm : IHttpContextRequestForm
+    public class ScopedHttpContextRequestForm : IScopedHttpContextRequestForm
     {
         private IHttpContextAccessor _httpContextAccessor;
 
-        public HttpContextRequestForm(IHttpContextAccessor httpContextAccessor)
+        public ScopedHttpContextRequestForm(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

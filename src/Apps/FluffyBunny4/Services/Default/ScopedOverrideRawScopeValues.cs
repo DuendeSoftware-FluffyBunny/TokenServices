@@ -2,7 +2,7 @@
 
 namespace FluffyBunny4.Services
 {
-    internal class OverrideRawScopeValues : IOverrideRawScopeValues
+    internal class ScopedOverrideRawScopeValues : IScopedOverrideRawScopeValues
     {
         List<string> _scopes;
         public List<string> Scopes => _scopes ?? (_scopes = new List<string>());

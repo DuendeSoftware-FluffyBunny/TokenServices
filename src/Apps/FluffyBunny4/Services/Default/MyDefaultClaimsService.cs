@@ -14,25 +14,25 @@ namespace FluffyBunny4.Services
 {
     public class MyDefaultClaimsService : DefaultClaimsService
     {
-        private IOptionalClaims _optionalClaims;
-        private IOverrideRawScopeValues _overrideRawScopeValues;
+        private IScopedOptionalClaims _scopedOptionalClaims;
+        private IScopedOverrideRawScopeValues _scopedOverrideRawScopeValues;
 
         public MyDefaultClaimsService(
             IProfileService profile,
-            IOptionalClaims optionalClaims,
-            IOverrideRawScopeValues overrideRawScopeValues,
+            IScopedOptionalClaims scopedOptionalClaims,
+            IScopedOverrideRawScopeValues scopedOverrideRawScopeValues,
             ILogger<MyDefaultClaimsService> logger) : base(profile, logger)
         {
-            _optionalClaims = optionalClaims;
-            _overrideRawScopeValues = overrideRawScopeValues;
+            _scopedOptionalClaims = scopedOptionalClaims;
+            _scopedOverrideRawScopeValues = scopedOverrideRawScopeValues;
         }
         public override async Task<IEnumerable<Claim>> GetAccessTokenClaimsAsync(ClaimsPrincipal subject,
             ResourceValidationResult resourceResult, ValidatedRequest request)
         {
-            if (_overrideRawScopeValues.Scopes.Any())
+            if (_scopedOverrideRawScopeValues.Scopes.Any())
             {
                 var scopes = new HashSet<ParsedScopeValue>();
-                foreach (var s in _overrideRawScopeValues.Scopes)
+                foreach (var s in _scopedOverrideRawScopeValues.Scopes)
                 {
                     scopes.Add((new ParsedScopeValue(s)));
                 }
@@ -76,9 +76,9 @@ namespace FluffyBunny4.Services
         {
             var claims = new List<Claim>();
             claims.AddRange(base.GetOptionalClaims(subject));
-            if (_optionalClaims.Claims != null)
+            if (_scopedOptionalClaims.Claims != null)
             {
-                claims.AddRange(_optionalClaims.Claims);
+                claims.AddRange(_scopedOptionalClaims.Claims);
             }
             return claims;
         }

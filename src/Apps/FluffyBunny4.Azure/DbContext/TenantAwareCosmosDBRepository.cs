@@ -30,19 +30,19 @@ namespace FluffyBunny4.Azure.DbContext
             public string DatabaseName { get; set; }
         
         }
-        protected ITenantRequestContext _tenantRequestContext;
+        protected IScopedTenantRequestContext ScopedTenantRequestContext;
         protected ITenantStore _tenantStore;
         private IHostStorage _hostStorage;
 
         public TenantAwareCosmosDBRepository(
-            ITenantRequestContext tenantRequestContext,
+            IScopedTenantRequestContext scopedTenantRequestContext,
             ITenantStore tenantStore,
             IHostStorage hostStorage,
             IOptions<CosmosDbConfiguration> settings,
             ConnectionPolicy connectionPolicy = null,
             ILogger logger = null) : base(settings, connectionPolicy, logger)
         {
-            _tenantRequestContext = tenantRequestContext;
+            ScopedTenantRequestContext = scopedTenantRequestContext;
             _tenantStore = tenantStore;
             _hostStorage = hostStorage;
         }

@@ -2,7 +2,7 @@
 
 namespace FluffyBunny4.Services
 {
-    public interface ITenantRequestContext
+    public interface IScopedTenantRequestContext
     {
         string TenantId { get; set; }
         Dictionary<string,object> Storage { get; }

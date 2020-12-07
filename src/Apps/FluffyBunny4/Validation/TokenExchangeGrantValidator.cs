@@ -33,7 +33,7 @@ namespace FluffyBunny4.Validation
         private static List<string> _oneMustExitsArguments;
         private ISerializer _serializer;
         private IResourceStore _resourceStore;
-        private IOptionalClaims _optionalClaims;
+        private IScopedOptionalClaims _scopedOptionalClaims;
         private IConsentExternalService _consentExternalService;
         private IExternalServicesStore _externalServicesStore;
         private IOverrideRawScopeValues _overrideRawScopeValues;
@@ -50,7 +50,7 @@ namespace FluffyBunny4.Validation
 
         public TokenExchangeGrantValidator(
             IResourceStore resourceStore,
-            IOptionalClaims optionalClaims,
+            IScopedOptionalClaims scopedOptionalClaims,
             IConsentExternalService consentExternalService,
             IExternalServicesStore externalServicesStore,
             IOverrideRawScopeValues overrideRawScopeValues,
@@ -62,7 +62,7 @@ namespace FluffyBunny4.Validation
         {
             _serializer = serializer;
             _resourceStore = resourceStore;
-            _optionalClaims = optionalClaims;
+            _scopedOptionalClaims = scopedOptionalClaims;
             _consentExternalService = consentExternalService;
             _externalServicesStore = externalServicesStore;
             _overrideRawScopeValues = overrideRawScopeValues;
@@ -144,7 +144,7 @@ namespace FluffyBunny4.Validation
             {
 
                 case FluffyBunny4.Constants.TokenExchangeTypes.IdToken:
-                    // do nothing
+                 
                     var validatedResult = await _identityTokenValidator.ValidateIdTokenAsync(subjectToken, _tokenExchangeOptions.AuthorityKey);
                     if (validatedResult.IsError)
                     {
@@ -224,7 +224,7 @@ namespace FluffyBunny4.Validation
                                     foreach (var cac in response.Claims)
                                     {
                                         // namespace the claims.
-                                        _optionalClaims.Claims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
+                                        _scopedOptionalClaims.Claims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
                                             cac.Value));
                                     }
                                 }
@@ -241,7 +241,7 @@ namespace FluffyBunny4.Validation
             }
             if (finalCustomPayload.Any())
             {
-                _optionalClaims.Claims.Add(new Claim(
+                _scopedOptionalClaims.Claims.Add(new Claim(
                     Constants.CustomPayload,
                     _serializer.Serialize(finalCustomPayload),
                     IdentityServerConstants.ClaimValueTypes.Json));

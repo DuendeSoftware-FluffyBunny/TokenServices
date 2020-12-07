@@ -16,7 +16,7 @@ namespace FluffyBunny4.Stores
         private readonly ICache<ExternalService> _cacheExternalService;
         private readonly ICache<List<ExternalService>> _cacheExternalServices;
         private readonly IExternalServicesStore _inner;
-        private readonly ITenantRequestContext _tenantRequestContext;
+        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -29,14 +29,14 @@ namespace FluffyBunny4.Stores
         public CachingTenantExternalServicesStore(
             IdentityServerOptions options,
             T inner,
-            ITenantRequestContext tenantRequestContext,
+            IScopedTenantRequestContext scopedTenantRequestContext,
             ICache<ExternalService> cacheExternalService,
             ICache<List<ExternalService>> cacheExternalServices,
             ILogger<CachingTenantExternalServicesStore<T>> logger)
         {
             _options = options;
             _inner = inner;
-            _tenantRequestContext = tenantRequestContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _cacheExternalService = cacheExternalService;
             _cacheExternalServices = cacheExternalServices;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace FluffyBunny4.Stores
         {
             if (string.IsNullOrEmpty(serviceName)) return null;
 
-            var key = $"{_tenantRequestContext.TenantId}.{serviceName}";
+            var key = $"{_scopedTenantRequestContext.TenantId}.{serviceName}";
             var item = await _cacheExternalService.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.GetExternalServiceByNameAsync(serviceName),
@@ -57,7 +57,7 @@ namespace FluffyBunny4.Stores
 
         public async Task<List<ExternalService>> GetExternalServicesAsync()
         {
-            var key = $"{_tenantRequestContext.TenantId}.GetExternalServicesAsync";
+            var key = $"{_scopedTenantRequestContext.TenantId}.GetExternalServicesAsync";
             var item = await _cacheExternalServices.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.GetExternalServicesAsync(),

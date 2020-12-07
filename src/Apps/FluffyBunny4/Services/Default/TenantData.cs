@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FluffyBunny4.Services
 {
-    internal class TenantRequestContext : ITenantRequestContext
+    internal class ScopedTenantRequestContext : IScopedTenantRequestContext
     {
         public string TenantId { get; set; }
         public Dictionary<string, object> _storage;

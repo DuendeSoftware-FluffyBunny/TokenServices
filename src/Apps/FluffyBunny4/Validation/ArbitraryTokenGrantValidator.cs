@@ -57,7 +57,7 @@ namespace FluffyBunny4.Validation
 
         private static List<string> _oneMustExitsArguments;
         private IResourceStore _resourceStore;
-        private IOptionalClaims _optionalClaims;
+        private IScopedOptionalClaims _scopedOptionalClaims;
         private ILogger _logger;
 
         private static List<string> OneMustExitsArguments => _oneMustExitsArguments ??
@@ -68,11 +68,11 @@ namespace FluffyBunny4.Validation
 
         public ArbitraryTokenGrantValidator(
             IResourceStore resourceStore,
-            IOptionalClaims optionalClaims,
+            IScopedOptionalClaims scopedOptionalClaims,
             ILogger<ArbitraryTokenGrantValidator> logger)
         {
             _resourceStore = resourceStore;
-            _optionalClaims = optionalClaims;
+            _scopedOptionalClaims = scopedOptionalClaims;
             _logger = logger;
         }
 
@@ -249,7 +249,7 @@ namespace FluffyBunny4.Validation
                 {
                     foreach (var item in arbitraryClaimSet.Value)
                     {
-                        _optionalClaims.Claims.Add(new Claim(arbitraryClaimSet.Key, item));
+                        _scopedOptionalClaims.Claims.Add(new Claim(arbitraryClaimSet.Key, item));
                     }
                 }
             }
@@ -257,14 +257,14 @@ namespace FluffyBunny4.Validation
             {
                 foreach (var item in arbitraryAudiences)
                 {
-                    _optionalClaims.Claims.Add(new Claim(JwtClaimTypes.Audience, item));
+                    _scopedOptionalClaims.Claims.Add(new Claim(JwtClaimTypes.Audience, item));
                 }
             }
 
             var customPayload = form[Constants.CustomPayload];
             if (!string.IsNullOrWhiteSpace(customPayload))
             {
-                _optionalClaims.Claims.Add(new Claim(Constants.CustomPayload, customPayload,
+                _scopedOptionalClaims.Claims.Add(new Claim(Constants.CustomPayload, customPayload,
                     IdentityServerConstants.ClaimValueTypes.Json));
             }
 

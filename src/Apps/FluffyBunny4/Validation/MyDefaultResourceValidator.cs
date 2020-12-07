@@ -18,16 +18,16 @@ namespace IdentityServer4.Validation
     /// </summary>
     public class MyDefaultResourceValidator : DefaultResourceValidator
     {
-        private readonly IHttpContextRequestForm _httpContextRequestForm;
+        private readonly IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
         private readonly ILogger _logger;
 
         public MyDefaultResourceValidator(
             IResourceStore store,
             IScopeParser scopeParser,
-            IHttpContextRequestForm httpContextRequestForm,
+            IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             ILogger<DefaultResourceValidator> logger) : base(store, scopeParser, logger)
         {
-            _httpContextRequestForm = httpContextRequestForm;
+            _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
             _logger = logger;
         }
 
@@ -42,7 +42,7 @@ namespace IdentityServer4.Validation
         protected override async Task ValidateScopeAsync(Client client, Resources resourcesFromStore, 
             ParsedScopeValue requestedScope, ResourceValidationResult result)
         {
-            var parameters = await _httpContextRequestForm.GetFormCollectionAsync();
+            var parameters = await _scopedHttpContextRequestForm.GetFormCollectionAsync();
             var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
             switch (grantType)
             {
@@ -79,7 +79,7 @@ namespace IdentityServer4.Validation
         /// <returns></returns>
         protected override async Task<bool> IsClientAllowedApiScopeAsync(Client client, ApiScope apiScope)
         {
-            var parameters = await _httpContextRequestForm.GetFormCollectionAsync();
+            var parameters = await _scopedHttpContextRequestForm.GetFormCollectionAsync();
             var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
             if (grantType == Constants.GrantType.ArbitraryToken)
             {
