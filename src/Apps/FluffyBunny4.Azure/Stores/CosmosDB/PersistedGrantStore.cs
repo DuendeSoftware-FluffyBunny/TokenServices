@@ -210,5 +210,10 @@ namespace FluffyBunny4.Azure.Stores.CosmosDB
                 }
             }
         }
+
+        public Task CopyAsync(string sourceKey, string destinationKey)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

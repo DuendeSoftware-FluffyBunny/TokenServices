@@ -143,6 +143,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var mapperConfiguration = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMap<PersistedGrant, PersistedGrantExtra>();
+                cfg.CreateMap<PersistedGrantExtra, PersistedGrant>();
+
                 cfg.CreateMap<ClientExtra, ClientExtraHandle>();
                 cfg.CreateMap<ClientExtraHandle, ClientExtra>();
 
@@ -259,7 +262,12 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddInMemoryTenantAwarePersistedGrantStoreOperationalStore(
             this IServiceCollection services)
         {
-            services.AddScoped<IPersistedGrantStore, InMemoryTenantAwarePersistedGrantStore>();
+            services.AddScoped<IPersistedGrantStoreEx, InMemoryTenantAwarePersistedGrantStore>();
+            services.AddScoped<IPersistedGrantStore>(sp =>
+            {
+                var persistedGrantStoreEx = sp.GetRequiredService<IPersistedGrantStoreEx>();
+                return persistedGrantStoreEx;
+            });
             return services;
         }
     }

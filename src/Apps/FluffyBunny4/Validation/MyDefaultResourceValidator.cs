@@ -46,6 +46,7 @@ namespace IdentityServer4.Validation
             var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
             switch (grantType)
             {
+                case Constants.GrantType.TokenExchangeMutate:
                 case Constants.GrantType.TokenExchange:
                 case Constants.GrantType.ArbitraryToken:
                     if (requestedScope.ParsedName == IdentityServerConstants.StandardScopes.OfflineAccess)

@@ -159,6 +159,7 @@ namespace TokenService
                     options.AddToLoggingScope = true;
                 });
                 services.AddHostStorage();
+                services.AddScopedStorage();
                 services.AddScopedServices();
                 
                 //////////////////////////////////////////////
@@ -219,6 +220,7 @@ namespace TokenService
                     .AddInMemoryCaching()
                     .AddExtensionGrantValidator<ArbitraryTokenGrantValidator>()
                     .AddExtensionGrantValidator<TokenExchangeGrantValidator>()
+                    .AddExtensionGrantValidator<TokenExchangeMutateGrantValidator>()
                     .SwapOutRefreshTokenStore()
                     .SwapOutReferenceTokenStore()
                     .SwapOutTokenRevocationRequestValidator()

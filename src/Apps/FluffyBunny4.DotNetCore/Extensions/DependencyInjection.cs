@@ -9,6 +9,11 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddScopedStorage(this IServiceCollection services)
+        {
+            services.AddSingleton<IScopedStorage, ThreadSafeScopedStorage>();
+            return services;
+        }
         public static IServiceCollection AddHostStorage(this IServiceCollection services)
         {
             services.AddSingleton<IHostStorage, ThreadSafeHostStorage>();
