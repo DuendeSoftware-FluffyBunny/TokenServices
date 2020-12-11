@@ -10,7 +10,7 @@ namespace FluffyBunny4
         {
             public const string ExtensionGrantValidationContext = "0f4842a1-5b0f-4542-9a28-d081ce1efc3a";
             public const string AccessTokenPersistedGrant = "324b920f-95a0-4e50-8c74-a887de2031d2";
-            public const string OverrideTokenCreationTime = "b91c5be4-eeb2-4f91-8ef2-60dc63c8e31a";
+            public const string OverrideTokenIssuedAtTime = "b91c5be4-eeb2-4f91-8ef2-60dc63c8e31a";
             public const string PersistedGrantExtra = "aca5797f-db0e-4aea-a299-e3a9447fe234";
             public const string SubjectToken = "d103430e-39cb-46ab-b41e-5e143739d610";
         }

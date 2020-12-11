@@ -114,10 +114,10 @@ namespace FluffyBunny4.Stores
 
             var at = await TokenService.CreateAccessTokenAsync(tokenRequest);
             object obj;
-            if (_scopedStorage.TryGetValue(Constants.ScopedRequestType.OverrideTokenCreationTime, out obj))
+            if (_scopedStorage.TryGetValue(Constants.ScopedRequestType.OverrideTokenIssuedAtTime, out obj))
             {
-                DateTime creationTime = obj is DateTime ? (DateTime) obj : default;
-                at.CreationTime = creationTime;
+                DateTime issuedAtTime = obj is DateTime ? (DateTime) obj : default;
+                at.CreationTime = issuedAtTime;
             }
             var accessToken = await TokenService.CreateSecurityTokenAsync(at);
 

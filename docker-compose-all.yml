@@ -45,6 +45,60 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
       - ASPNETCORE_HTTPS_PORT=7301
 
+  identityserverhost-microservice:
+    image: ghstahl/identityserverhost:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 7400:80
+      - 7401:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=7401
+
+  webappexternallogin-microservice:
+    image: ghstahl/webappexternallogin:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 44299:80
+      - 44300:443
+    environment:
+      - externalOIDC__0__authority=https://demo.identityserver.io/
+      - externalOIDC__0__clientId=interactive.confidential
+      - externalOIDC__0__clientSecret=secret
+      - externalOIDC__0__callbackPath=/signin-demo-identityserver
+      - externalOIDC__1__authority=${externalOIDC__1__authority}
+      - externalOIDC__1__clientId=${externalOIDC__1__clientId}
+      - externalOIDC__1__clientSecret=${externalOIDC__1__clientSecret}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=44300
+
+  oidcconsentorchestrator-microservice:
+    image: ghstahl/oidcconsentorchestrator:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 6600:80
+      - 6601:443
+    environment:
+      - oidcOptionStore__Google__clientRecords__0__ClientId=${oidcOptionStore__Google__clientRecords__0__ClientId}
+      - oidcOptionStore__Google__clientRecords__0__Secret=${oidcOptionStore__Google__clientRecords__0__Secret}
+      - FluffyBunny4TokenServiceConfiguration__ClientId=301e4b53-27c2-4508-86f7-448f08229a44
+      - FluffyBunny4TokenServiceConfiguration__ClientSecret=NkFzuAe3V8LL4PHSjuPCPCRE5HXQ53bq
+      - FluffyBunny4TokenServiceConfiguration__Authority=https://tokenservice-microservice/zep
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=6601
+
   tokenservice-microservice:
     image: ghstahl/tokenservice:latest
     volumes:
@@ -53,6 +107,7 @@ services:
       - 7000:80
       - 7001:443
     depends_on:
+      - identityserverhost-microservice
       - sqlserver-microservice
     environment:
       - Logging__LogLevel__Default=Debug

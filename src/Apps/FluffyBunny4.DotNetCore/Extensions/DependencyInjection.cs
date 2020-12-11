@@ -4,11 +4,24 @@ using FluffyBunny4.DotNetCore.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FluffyBunny4.DotNetCore.Services.Defaults;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddNullDataProtection(this IServiceCollection services)
+        {
+            services.AddSingleton<IDataProtection, NullDataProtection>();
+            return services;
+        }
+
+        public static IServiceCollection AddDataProtection(this IServiceCollection services)
+        {
+            services.AddSingleton<IDataProtection, DataProtection>();
+            return services;
+        }
+
         public static IServiceCollection AddScopedStorage(this IServiceCollection services)
         {
             services.AddSingleton<IScopedStorage, ThreadSafeScopedStorage>();

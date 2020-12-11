@@ -45,7 +45,40 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
       - ASPNETCORE_HTTPS_PORT=7301
 
- 
+  identityserverhost-microservice:
+    image: ghstahl/identityserverhost:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 7400:80
+      - 7401:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=7401
+
+  webappexternallogin-microservice:
+    image: ghstahl/webappexternallogin:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 44299:80
+      - 44300:443
+    environment:
+      - externalOIDC__0__authority=https://demo.identityserver.io/
+      - externalOIDC__0__clientId=interactive.confidential
+      - externalOIDC__0__clientSecret=secret
+      - externalOIDC__0__callbackPath=/signin-demo-identityserver
+      - externalOIDC__1__authority=${externalOIDC__1__authority}
+      - externalOIDC__1__clientId=${externalOIDC__1__clientId}
+      - externalOIDC__1__clientSecret=${externalOIDC__1__clientSecret}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=44300
 
 volumes:
   sqlsystem:

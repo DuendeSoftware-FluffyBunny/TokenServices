@@ -9,6 +9,42 @@ namespace Microsoft.AspNetCore.Mvc
     public static class StringExtensions
     {
         [DebuggerStepThrough]
+        public static string AddHashFragment(this string url, string query)
+        {
+            if (!url.Contains("#"))
+            {
+                url += "#";
+            }
+
+            return url + query;
+        }
+        [DebuggerStepThrough]
+        public static string AddQueryString(this string url, string query)
+        {
+            if (!url.Contains("?"))
+            {
+                url += "?";
+            }
+            else if (!url.EndsWith("&"))
+            {
+                url += "&";
+            }
+
+            return url + query;
+        }
+
+        [DebuggerStepThrough]
+        public static string EnsureLeadingSlash(this string url)
+        {
+            if (!url.StartsWith("/"))
+            {
+                return "/" + url;
+            }
+
+            return url;
+        }
+
+        [DebuggerStepThrough]
         public static string ToSpaceSeparatedString(this IEnumerable<string> list)
         {
             if (list == null)

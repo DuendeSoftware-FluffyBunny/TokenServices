@@ -148,7 +148,7 @@ namespace FluffyBunny4.Validation
                 return;
             }
 
-            DateTime tokenCreateTime;
+            DateTime tokenIssuedAtTime;
             List<Claim> claims;
             var subject = "";
             switch (subjectTokenType)
@@ -182,18 +182,18 @@ namespace FluffyBunny4.Validation
                             new Exception(validatedResultAccessToken.Error));
                     }
 
-                    var authTime = claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.AuthenticationTime);
-                    if (authTime == null)
+                    var issuedAt = claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.IssuedAt);
+                    if (issuedAt == null)
                     {
                         throw new Exception(
-                            $"failed to validate, {JwtClaimTypes.AuthenticationTime} is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}",
+                            $"failed to validate, {JwtClaimTypes.IssuedAt} is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}",
                             new Exception(validatedResultAccessToken.Error));
                     }
 
-                    var unixSeconds = Convert.ToInt64(authTime.Value);
+                    var unixSeconds = Convert.ToInt64(issuedAt.Value);
                     DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixSeconds);
 
-                    tokenCreateTime = dateTimeOffset.UtcDateTime;
+                    tokenIssuedAtTime = dateTimeOffset.UtcDateTime;
 
                     var referenceTokenStoreGrantStoreHashAccessor = _referenceTokenStore as IGrantStoreHashAccessor;
                     var hashKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(subjectToken);
@@ -299,9 +299,9 @@ namespace FluffyBunny4.Validation
                 new Claim(JwtClaimTypes.AuthenticationMethod, GrantType)
             };
 
-            context.Result = new GrantValidationResult(subject, GrantType, tokenCreateTime,claims);
+            context.Result = new GrantValidationResult(subject, GrantType, tokenIssuedAtTime,claims);
             _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.ExtensionGrantValidationContext, context);
-            _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.OverrideTokenCreationTime, tokenCreateTime);
+            _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.OverrideTokenIssuedAtTime, tokenIssuedAtTime);
             return;
         }
 

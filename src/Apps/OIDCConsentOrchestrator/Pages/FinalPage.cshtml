@@ -1,0 +1,95 @@
+﻿@page
+@model OIDCConsentOrchestrator.Pages.FinalPageModel
+@{
+}
+<div class="text-center">
+    <p>
+        <center>
+            <img src="~/images/Openid_connect_logo_high-1.png" class="img" alt="My image" />
+        </center>
+    </p>
+    <p>Discovery <a href="~/.well-known/openid-configuration">openid-configuration</a>.</p>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row">
+
+    @if (HttpContext.User.Identity.IsAuthenticated)
+    {
+        <form method="POST" class="form-horizontal">
+            <button type="submit" asp-route-data="foo" asp-page-handler="Way2">Way 2</button>
+        </form>
+
+
+
+        <div class="col-md-9">
+            <h2>User</h2>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var claim in Model.Claims)
+                    {
+                        <tr>
+                            <th scope="row">@claim.Type</th>
+                            <td>@claim.Value</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+<div class="row">
+
+    @if (HttpContext.User.Identity.IsAuthenticated && Model.IdTokenResponse != null)
+    {
+        <div class="col-md-9">
+            <h2>OIDC</h2>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.LoginProvider)</th>
+                        <td>@Model.IdTokenResponse.LoginProvider</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.IdToken)</th>
+                        <td>@Model.IdTokenResponse.IdToken</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.AccessToken)</th>
+                        <td>@Model.IdTokenResponse.AccessToken</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.RefreshToken)</th>
+                        <td>@Model.IdTokenResponse.RefreshToken</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.TokenType)</th>
+                        <td>@Model.IdTokenResponse.TokenType</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">@nameof(Model.IdTokenResponse.ExpiresAt)</th>
+                        <td>@Model.IdTokenResponse.ExpiresAt</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>

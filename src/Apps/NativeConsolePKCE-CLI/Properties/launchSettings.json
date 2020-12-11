@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NativeConsolePKCE-CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "login -c 1234"
+    }
+  }
+}

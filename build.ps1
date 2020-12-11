@@ -41,6 +41,16 @@ docker tag  fluffybunny4/fluffybunny.admin:latest ghstahl/fluffybunny.admin:late
 docker build -f ./Dockerfile-TokenService -t fluffybunny4/tokenservice .
 docker tag  fluffybunny4/tokenservice:latest ghstahl/tokenservice:latest
 
+docker build -f ./Dockerfile-IdentityServerHost -t fluffybunny4/identityserverhost .
+docker tag  fluffybunny4/identityserverhost:latest ghstahl/identityserverhost:latest
+
+docker build -f ./Dockerfile-WebAppExternalLogin -t fluffybunny4/webappexternallogin .
+docker tag  fluffybunny4/webappexternallogin:latest ghstahl/webappexternallogin:latest
+
+docker build -f ./Dockerfile-OIDCConsentOrchestrator -t fluffybunny4/oidcconsentorchestrator .
+docker tag  fluffybunny4/oidcconsentorchestrator:latest ghstahl/oidcconsentorchestrator:latest
+
+
 # push to docker hub.
 # docker push ghstahl/sampleexternalservice:latest
 

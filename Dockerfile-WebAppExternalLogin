@@ -1,0 +1,16 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+ 
+FROM fluffybunny4/build AS build
+WORKDIR /src
+RUN dotnet publish  ./src/Apps/WebAppExternalLogin -c Release -o /out --no-restore --no-build
+RUN ls
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=build /out .
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+ENTRYPOINT ["dotnet", "WebAppExternalLogin.dll"]

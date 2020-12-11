@@ -1,0 +1,97 @@
+﻿@page
+@model OIDCConsentOrchestrator.Pages.AuthorizeConsentModel
+@{
+}
+
+<div class="card">
+    <div class="card-header">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">@nameof(Model.NameIdentifier)</th>
+ 
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">@Model.NameIdentifier</th>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+
+            <tbody>
+                <tr>
+                    <th scope="row">@nameof(Model.NameIdentifier)</th>
+                    <td>@Model.NameIdentifier</td>
+                </tr>
+               
+                @foreach (var rawRequest in Model.OriginalAuthorizationRequest.Raw)
+                {
+                    <tr>
+                        <th scope="row">@rawRequest.Key</th>
+                        <td>@rawRequest.Value</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">@nameof(Model.NameIdentifier)</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">@Model.NameIdentifier</th>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+
+            <tbody>
+                <tr>
+                    <th scope="row">@nameof(Model.TokenPayload.Scope)</th>
+                    <td>@Model.TokenPayload.Scope</td>
+                </tr>
+                <tr>
+                    <th scope="row">@nameof(Model.TokenPayload.AccessToken)</th>
+                    <td>@Model.TokenPayload.AccessToken</td>
+                </tr>
+                <tr>
+                    <th scope="row">@nameof(Model.TokenPayload.RefreshToken)</th>
+                    <td>@Model.TokenPayload.RefreshToken</td>
+                </tr>
+                <tr>
+                    <th scope="row">@nameof(Model.TokenPayload.IssuedTokenType)</th>
+                    <td>@Model.TokenPayload.IssuedTokenType</td>
+                </tr>
+                <tr>
+                    <th scope="row">@nameof(Model.TokenPayload.TokenType)</th>
+                    <td>@Model.TokenPayload.TokenType</td>
+                </tr>
+
+            </tbody>
+        </table>
+        <p>
+            @Model.TokenPayload.Raw
+        </p>
+    </div>
+</div>
