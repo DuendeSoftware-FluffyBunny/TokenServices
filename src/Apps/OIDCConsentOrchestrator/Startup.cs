@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using OIDCConsentOrchestrator.Models;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +21,7 @@ using OpenIdConnectModels;
 using Nito.AsyncEx;
 using OIDCConsentOrchestrator.Models.Client;
 using System.Net.Http;
+using System.Text.Json;
 using FluffyBunny4.DotNetCore;
 using OIDCConsentOrchestrator.Services;
 using OIDCPipeline.Core;
@@ -66,11 +66,19 @@ namespace OIDCConsentOrchestrator
                 AppOptions = Configuration
                       .GetSection("AppOptions")
                       .Get<AppOptions>();
+                _logger.LogDebug("AppOptions");
+                _logger.LogDebug(ToJson(AppOptions));
 
                 services.Configure<DataProtectionOptions>(Configuration.GetSection("DataProtectionOptions"));
                 services.Configure<FluffyBunny4TokenServiceConfiguration>(Configuration.GetSection("FluffyBunny4TokenServiceConfiguration"));
 
-                
+
+                var fbtsc = Configuration
+                    .GetSection("FluffyBunny4TokenServiceConfiguration")
+                    .Get<FluffyBunny4TokenServiceConfiguration>();
+                _logger.LogDebug("FluffyBunny4TokenServiceConfiguration");
+                _logger.LogDebug(ToJson(fbtsc));
+
                 OpenIdConnectSchemeRecords = Configuration
                   .GetSection("OpenIdConnect")
                   .Get<List<OpenIdConnectSchemeRecord>>();
@@ -91,9 +99,30 @@ namespace OIDCConsentOrchestrator
 
 
                 services.AddHttpClient();
-            
- 
-               
+
+                Func<HttpMessageHandler> configureHandler = () =>
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        //!DO NOT DO IT IN PRODUCTION!! GO AND CREATE VALID CERTIFICATE!
+                       
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                    return handler;
+                };
+
+                if (AppOptions.DangerousAcceptAnyServerCertificateValidator)
+                {
+                    services.AddHttpClient("HttpClient").ConfigurePrimaryHttpMessageHandler(configureHandler);
+                    services.AddHttpClient("token-service").ConfigurePrimaryHttpMessageHandler(configureHandler);
+                }
+                else
+                {
+                    services.AddHttpClient("HttpClient");
+                    services.AddHttpClient("token-service");
+                }
+
+
 
                 services.AddSingleton<IOpenIdConnectSchemeRecords>(new InMemoryOpenIdConnectSchemeRecords(openIdConnectSchemeRecordSchemeRecords));
 
@@ -222,6 +251,16 @@ namespace OIDCConsentOrchestrator
             {
                 _deferedException = ex;
             }
+        }
+        string ToJson<T>(T obj)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IgnoreNullValues = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            return JsonSerializer.Serialize(obj, jsonSerializerOptions);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

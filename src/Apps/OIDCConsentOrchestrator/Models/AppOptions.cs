@@ -19,5 +19,6 @@ namespace OIDCConsentOrchestrator.Models
         public double CookieTTL { get; set; }
         public string DownstreamAuthorityScheme { get; set; }
     
+        public bool DangerousAcceptAnyServerCertificateValidator { get; set; }
     }
 }

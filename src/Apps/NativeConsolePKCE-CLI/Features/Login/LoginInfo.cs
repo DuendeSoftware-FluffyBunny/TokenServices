@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace NativeConsolePKCE_CLI.Features.Login
 {
@@ -72,7 +73,7 @@ namespace NativeConsolePKCE_CLI.Features.Login
                     var serilog = new LoggerConfiguration()
                        .MinimumLevel.Verbose()
                        .Enrich.FromLogContext()
-                       .WriteTo.LiterateConsole(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}")
+                       .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}")
                        .CreateLogger();
 
                     options.LoggerFactory.AddSerilog(serilog);

@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using FluffyBunny4.DotNetCore;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace NativeConsolePKCE_CLI.Features.Login
 {

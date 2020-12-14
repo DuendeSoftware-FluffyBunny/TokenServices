@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NativeConsolePKCE_CLI.Features.Login;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Threading.Tasks;
+using FluffyBunny4.DotNetCore.Services;
 using static NativeConsolePKCE_CLI.Features.Login.Commands;
 
 namespace NativeConsolePKCE_CLI
@@ -47,7 +49,7 @@ namespace NativeConsolePKCE_CLI
                     services
                         .AddMediatR(typeof(Program).Assembly)
                         .AddAutoMapper(typeof(Program).Assembly);
-                    services.AddSingleton<ISerializer, Serializer>();
+                    services.AddSingleton<ISerializer, FluffyBunny4.DotNetCore.Services.Serializer>();
 
 
                     services.AddTransient<LoginInfo.Request>();

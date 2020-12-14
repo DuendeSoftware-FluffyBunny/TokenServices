@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;

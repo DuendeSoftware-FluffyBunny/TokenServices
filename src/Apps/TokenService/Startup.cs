@@ -45,6 +45,8 @@ namespace TokenService
 
         public IConfiguration Configuration { get; }
         public IHostEnvironment HostingEnvironment { get; }
+        public AppOptions AppOptions { get; private set; }
+
         private ILogger _logger;
         private Exception _deferedException;
         public Startup(
@@ -90,10 +92,10 @@ namespace TokenService
             try
             {
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                var appOptions = Configuration
+                AppOptions = Configuration
                     .GetSection("AppOptions")
                     .Get<AppOptions>();
-                _logger.LogDebug($"appOptions:{ToJson(appOptions)}");
+                _logger.LogDebug($"appOptions:{ToJson(AppOptions)}");
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));
                 var keyVaultSigningOptions = Configuration
                     .GetSection("KeyVaultSigningOptions")
@@ -237,7 +239,7 @@ namespace TokenService
                         $"entityFrameworkConnectionOptions:{ToJson(entityFrameworkConnectionOptions)}");
                 }
 
-                switch (appOptions.DatabaseType)
+                switch (AppOptions.DatabaseType)
                 {
                     default:
                     case AppOptions.DatabaseTypes.InMemory:
@@ -329,7 +331,7 @@ namespace TokenService
                         throw new Exception("Need a SigningType!");
                 }
 
-                switch (appOptions.OperationalStoreType)
+                switch (AppOptions.OperationalStoreType)
                 {
                     default:
                     case AppOptions.DatabaseTypes.InMemory:
@@ -378,7 +380,10 @@ namespace TokenService
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenService v1"));
             }
 
-            app.UseHttpsRedirection();
+            if (!AppOptions.DisableHttpRedirect)
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseForwardedHeaders();
 
             app.UseRouting();

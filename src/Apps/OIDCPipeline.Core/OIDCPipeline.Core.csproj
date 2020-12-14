@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="4.4.0" />
+    <PackageReference Include="IdentityModel" Version="4.5.0" />
     <PackageReference Include="IdentityServer4" Version="4.1.1" />
     <PackageReference Include="IdentityServer4.Storage" Version="4.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
     <ProjectReference Include="..\OpenIdConnectModels\OpenIdConnectModels.csproj" />
   </ItemGroup>

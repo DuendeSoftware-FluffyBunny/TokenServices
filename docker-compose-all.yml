@@ -59,6 +59,40 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
       - ASPNETCORE_HTTPS_PORT=7401
 
+  tokenservice-microservice:
+    image: ghstahl/tokenservice:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 7000:80
+      - 7001:443
+    depends_on:
+      - identityserverhost-microservice
+      - sqlserver-microservice
+    environment:
+      - Logging__LogLevel__Default=Debug
+      - AppOptions__DisableHttpRedirect=true
+      - AppOptions__OperationalStoreType=InMemory
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=7001
+      - ARM_CLIENT_ID=${ARM_CLIENT_ID}
+      - ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
+      - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
+      - ARM_TENANT_ID=${ARM_TENANT_ID}
+      - KeyVaultSigningOptions__KeyVaultName=kv-fluffybunny4
+      - CosmosDbConfiguration__DangerousAcceptAnyServerCertificateValidator=true
+      - CosmosDbConfiguration__EndPointUrl=https://host.docker.internal:8081
+      - CosmosDbConfiguration__PrimaryKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+      - AZURE_CosmosDbConfiguration__EndPointUrl=https://fluffybunny4.documents.azure.com:443
+      - AZURE_CosmosDbConfiguration__PrimaryKey=**REDACTED**
+      - BLAH_ConnectionStrings__DefaultConnection=Server=(sqlserver-microservice)\\mssqllocaldb;Database=aspnet-FluffyBunny.Admin-53bc9b9d-9d6a-45d4-8429-2a2761773502;Trusted_Connection=True;MultipleActiveResultSets=true
+      - ConnectionStrings__DefaultConnection=Server=sqlserver-microservice;Database=myDataBase;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+      - EntityFrameworkConnectionOptions__ConnectionString=Server=sqlserver-microservice;Database=fluffybunny;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+      - EntityFrameworkConnectionOptions__ConnectionStringDatabaseTemplate=Server=sqlserver-microservice;Database={{Database}};User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+
   webappexternallogin-microservice:
     image: ghstahl/webappexternallogin:latest
     volumes:
@@ -80,57 +114,6 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
       - ASPNETCORE_HTTPS_PORT=44300
 
-  oidcconsentorchestrator-microservice:
-    image: ghstahl/oidcconsentorchestrator:latest
-    volumes:
-      - ${CERTIFICATE_PATH}:/root/.dotnet/https
-    ports:
-      - 6600:80
-      - 6601:443
-    environment:
-      - oidcOptionStore__Google__clientRecords__0__ClientId=${oidcOptionStore__Google__clientRecords__0__ClientId}
-      - oidcOptionStore__Google__clientRecords__0__Secret=${oidcOptionStore__Google__clientRecords__0__Secret}
-      - FluffyBunny4TokenServiceConfiguration__ClientId=301e4b53-27c2-4508-86f7-448f08229a44
-      - FluffyBunny4TokenServiceConfiguration__ClientSecret=NkFzuAe3V8LL4PHSjuPCPCRE5HXQ53bq
-      - FluffyBunny4TokenServiceConfiguration__Authority=https://tokenservice-microservice/zep
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
-      - ASPNETCORE_HTTPS_PORT=6601
-
-  tokenservice-microservice:
-    image: ghstahl/tokenservice:latest
-    volumes:
-      - ${CERTIFICATE_PATH}:/root/.dotnet/https
-    ports:
-      - 7000:80
-      - 7001:443
-    depends_on:
-      - identityserverhost-microservice
-      - sqlserver-microservice
-    environment:
-      - Logging__LogLevel__Default=Debug
-      - AppOptions__OperationalStoreType=InMemory
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
-      - ASPNETCORE_HTTPS_PORT=7001
-      - ARM_CLIENT_ID=${ARM_CLIENT_ID}
-      - ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
-      - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
-      - ARM_TENANT_ID=${ARM_TENANT_ID}
-      - KeyVaultSigningOptions__KeyVaultName=kv-fluffybunny4
-      - CosmosDbConfiguration__DangerousAcceptAnyServerCertificateValidator=true
-      - CosmosDbConfiguration__EndPointUrl=https://host.docker.internal:8081
-      - CosmosDbConfiguration__PrimaryKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
-      - AZURE_CosmosDbConfiguration__EndPointUrl=https://fluffybunny4.documents.azure.com:443
-      - AZURE_CosmosDbConfiguration__PrimaryKey=**REDACTED**
-      - BLAH_ConnectionStrings__DefaultConnection=Server=(sqlserver-microservice)\\mssqllocaldb;Database=aspnet-FluffyBunny.Admin-53bc9b9d-9d6a-45d4-8429-2a2761773502;Trusted_Connection=True;MultipleActiveResultSets=true
-      - ConnectionStrings__DefaultConnection=Server=sqlserver-microservice;Database=myDataBase;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
-      - EntityFrameworkConnectionOptions__ConnectionString=Server=sqlserver-microservice;Database=fluffybunny;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
-      - EntityFrameworkConnectionOptions__ConnectionStringDatabaseTemplate=Server=sqlserver-microservice;Database={{Database}};User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
     
 
 volumes:

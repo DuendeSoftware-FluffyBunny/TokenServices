@@ -28,6 +28,8 @@ namespace OIDCConsentOrchestrator.Pages
     {
         private const string ScopeBaseUrl = "https://www.companyapis.com/auth/";
         public string IdToken { get; set; }
+
+        private IHttpClientFactory _httpClientFactory;
         private IOIDCPipeLineKey _oidcPipelineKey;
         private IOIDCPipelineStore _oidcPipelineStore;
         private IFluffyBunnyTokenService _fluffyBunnyTokenService;
@@ -38,6 +40,7 @@ namespace OIDCConsentOrchestrator.Pages
       
 
         public AuthorizeConsentModel(
+            IHttpClientFactory httpClientFactory,
             IOIDCPipeLineKey oidcPipelineKey,
             IOIDCPipelineStore oidcPipelineStore,
             IFluffyBunnyTokenService fluffyBunnyTokenService,
@@ -46,6 +49,7 @@ namespace OIDCConsentOrchestrator.Pages
             ISerializer serializer,
             ILogger<AuthorizeConsentModel> logger)
         {
+            _httpClientFactory = httpClientFactory;
             _oidcPipelineKey = oidcPipelineKey;
             _oidcPipelineStore = oidcPipelineStore;
             _fluffyBunnyTokenService = fluffyBunnyTokenService;
@@ -98,6 +102,8 @@ namespace OIDCConsentOrchestrator.Pages
             
 
             var docoTokenService = await _tokenServiceDiscoveryCache.GetAsync();
+            _logger.LogDebug(docoTokenService.Raw);
+
             /*
             ArbitraryTokenTokenRequestV2 = new ArbitraryTokenTokenRequestV2() {
                 Address = docoTokenService.TokenEndpoint,
@@ -121,10 +127,15 @@ namespace OIDCConsentOrchestrator.Pages
                 SubjectTokenType = FluffyBunny4.Constants.TokenExchangeTypes.IdToken,
                 SubjectToken = IdToken
             };
- 
+            _logger.LogDebug(_serializer.Serialize(TokenExchangeTokenRequest,true));
 
-            var httpClient = new HttpClient();
-            TokenPayload = await _fluffyBunnyTokenService.RequestTokenExchangeTokenAsync(httpClient, TokenExchangeTokenRequest);
+            var client = _httpClientFactory.CreateClient("HttpClient");
+            TokenPayload = await _fluffyBunnyTokenService.RequestTokenExchangeTokenAsync(client, TokenExchangeTokenRequest);
+            if (TokenPayload.IsError)
+            {
+                _logger.LogError("RequestTokenExchangeTokenAsync");
+                _logger.LogError(TokenPayload.ErrorDescription);
+            }
             var tokenExchangePayload = new
             {
                 access_token = TokenPayload.AccessToken,

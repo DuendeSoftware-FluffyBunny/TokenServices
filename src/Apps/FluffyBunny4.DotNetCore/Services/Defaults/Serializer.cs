@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace FluffyBunny4.DotNetCore.Services
 {
-    internal class Serializer : ISerializer
+    public class Serializer : ISerializer
     {
         public T Deserialize<T>(string text) where T : class
         {
