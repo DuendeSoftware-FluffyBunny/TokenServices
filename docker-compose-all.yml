@@ -114,8 +114,34 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
       - ASPNETCORE_HTTPS_PORT=44300
 
+ 
+  oidcconsentorchestrator-microservice:
+    image: ghstahl/oidcconsentorchestrator:latest
+    volumes:
+      - ${CERTIFICATE_PATH}:/root/.dotnet/https
+    ports:
+      - 6600:80
+      - 6601:443
+    environment:
+      - AppOptions__DangerousAcceptAnyServerCertificateValidator=true
+      - Logging__LogLevel__Default=Debug    
+      - oidcOptionStore__Google__clientRecords__0__ClientId=${oidcOptionStore__Google__clientRecords__0__ClientId}
+      - oidcOptionStore__Google__clientRecords__0__Secret=${oidcOptionStore__Google__clientRecords__0__Secret}
+      - FluffyBunny4TokenServiceConfiguration__ClientId=301e4b53-27c2-4508-86f7-448f08229a44
+      - FluffyBunny4TokenServiceConfiguration__ClientSecret=NkFzuAe3V8LL4PHSjuPCPCRE5HXQ53bq
+      - FluffyBunny4TokenServiceConfiguration__Authority=https://host.docker.internal:7001/zep
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_KESTREL_CERTIFICATE_PATH}
+      - ASPNETCORE_HTTPS_PORT=6601
+    networks:
+      - local
+   
+networks:
+  local:
+    driver: bridge
     
-
 volumes:
   sqlsystem:
   sqldata:
