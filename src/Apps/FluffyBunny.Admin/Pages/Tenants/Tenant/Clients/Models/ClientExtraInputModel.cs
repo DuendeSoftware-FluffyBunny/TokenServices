@@ -14,6 +14,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models
         public DateTime Updated { get; set; }
 
         public bool Readonly { get; set; }
+
         [Required]
         [DataType(DataType.Text)]
         public string ClientId { get; set; }
@@ -21,6 +22,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models
         [Required]
         [DataType(DataType.Text)]
         public string ClientName { get; set; }
+
         [Required]
         [DataType(DataType.Text)]
         public string Description { get; set; }

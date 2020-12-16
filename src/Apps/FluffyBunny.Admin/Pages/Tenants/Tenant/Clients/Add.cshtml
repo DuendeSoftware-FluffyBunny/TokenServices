@@ -19,7 +19,6 @@
             Add Client
         </div>
         <input hidden asp-for="TenantId" class="form-control" />
-        <input hidden asp-for="Input.ClientId" class="form-control" />
         <div id="cardBodyId">
 
             <div class="card-body">
@@ -43,7 +42,8 @@
                                     @nameof(Model.Input.ClientId)
                                 </td>
                                 <td class="w-50">
-                                    @Model.Input.ClientId
+                                    <input asp-for="Input.ClientId" class="form-control" />
+                                    <span asp-validation-for="Input.ClientId" class="text-danger"></span>
                                 </td>
                             </tr>
                             <tr>
