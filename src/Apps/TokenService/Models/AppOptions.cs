@@ -12,7 +12,8 @@ namespace TokenService.Models
             Postgres,
             CosmosDB,
             InMemory,
-            SqlServer
+            SqlServer,
+            EntityFramework
         }
         public DatabaseTypes DatabaseType { get; set; }
         public DatabaseTypes OperationalStoreType { get; set; }

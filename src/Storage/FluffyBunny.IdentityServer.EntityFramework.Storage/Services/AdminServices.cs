@@ -28,18 +28,28 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
         }
-        public async Task EnsureTenantDatabaseAsync()
+        public async Task EnsureMainConfigurationDatabaseAsync()
         {
             await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
             await _mainEntityCoreContext.DbContext.Database.MigrateAsync();
         }
+        public async Task EnsureTenantDatabaseAsync(string name)
+        {
+            Guard.ArgumentNotNullOrEmpty(nameof(name), name);
+            var tenantContext =
+                _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
+            Guard.NotNull(nameof(tenantContext), tenantContext);
+            await tenantContext.DbContext.Database.EnsureCreatedAsync();
+            await tenantContext.DbContext.Database.MigrateAsync();
+
+        }
+
         public async Task CreateTenantAsync(string name)
         {
             Guard.ArgumentNotNullOrEmpty(nameof(name), name);
 
             // ensure db created
-            await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
-            await _mainEntityCoreContext.DbContext.Database.MigrateAsync();
+            await EnsureMainConfigurationDatabaseAsync();
             var tenantInDb = await _mainEntityCoreContext.Tenants.FirstOrDefaultAsync(x => x.Name == name);
             if (tenantInDb == null)
             {
@@ -54,8 +64,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 await _mainEntityCoreContext.SaveChangesAsync();
 
                 // ensure tenant database is created
-                await tenantContext.DbContext.Database.EnsureCreatedAsync();
-                await tenantContext.DbContext.Database.MigrateAsync();
+                await EnsureTenantDatabaseAsync(name);
             }
         }
 

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Duende.IdentityServer.Models;
+using Duende.IdentityServer.EntityFramework.Entities;
 
-namespace FluffyBunny4.Models
+namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Entities
 {
-    public class PersistedGrantExtra: PersistedGrant
+    public class PersistedGrantExtra : PersistedGrant
     {
         public string RefreshTokenKey { get; set; }
-      //  public string AccessTokenKey { get; set; }
     }
 }

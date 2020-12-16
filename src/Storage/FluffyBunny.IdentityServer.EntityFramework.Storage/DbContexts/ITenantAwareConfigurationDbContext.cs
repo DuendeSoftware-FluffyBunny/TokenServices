@@ -10,6 +10,7 @@ namespace Microsoft.EntityFrameworkCore
         DbSet<ExternalService> ExternalServices { get; set; }
  
         public DbSet<ClientExtra> Clients { get; set; }
+        public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }
 
         public DbSet<ClientCorsOrigin> ClientCorsOrigins { get; set; }
 
@@ -18,6 +19,8 @@ namespace Microsoft.EntityFrameworkCore
         public DbSet<ApiResource> ApiResources { get; set; }
 
         public DbSet<ApiScope> ApiScopes { get; set; }
+
+        
         DbContext DbContext { get; }
         Task<int> SaveChangesAsync();
 

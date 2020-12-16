@@ -9,9 +9,11 @@ using FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Stores;
+using FluffyBunny4.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
 {
@@ -102,6 +104,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
         {
             return services.AddClientStoreCache<EntityFrameworkClientStore>();
         }
+
+        public static IServiceCollection AddEntityFrameworkOperationalStore(
+            this IServiceCollection services)
+        {
+            services.AddTransient<IPersistedGrantStoreEx, EntityFrameworkPersistedGrantStoreEx>();
+            services.AddTransient<IPersistedGrantStore, EntityFrameworkPersistedGrantStoreEx>();
+
+            services.AddSingleton<IHostedService, FluffyBunny.IdentityServer.EntityFramework.Storage.Services.TokenCleanupHost>();
+            services.AddTransient<TenantAwareTokenCleanupService>();
+            return services;
+        }
+
         public static IServiceCollection AddClientStoreCache<T>(this IServiceCollection services)
             where T : IClientStore
         {

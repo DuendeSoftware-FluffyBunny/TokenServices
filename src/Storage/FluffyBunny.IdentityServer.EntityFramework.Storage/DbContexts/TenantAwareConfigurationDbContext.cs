@@ -15,26 +15,34 @@ namespace Microsoft.EntityFrameworkCore
         private string _tenantId;
         private IDbContextOptionsProvider _dbContextOptionsProvider;
         private ConfigurationStoreOptions _storeOptions;
+        private OperationalStoreOptions _operationalStoreOptions;
 
         // only used to build out migrations
         public TenantAwareConfigurationDbContext(
-            DbContextOptions<TenantAwareConfigurationDbContext> options, ConfigurationStoreOptions storeOptions) :
+            DbContextOptions<TenantAwareConfigurationDbContext> options, 
+            ConfigurationStoreOptions storeOptions,
+            OperationalStoreOptions operationalStoreOptions) :
             base(options)
         {
             this._storeOptions = storeOptions ?? throw new ArgumentNullException(nameof(storeOptions));
+            this._operationalStoreOptions = operationalStoreOptions ?? throw new ArgumentNullException(nameof(operationalStoreOptions));
+             
         }
 
         public TenantAwareConfigurationDbContext(
             string tenantId, 
             ConfigurationStoreOptions storeOptions,
+            OperationalStoreOptions operationalStoreOptions,
             IDbContextOptionsProvider dbContextOptionsProvider)
         {
-            _tenantId = tenantId;
-            _storeOptions = storeOptions;
-            _dbContextOptionsProvider = dbContextOptionsProvider;
-            _storeOptions.ConfigureDbContext = o =>
+            this._storeOptions = storeOptions ?? throw new ArgumentNullException(nameof(storeOptions));
+            this._operationalStoreOptions = operationalStoreOptions ?? throw new ArgumentNullException(nameof(operationalStoreOptions));
+
+            _tenantId = tenantId ?? throw new ArgumentNullException(nameof(tenantId));
+            _dbContextOptionsProvider = dbContextOptionsProvider ?? throw new ArgumentNullException(nameof(dbContextOptionsProvider));
+            _storeOptions.ConfigureDbContext = optionsBuilder =>
             {
-                _dbContextOptionsProvider.Configure(o);
+                _dbContextOptionsProvider.Configure(optionsBuilder);
             };
         }
 
@@ -55,6 +63,14 @@ namespace Microsoft.EntityFrameworkCore
         /// </value>
         public DbSet<ClientExtra> Clients { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Persisted Grants.
+        /// </summary>
+        /// <value>
+        /// The PersistedGrants.
+        /// </value>
+        public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }
+ 
         /// <summary>
         /// Gets or sets the clients' CORS origins.
         /// </summary>
@@ -86,6 +102,7 @@ namespace Microsoft.EntityFrameworkCore
         /// The API resources.
         /// </value>
         public DbSet<ApiScope> ApiScopes { get; set; }
+     
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -127,7 +144,7 @@ namespace Microsoft.EntityFrameworkCore
             
             modelBuilder.ConfigureClientContext(_storeOptions);
             modelBuilder.ConfigureResourcesContext(_storeOptions);
-
+            modelBuilder.ConfigurePersistedGrantContext(_operationalStoreOptions);
             base.OnModelCreating(modelBuilder);
         }
     }

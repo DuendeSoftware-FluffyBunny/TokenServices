@@ -55,8 +55,12 @@ namespace TestWebApp
 
             }
             services.AddDbContextTenantServices();
+
             var options = new ConfigurationStoreOptions();
             services.AddSingleton(options);
+
+            var operationalStoreOptions = new OperationalStoreOptions();
+            services.AddSingleton(operationalStoreOptions);
 
         }
 

@@ -104,7 +104,7 @@ namespace FluffyBunny4.Stores
                         await _innerPersistedGrantStore.StoreAsync(extra);
 
                         extra = _coreMapperAccessor.Mapper.Map<PersistedGrantExtra>(grant);
-                        extra.AccessTokenKey = grantStored.Key;
+                   //     extra.AccessTokenKey = grantStored.Key;
                         await _innerPersistedGrantStore.StoreAsync(extra);
 
                         return;

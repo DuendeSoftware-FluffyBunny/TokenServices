@@ -205,6 +205,13 @@ namespace TokenService
 
                 var options = new ConfigurationStoreOptions();
                 services.AddSingleton(options);
+
+                var operationalStoreOptions = new OperationalStoreOptions
+                {
+                    EnableTokenCleanup = true
+                };
+                services.AddSingleton(operationalStoreOptions);
+
                 services.AddSingleton<IConsentExternalService, ConsentExternalService>();
 
                 _logger.LogInformation("ConfigureServices - AddIdentityServer ");
@@ -339,6 +346,9 @@ namespace TokenService
                         break;
                     case AppOptions.DatabaseTypes.CosmosDB:
                         services.AddCosmosOperationalStore();
+                        break;
+                    case AppOptions.DatabaseTypes.EntityFramework:
+                        services.AddEntityFrameworkOperationalStore();
                         break;
                 }
 

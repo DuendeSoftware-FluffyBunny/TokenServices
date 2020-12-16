@@ -48,8 +48,9 @@ namespace FluffyBunny.Admin.Pages.Tenant
                Enabled = Tenant.Enabled
            };
         }
-        public async Task<IActionResult> OnPostAsync(string tenantName)
+        public async Task<IActionResult> OnPostAsync()
         {
+            await _adminServices.EnsureTenantDatabaseAsync(TenantId);
             Tenant = await _adminServices.GetTenantByNameAsync(TenantId);
             Tenant.Enabled = Input.Enabled;
             await _adminServices.UpdateTenantAsync(Tenant);

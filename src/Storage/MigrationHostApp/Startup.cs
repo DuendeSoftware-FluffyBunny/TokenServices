@@ -46,8 +46,12 @@ namespace MigrationHostApp
                     break;
             }
             services.AddDbContextTenantServices();
+
             var options = new ConfigurationStoreOptions();
             services.AddSingleton(options);
+
+            var operationalStoreOptions = new OperationalStoreOptions();
+            services.AddSingleton(operationalStoreOptions);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

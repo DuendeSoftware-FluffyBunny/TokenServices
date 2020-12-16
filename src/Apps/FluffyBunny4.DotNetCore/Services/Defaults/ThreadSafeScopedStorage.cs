@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace FluffyBunny4.DotNetCore.Services
 {
@@ -15,7 +16,13 @@ namespace FluffyBunny4.DotNetCore.Services
         }
         public bool TryGetValue(string key, out object value)
         {
+           
             return Storage.TryGetValue(key, out value);
+        }
+
+        public bool TryRemove(string key, out object value)
+        {
+            return Storage.TryRemove(key, out value);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace FluffyBunny.Admin.Pages.Tenants
         }
         public async Task OnGetAsync(TenantsSortType sortOrder,int? pageNumber,int? pageSize)
         {
-            await _adminServices.EnsureTenantDatabaseAsync();
+            await _adminServices.EnsureMainConfigurationDatabaseAsync();
             PageSize = _pagingHelper.ValidatePageSize(pageSize);
             PageSizeOptions = _pagingHelper.GetPagingSizeOptions();
             SelectedPageSize = PageSize;

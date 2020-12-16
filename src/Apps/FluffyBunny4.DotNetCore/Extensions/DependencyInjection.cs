@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddScopedStorage(this IServiceCollection services)
         {
-            services.AddSingleton<IScopedStorage, ThreadSafeScopedStorage>();
+            services.AddScoped<IScopedStorage, ThreadSafeScopedStorage>();
             return services;
         }
         public static IServiceCollection AddHostStorage(this IServiceCollection services)

@@ -117,9 +117,15 @@ namespace FluffyBunny.Admin
 
                 }
                 services.AddDbContextTenantServices();
+                
                 var options = new ConfigurationStoreOptions();
                 services.AddSingleton(options);
 
+                var operationalStoreOptions = new OperationalStoreOptions
+                {
+                    EnableTokenCleanup = true
+                };
+                services.AddSingleton(operationalStoreOptions);
 
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(
