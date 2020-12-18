@@ -18,15 +18,18 @@ namespace IdentityServer4.Validation
     /// </summary>
     public class MyDefaultResourceValidator : DefaultResourceValidator
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
         private readonly ILogger _logger;
 
         public MyDefaultResourceValidator(
+            IHttpContextAccessor httpContextAccessor,
             IResourceStore store,
             IScopeParser scopeParser,
             IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             ILogger<DefaultResourceValidator> logger) : base(store, scopeParser, logger)
         {
+            _httpContextAccessor = httpContextAccessor;
             _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
             _logger = logger;
         }
@@ -44,8 +47,19 @@ namespace IdentityServer4.Validation
         {
             var parameters = await _scopedHttpContextRequestForm.GetFormCollectionAsync();
             var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
+
+            if (grantType == null)
+            {
+                // check if this is deviceauthorizaiton.
+                if ( _httpContextAccessor.HttpContext.Request.Path.ToString().Contains("deviceauthorization"))
+                {
+                    grantType = Constants.GrantType.DeviceAuthorization;
+                }
+            }
+
             switch (grantType)
             {
+                case Constants.GrantType.DeviceAuthorization:
                 case Constants.GrantType.TokenExchangeMutate:
                 case Constants.GrantType.TokenExchange:
                 case Constants.GrantType.ArbitraryToken:

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using IdentityModel.OidcClient.Results;
 
 namespace FluffyBunny4.Services

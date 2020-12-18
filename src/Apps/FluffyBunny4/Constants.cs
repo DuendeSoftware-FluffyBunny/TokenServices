@@ -72,6 +72,7 @@ namespace FluffyBunny4
             public const string ArbitraryToken = "arbitrary_token";
             public const string TokenExchange = "urn:ietf:params:oauth:grant-type:token-exchange";
             public const string TokenExchangeMutate = "urn:ietf:params:oauth:grant-type:token-exchange-mutate";
+            public const string DeviceAuthorization = "DeviceAuthorization";
         }
 
         public static class EndpointNames

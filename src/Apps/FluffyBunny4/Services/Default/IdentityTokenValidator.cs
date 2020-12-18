@@ -17,6 +17,8 @@ namespace FluffyBunny4.Services.Default
         private IDiscoveryCacheAccessor _discoveryCacheAccessor;
         private ILogger<IdentityTokenValidator> _logger;
 
+        
+
         public IdentityTokenValidator(IDiscoveryCacheAccessor discoveryCacheAccessor,ILogger<IdentityTokenValidator> logger)
         {
             _discoveryCacheAccessor = discoveryCacheAccessor;

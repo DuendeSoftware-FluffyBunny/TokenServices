@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace TokenService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("{tenantId}/[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -24,7 +24,8 @@ namespace TokenService.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [Route("now")]
+        public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

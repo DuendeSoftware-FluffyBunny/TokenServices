@@ -288,6 +288,8 @@ namespace TokenService
                 services.SwapOutClientSecretValidator<FluffyBunnyClientSecretValidator>();
                 services.SwapOutIntrospectionResponseGenerator<FluffyBunnyIntrospectionResponseGenerator>();
                 services.SwapOutCustomTokenRequestValidator<FluffyBunnyCustomTokenRequestValidator>();
+                services.SwapOutDeviceCodeValidator<MyDeviceCodeValidator>();
+                
 
 
                 // BASICALLY to make sure your stuff is the one being used, add it last.

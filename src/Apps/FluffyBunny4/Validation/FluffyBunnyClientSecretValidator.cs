@@ -1,4 +1,5 @@
-﻿using FluffyBunny4.Models;
+﻿using System;
+using FluffyBunny4.Models;
 using FluffyBunny4.Services;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
@@ -93,14 +94,24 @@ namespace FluffyBunny4.Validation
                 bool continueValidation = true;
                 if (!client.RequireRefreshClientSecret)
                 {
-                    var parameters = (await context.Request.ReadFormAsync()).AsNameValueCollection();
-                    var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
-                    if (!string.IsNullOrWhiteSpace(grantType) && grantType == OidcConstants.GrantTypes.RefreshToken)
+                    try
+                    {
+                        var parameters = (await context.Request.ReadFormAsync()).AsNameValueCollection();
+                        var grantType = parameters.Get(OidcConstants.TokenRequest.GrantType);
+                        if (!string.IsNullOrWhiteSpace(grantType) && grantType == OidcConstants.GrantTypes.RefreshToken)
+                        {
+                            // let it through
+                            _logger.LogDebug("RequireRefreshClientSecret == false - skipping secret validation success");
+                            continueValidation = false;
+                        }
+                    }
+                    catch (Exception ex)
                     {
                         // let it through
                         _logger.LogDebug("RequireRefreshClientSecret == false - skipping secret validation success");
                         continueValidation = false;
                     }
+                 
                 }
                 if (continueValidation)
                 {

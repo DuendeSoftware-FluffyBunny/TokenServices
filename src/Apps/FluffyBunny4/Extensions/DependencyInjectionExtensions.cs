@@ -21,6 +21,8 @@ using Duende.IdentityServer.ResponseHandling;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.AutoMapper;
+using FluffyBunny4.Validation;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -141,32 +143,8 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection AddFluffyBunny4AutoMapper(this IServiceCollection services)
         {
-            var mapperConfiguration = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<PersistedGrant, PersistedGrantExtra>();
-                cfg.CreateMap<PersistedGrantExtra, PersistedGrant>();
-
-                cfg.CreateMap<ClientExtra, ClientExtraHandle>();
-                cfg.CreateMap<ClientExtraHandle, ClientExtra>();
-
-                cfg.CreateMap<ApiScope, ApiScopeHandle>();
-                cfg.CreateMap<ApiScopeHandle, ApiScope>();
-
-                cfg.CreateMap<ApiScope, TenantApiScopeHandle>();
-                cfg.CreateMap<TenantApiScopeHandle, ApiScope>();
-
-                cfg.CreateMap<ApiResource, ApiResourceHandle>();
-                cfg.CreateMap<ApiResourceHandle, ApiResource>();
-
-                cfg.CreateMap<Secret, SecretHandle>();
-                cfg.CreateMap<SecretHandle, Secret>();
-
-
-                cfg.CreateMap<ApiResource, TenantApiResourceHandle>();
-                cfg.CreateMap<TenantApiResourceHandle, ApiResource>();
-
-            });
-            var mapper = mapperConfiguration.CreateMapper();
+            
+            var mapper = MapperConfigurationBuilder.BuidOneToOneMapper;
             services.AddSingleton<IMapper>(mapper);
             var coreMapperAccessor = new CoreMapperAccessor(mapper);
             services.AddSingleton<ICoreMapperAccessor>(coreMapperAccessor);
@@ -226,6 +204,16 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+      
+
+        public static IServiceCollection SwapOutDeviceCodeValidator<T>(
+            this IServiceCollection services) where T : class, IDeviceCodeValidator
+        {
+
+            services.RemoveAll<IDeviceCodeValidator>();
+            services.AddTransient<IDeviceCodeValidator, T>();
+            return services;
+        }
         public static IServiceCollection SwapOutCustomTokenRequestValidator<T>(
             this IServiceCollection services) where T : class, ICustomTokenRequestValidator
         {
