@@ -109,7 +109,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
             this IServiceCollection services)
         {
             services.AddTransient<IPersistedGrantStoreEx, EntityFrameworkPersistedGrantStoreEx>();
+            services.RemoveAll<IPersistedGrantStore>();
             services.AddTransient<IPersistedGrantStore, EntityFrameworkPersistedGrantStoreEx>();
+
+            services.RemoveAll<IDeviceFlowStore>();
+            services.AddTransient<IDeviceFlowStore, EntityFrameworkDeviceFlowStoreExtra>();
 
             services.AddSingleton<IHostedService, FluffyBunny.IdentityServer.EntityFramework.Storage.Services.TokenCleanupHost>();
             services.AddTransient<TenantAwareTokenCleanupService>();

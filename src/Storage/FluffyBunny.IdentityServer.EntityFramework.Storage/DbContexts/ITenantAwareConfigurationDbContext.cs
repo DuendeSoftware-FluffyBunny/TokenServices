@@ -11,6 +11,7 @@ namespace Microsoft.EntityFrameworkCore
  
         public DbSet<ClientExtra> Clients { get; set; }
         public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }
+        public DbSet<DeviceFlowCodes> DeviceFlowCodes { get; set; }
 
         public DbSet<ClientCorsOrigin> ClientCorsOrigins { get; set; }
 

@@ -8,6 +8,7 @@ namespace FluffyBunny4.AutoMapper
     {
         public IEnumerable<string> Convert(IEnumerable<string> sourceMember, ResolutionContext context)
         {
+            if (sourceMember == null) return null;
             return sourceMember.ToList();
         }
     }

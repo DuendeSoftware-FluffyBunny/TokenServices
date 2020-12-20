@@ -70,7 +70,15 @@ namespace Microsoft.EntityFrameworkCore
         /// The PersistedGrants.
         /// </value>
         public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }
- 
+
+        /// <summary>
+        /// Gets or sets the device codes.
+        /// </summary>
+        /// <value>
+        /// The device codes.
+        /// </value>
+        public DbSet<DeviceFlowCodes> DeviceFlowCodes { get; set; }
+
         /// <summary>
         /// Gets or sets the clients' CORS origins.
         /// </summary>
