@@ -39,6 +39,47 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
         }
 
+        public async Task RemoveExpiredDeviceCodesAsync()
+        {
+            try
+            {
+                var tenants = await _adminServices.GetAllTenantsAsync();
+                foreach (var tenant in tenants)
+                {
+                    var context = GetTenantContext(tenant.Name);
+
+                    var found = Int32.MaxValue;
+
+                    while (found >= _options.TokenCleanupBatchSize)
+                    {
+                        var expiredCodes = await context.DeviceFlowCodes
+                            .Where(x => x.Expiration < DateTime.UtcNow)
+                            .OrderBy(x => x.DeviceCode)
+                            .Take(_options.TokenCleanupBatchSize)
+                            .ToArrayAsync();
+
+                        found = expiredCodes.Length;
+                        _logger.LogInformation("Removing {deviceCodeCount} device flow codes", found);
+
+                        if (found > 0)
+                        {
+                            context.DeviceFlowCodes.RemoveRange(expiredCodes);
+                            await context.SaveChangesAsync();
+
+                            if (_operationalStoreNotification != null)
+                            {
+                                await _operationalStoreNotification.DeviceCodesRemovedAsync(expiredCodes);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Exception removing expired device codes: {exception}", ex.Message);
+            }
+        }
+
         public async Task RemoveExpiredGrantsAsync()
         {
             try

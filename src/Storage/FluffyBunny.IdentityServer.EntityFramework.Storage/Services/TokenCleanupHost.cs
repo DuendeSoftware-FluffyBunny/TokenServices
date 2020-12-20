@@ -117,6 +117,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 {
                     var tokenCleanupService = serviceScope.ServiceProvider.GetRequiredService<TenantAwareTokenCleanupService>();
                     await tokenCleanupService.RemoveExpiredGrantsAsync();
+                    await tokenCleanupService.RemoveExpiredDeviceCodesAsync();
+                    
                 }
             }
             catch (Exception ex)
