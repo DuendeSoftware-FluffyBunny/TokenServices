@@ -5,7 +5,7 @@ This project requires Duende as its base and as such you must agree to the Duend
 # OAuth2 Services
 Whilst IdentityServer provided OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.
 
-The top 3 OAuth2 services I have seen are;
+The top OAuth2 services I have seen are;
 
 1. **client_credentials**    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
@@ -15,7 +15,8 @@ The top 3 OAuth2 services I have seen are;
   In this flow I fan our calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requeted scopes.  The real control of what a user gets access to is delegated to the actual services.  
 3. **device_code_flow**   
   Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating he user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
- 
+4. **arbitrary_token**  
+  This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and if a JWT key signing managment.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  
 
 
 
