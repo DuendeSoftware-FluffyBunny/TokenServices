@@ -32,7 +32,36 @@ These should be considered islands.  Islands that expose a discovery endpoint th
 | Authority | Endpoint | Data  |
 | --------- | -------- | ----  |
 | https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | {<br>  "authorization\_endpoint": "https://localhost:7301/zep/api/consent/authorize",<br>  "scopes\_supported": \[<br>    "https://www.companyapis.com/auth/zep",<br>    "https://www.companyapis.com/auth/zep.readonly",<br>    "https://www.companyapis.com/auth/zep.modify"<br>  \],<br>  "authorization\_type": "subject\_and\_scopes"<br>} |  
-| dd | dd | dd |
+
+When a call is made to the external service the service can return the following;
+1. scopes allowed
+2. claims that the service wants added.  These claims will be namespaced.  
+3. custom json payload.  This is namespaced as well 
+
+Namespacing is the service key ```zep``` prepended to the claims and custom payload.  
+
+```
+{
+  "authorized": true,
+  "scopes": [
+    "https://www.companyapis.com/auth/zep",
+    "https://www.companyapis.com/auth/zep.readonly",
+    "https://www.companyapis.com/auth/zep.modify"
+  ],
+  "subject": "1234abcd",
+  "claims": [
+    {
+      "type": "geo_location",
+      "value": "Canada"
+    }
+  ],
+  "custom_payload": {
+    "name": "MyCustom",
+    "value": 1234
+  }
+}
+```
+
 
 ## External Services Authorization Types
 | Type | Description |
@@ -50,3 +79,7 @@ The token exchange implementation here is fanning out calls to external services
 | scope | offline_access <br>https://www.companyapis.com/auth/myphotos <br>https://www.companyapis.com/auth/myphotos.readonly <br>https://www.companyapis.com/auth/myphotos.modify |
 | subject_token_type | urn:ietf:params:oauth:token-type:id_token |
 | subject_token | {id_token} |
+
+
+
+
