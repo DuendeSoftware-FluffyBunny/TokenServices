@@ -5,6 +5,19 @@ This project requires Duende as its base and as such you must agree to the Duend
 # OAuth2 Services
 Whilst IdentityServer provided OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.
 
+The top 3 OAuth2 services I have seen are;
+
+1. **client_credentials**    
+  We get this for free with IdentityServer.  This is used for service-2-service trust.  
+2.  **token_exchange**  
+  This is custom because there is no reference answer when it comes to exchanging an id_token (issued by google) for an access_token to services that I control.  
+  This is used for granting authorization to services that a user can access.  
+3. **device_code_flow**   
+  Nothing more than a variant of a token_exchange
+ 
+
+
+
 # OIDC Orchestrator
 The role of an orchestrator is to take care of what comes after a login.  Authentication is NOT Authorization.  All an SSO/IDP does is provide proof-of-life, what an orchestrator does is lookup what the user has access to and issues in EVERY CASE authorization tokens AKA access_tokens to a meriade or services.  A simple example is that the user hasn't bought a subscription to the service, having an account is good because we can start asking for money so that finally we can issue access_tokens to paid services.
 
