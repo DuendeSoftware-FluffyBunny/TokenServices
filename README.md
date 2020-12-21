@@ -1,6 +1,6 @@
 # TokenServices
 
-This project requires Duende as its base and as such you must agree to the Duende Software licensing terms.
+This project requires Duende as its base and as such you must agree to the Duende Software [licensing terms](https://github.com/DuendeSoftware/IdentityServer/blob/main/LICENSE).
 
 # OAuth2 Services
 Whilst IdentityServer provided OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  
