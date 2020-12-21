@@ -40,4 +40,13 @@ These should be considered islands.  Islands that expose a discovery endpoint th
 | implicit           | Don't call the external service to authorize.  Simple authentication is good enough and give the caller all scopes requested |
 | subject_and_scopes | The service is the final shot caller.  The token_exchange will delegate all scopes to the service. |
 
+# Token Exchange
+This is exchanging an id_token + requested scopes for access.  
+The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services.  The requested scopes are follow a well known format.  
 
+| paramater  | Description |
+| ---------  | -------- |
+| grant_type | urn:ietf:params:oauth:grant-type:token-exchange |
+| scope | offline_access <br>https://www.companyapis.com/auth/myphotos <br>https://www.companyapis.com/auth/myphotos.readonly <br>https://www.companyapis.com/auth/myphotos.modify |
+| subject_token_type | urn:ietf:params:oauth:token-type:id_token |
+| subject_token | {id_token} |
