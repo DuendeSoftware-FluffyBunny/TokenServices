@@ -40,6 +40,22 @@ When a call is made to the external service the service can return the following
 
 Namespacing is the service key ```zep``` prepended to the claims and custom payload.  
 
+## External Service Authorize endpoint
+The following is posted to the appropriate service if scopes for that service was requested.  
+### Request
+```
+{
+  "authorization_type": "subject_and_scopes",
+  "subject": "good",
+  "scopes": [
+    "https://www.companyapis.com/auth/zep",
+    "https://www.companyapis.com/auth/zep.readonly",
+    "https://www.companyapis.com/auth/zep.modify"
+  ] 
+}
+```
+### Response
+
 ```
 {
   "authorized": true,
