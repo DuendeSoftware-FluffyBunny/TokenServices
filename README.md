@@ -27,4 +27,17 @@ The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary re
 
 The what next for a simple orchestrator is calling the TokenService's token_exchange flow.
 
+# External Services
+These should be considered islands.  Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
+| Authority | Endpoint | Data  |
+| --------- | -------- | ----  |
+| https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | {<br>  "authorization\_endpoint": "https://localhost:7301/zep/api/consent/authorize",<br>  "scopes\_supported": \[<br>    "https://www.companyapis.com/auth/zep",<br>    "https://www.companyapis.com/auth/zep.readonly",<br>    "https://www.companyapis.com/auth/zep.modify"<br>  \],<br>  "authorization\_type": "subject\_and\_scopes"<br>} |  
+| dd | dd | dd |
+
+## External Services Authorization Types
+| Type | Description |
+| --------- | -------- |
+| implicit           | Don't call the external service to authorize.  Simple authentication is good enough and give the caller all scopes requested |
+| subject_and_scopes | The service is the final shot caller.  The token_exchange will delegate all scopes to the service. |
+
 
