@@ -46,7 +46,7 @@ The following is posted to the appropriate service if scopes for that service wa
 ```
 {
   "authorization_type": "subject_and_scopes",
-  "subject": "good",
+  "subject": "1234abcd",
   "scopes": [
     "https://www.companyapis.com/auth/zep",
     "https://www.companyapis.com/auth/zep.readonly",
