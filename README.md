@@ -14,7 +14,7 @@ The top 3 OAuth2 services I have seen are;
   This is used for granting authorization to services that a user can access.  
   In this flow I fan our calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requeted scopes.  The real control of what a user gets access to is delegated to the actual services.  
 3. **device_code_flow**   
-  Nothing more than a variant of a token_exchange
+  Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating he user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
  
 
 
