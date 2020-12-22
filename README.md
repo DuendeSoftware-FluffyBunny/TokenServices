@@ -12,12 +12,14 @@ The top OAuth2 services I have seen are;
 2.  **token_exchange**  
   This is custom because there is no reference answer when it comes to exchanging an id_token (issued by google) for an access_token to services that I control.  
   This is used for granting authorization to services that a user can access.  
-  In this flow I fan our calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requeted scopes.  The real control of what a user gets access to is delegated to the actual services.  
+  In this flow I fan out calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requeted scopes.  The real control of what a user gets access to is delegated to the actual services.  
 3. **device_code_flow**   
   Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating he user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
 4. **arbitrary_token**  
   This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and if a JWT key signing managment.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  
 
+5. **token_exchange_mutate**  
+   This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but better, to the a "On Behalf Of" flow.  This flow requires that reference_tokens be used, because we want to modify the backend database of what scopes a refererence_token type access_token is pointing to.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token.     
 
 
 # OIDC Orchestrator
