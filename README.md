@@ -33,7 +33,7 @@ The what next for a simple orchestrator is calling the TokenService's token_exch
 These should be considered islands.  Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
 | Authority | Endpoint | Data  |
 | --------- | -------- | ----  |
-| https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | {<br>  "authorization\_endpoint": "https://localhost:7301/zep/api/consent/authorize",<br>  "scopes\_supported": \[<br>    "https://www.companyapis.com/auth/zep",<br>    "https://www.companyapis.com/auth/zep.readonly",<br>    "https://www.companyapis.com/auth/zep.modify"<br>  \],<br>  "authorization\_type": "subject\_and\_scopes"<br>} |  
+| https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | ```{<br>  "authorization\_endpoint": "https://localhost:7301/zep/api/consent/authorize",<br>  "scopes\_supported": \[<br>    "https://www.companyapis.com/auth/zep",<br>    "https://www.companyapis.com/auth/zep.readonly",<br>    "https://www.companyapis.com/auth/zep.modify"<br>  \],<br>  "authorization\_type": "subject\_and\_scopes"<br>} ```|  
 
 When a call is made to the external service the service can return the following;
 1. scopes allowed
