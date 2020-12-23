@@ -2,7 +2,7 @@
 These should be considered islands.  Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
 | Authority | Endpoint | Description  |
 | --------- | -------- | ----  |
-| https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | Consent discovery Document|  
+| https://localhost:7301/myphotos/api/Consent | .well-known/consent-configuration | Consent discovery Document|  
 
 ```
 {
