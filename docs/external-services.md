@@ -72,7 +72,7 @@ The response comming back from the service must be honored.  The resulting acces
 ```
 "claims": [
     {
-      "type": "myphotos:geo_location",
+      "type": "myphotos.geo_location",
       "value": "Canada"
     }
   ],
