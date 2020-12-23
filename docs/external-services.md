@@ -22,12 +22,13 @@ These should be considered islands.  Islands that expose a discovery endpoint th
 | scopes_supported       | array of supported scopes |  
 | authorization_type     | the type of authorization [implicit \| subject_and_scopes] |
 
-## Implicit
-This authorization type is for services that find it ok for simple subject authentication done by the token_exchange to be good enough.  This is no reason to call the service.  Just give out any scope that was requested.  
+# Authorization_types
+| Type | Description |
+| --------- | -------- |
+| implicit           | This authorization type is for services that find it ok for simple subject authentication done by the token_exchange to be good enough.  This is no reason to call the service.  Just give out any scope that was requested. |
+| subject_and_scopes |This authorization type give full control to the service to accept, reject, and ultimatly state what scopes, claims and custom data is put in the final access_token.  |
 
-## subject_and_scopes
-This authorization type give full control to the service to accept, reject, and ultimatly state what scopes, claims and custom data is put in the final access_token.  
-
+ 
 ## Authorization Call
 
 ### Request
