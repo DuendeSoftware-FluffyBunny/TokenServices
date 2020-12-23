@@ -32,13 +32,6 @@ The what next for a simple orchestrator is calling the TokenService's token_exch
 # [External Services](docs/external-services.md)
  
 
-
-## External Services Authorization Types
-| Type | Description |
-| --------- | -------- |
-| implicit           | Don't call the external service to authorize.  Simple authentication is good enough and give the caller all scopes requested |
-| subject_and_scopes | The service is the final shot caller.  The token_exchange will delegate all scopes to the service. |
-
 # Token Exchange
 This is exchanging an id_token + requested scopes for access.  
 The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services.  The requested scopes are follow a well known format.  
