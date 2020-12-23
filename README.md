@@ -30,55 +30,7 @@ The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary re
 The what next for a simple orchestrator is calling the TokenService's token_exchange flow.
 
 # [External Services](docs/external-services.md)
-These should be considered islands.  Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
-| Authority | Endpoint | Data  |
-| --------- | -------- | ----  |
-| https://localhost:7301/zep/api/Consent | .well-known/consent-configuration | ```{<br>  "authorization\_endpoint": "https://localhost:7301/zep/api/consent/authorize",<br>  "scopes\_supported": \[<br>    "https://www.companyapis.com/auth/zep",<br>    "https://www.companyapis.com/auth/zep.readonly",<br>    "https://www.companyapis.com/auth/zep.modify"<br>  \],<br>  "authorization\_type": "subject\_and\_scopes"<br>} ```|  
-
-When a call is made to the external service the service can return the following;
-1. scopes allowed
-2. claims that the service wants added.  These claims will be namespaced.  
-3. custom json payload.  This is namespaced as well 
-
-Namespacing is the service key ```zep``` prepended to the claims and custom payload.  
-
-## External Service Authorize endpoint
-The following is posted to the appropriate service if scopes for that service was requested.  
-### Request
-```
-{
-  "authorization_type": "subject_and_scopes",
-  "subject": "1234abcd",
-  "scopes": [
-    "https://www.companyapis.com/auth/zep",
-    "https://www.companyapis.com/auth/zep.readonly",
-    "https://www.companyapis.com/auth/zep.modify"
-  ] 
-}
-```
-### Response
-
-```
-{
-  "authorized": true,
-  "scopes": [
-    "https://www.companyapis.com/auth/zep",
-    "https://www.companyapis.com/auth/zep.readonly",
-    "https://www.companyapis.com/auth/zep.modify"
-  ],
-  "subject": "1234abcd",
-  "claims": [
-    {
-      "type": "geo_location",
-      "value": "Canada"
-    }
-  ],
-  "custom_payload": {
-    "name": "MyCustom",
-    "value": 1234
-  }
-}
-```
+ 
 
 
 ## External Services Authorization Types
