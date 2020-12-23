@@ -29,7 +29,7 @@ The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary re
 
 The what next for a simple orchestrator is calling the TokenService's token_exchange flow.
 
-# External Services
+# [External Services](docs/external-services.md)
 These should be considered islands.  Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
 | Authority | Endpoint | Data  |
 | --------- | -------- | ----  |
