@@ -13,7 +13,6 @@ namespace FluffyBunny4.Models
         public string Subject { get; set; }
         [JsonPropertyName("scopes")]
         public List<string> Scopes { get; set; }
-        [JsonPropertyName("ip_address")]
-        public string IPAddress { get; set; }
+ 
     }
 }

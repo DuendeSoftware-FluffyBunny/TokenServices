@@ -66,7 +66,7 @@ namespace FluffyBunny4.Services
                         var contentText = await httpResponse.Content.ReadAsStringAsync();
                         result.Error.Message = contentText;
                     }
-                    _logger.LogError($"statusCode={httpResponse.StatusCode},content=\'{result.Error.Message}\'");
+                    _logger.LogError($"authorizationEndPoint={discovery.AuthorizeEndpoint},statusCode={httpResponse.StatusCode},content=\'{result.Error.Message}\'");
                     return result;
                 }
 

@@ -5,5 +5,6 @@ namespace FluffyBunny4.Services
     public interface IScopedOverrideRawScopeValues
     {
         List<string> Scopes { get; }
+        bool IsOverride { get; set; }
     }
 }

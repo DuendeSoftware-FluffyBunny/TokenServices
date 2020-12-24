@@ -60,7 +60,7 @@ namespace FluffyBunny4.Validation
             IConsentDiscoveryCacheAccessor consentDiscoveryCacheAccessor,
             IOptions<TokenExchangeOptions> tokenExchangeOptions,
             IIdentityTokenValidator identityTokenValidator,
-            ILogger<ArbitraryTokenGrantValidator> logger)
+            ILogger<TokenExchangeGrantValidator> logger)
         {
             _scopedStorage = scopedStorage;
             _serializer = serializer;
@@ -174,6 +174,7 @@ namespace FluffyBunny4.Validation
          
             var requestedScopesRaw = form[Constants.Scope].Split(' ').ToList();
             var requestedServiceScopes = GetServiceToScopesFromRequest(requestedScopesRaw);
+            _scopedOverrideRawScopeValues.IsOverride = true;
             foreach (var serviceScopeSet in requestedServiceScopes)
             {
                 var externalService = await _externalServicesStore.GetExternalServiceByNameAsync(serviceScopeSet.Key);
@@ -185,6 +186,14 @@ namespace FluffyBunny4.Validation
                 var discoCache =
                     await _consentDiscoveryCacheAccessor.GetConsentDiscoveryCacheAsync(serviceScopeSet.Key);
                 var doco = await discoCache.GetAsync();
+                if (doco.IsError)
+                {
+                    // OPINION: If I have a lot of external services it it probably better to let this continue even it if 
+                    //          results in an access_token that is missing this bad service's scopes.
+
+                    _logger.LogError(doco.Error);
+                    continue;
+                }
 
                 List<string> scopes = null;
                 switch (doco.AuthorizationType)

@@ -49,6 +49,11 @@ namespace FluffyBunny4.Services
         public TimeSpan CacheDuration { get; set; } = TimeSpan.FromHours(24);
 
         /// <summary>
+        /// Frequency to refresh discovery document on error. Defaults to 1 minute.
+        /// </summary>
+        public TimeSpan CacheErrorDuration { get; set; } = TimeSpan.FromMinutes(1);
+
+        /// <summary>
         /// Get the DiscoveryResponse either from cache or from discovery endpoint.
         /// </summary>
         /// <returns></returns>
@@ -79,8 +84,8 @@ namespace FluffyBunny4.Services
 
             if (result.IsError)
             {
-                Refresh();
-                _nextReload = DateTime.MinValue;
+           //     Refresh();
+                _nextReload = DateTime.UtcNow.Add(CacheErrorDuration);
             }
             else
             {

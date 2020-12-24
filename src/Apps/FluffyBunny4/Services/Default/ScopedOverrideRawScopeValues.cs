@@ -6,5 +6,8 @@ namespace FluffyBunny4.Services
     {
         List<string> _scopes;
         public List<string> Scopes => _scopes ?? (_scopes = new List<string>());
+
+        public bool IsOverride { get; set; }
     }
+    
 }

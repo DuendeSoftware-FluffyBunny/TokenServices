@@ -112,6 +112,7 @@ namespace TokenService
                 services.Configure<IdentityServerOptions>(Configuration.GetSection("IdentityServer"));
                 services.Configure<KeyVaultSigningOptions>(Configuration.GetSection("KeyVaultSigningOptions"));
                 services.Configure<TokenExchangeOptions>(Configuration.GetSection("TokenExchangeOptions"));
+                _logger.LogInformation($"HostingEnvironment.EnvironmentNam:{HostingEnvironment.EnvironmentName}");
                 if (HostingEnvironment.IsDevelopment())
                 {
                     Func<HttpMessageHandler> configureHandler = () =>

@@ -7,6 +7,7 @@ using IdentityModel;
 using IdentityServer4.Validation;
 using FluffyBunny4.Models;
 using System.Reflection.Metadata;
+using Duende.IdentityServer;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 
@@ -29,16 +30,23 @@ namespace FluffyBunny4.Services
         public override async Task<IEnumerable<Claim>> GetAccessTokenClaimsAsync(ClaimsPrincipal subject,
             ResourceValidationResult resourceResult, ValidatedRequest request)
         {
-            if (_scopedOverrideRawScopeValues.Scopes.Any())
+            if (_scopedOverrideRawScopeValues.IsOverride)
             {
                 var scopes = new HashSet<ParsedScopeValue>();
                 foreach (var s in _scopedOverrideRawScopeValues.Scopes)
                 {
                     scopes.Add((new ParsedScopeValue(s)));
                 }
+                if (resourceResult.Resources.OfflineAccess)
+                {
+                    scopes.Add((new ParsedScopeValue(IdentityServerConstants.StandardScopes.OfflineAccess)));
+                }
 
                 resourceResult.ParsedScopes = scopes;
             }
+
+            
+
             var claims = await base.GetAccessTokenClaimsAsync(subject, resourceResult, request);
             var clientExtra = request.Client as ClientExtra;
             if (!clientExtra.IncludeClientId)
