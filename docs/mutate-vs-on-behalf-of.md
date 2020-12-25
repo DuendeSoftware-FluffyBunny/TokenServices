@@ -11,4 +11,17 @@ Once the mutate happens you don't have to store it, because its already stored b
 Now I understand fully why Google doesn't use JWT type access_tokens.  
 
 
+# Alternative
+Another approach if you don't want the original access_token (still needs to be a reference) to get all these new scopes is to do the following;
+
+1. Run a token_exhange by passing in the original access_token (this contains the subject)
+2. Ask for the new scopes
+3. Get a brand new access_token/refresh_token
+4. Problem: The TokenService is storing the access_token/refresh_token, but we need to store them as well.
+5. A new custom mutate allows you to add arbitrary json where you store those downstream access_token/refresh_token in the original access_token.
+
+So that original access_token CANNOT be used to talk directly to the downstream service.  A native app CANNOT crack open the access_token to see them, thanks to it being a reference. Only the middle-teir can use introspection to crack open the access_token and then use the contained access_token/refresh_token to talk to the downstream service.  
+
+
+
 
