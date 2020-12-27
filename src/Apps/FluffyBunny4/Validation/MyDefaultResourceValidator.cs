@@ -63,6 +63,7 @@ namespace IdentityServer4.Validation
                 case Constants.GrantType.TokenExchangeMutate:
                 case Constants.GrantType.TokenExchange:
                 case Constants.GrantType.ArbitraryToken:
+                case Constants.GrantType.ArbitraryIdentity:
                     if (requestedScope.ParsedName == IdentityServerConstants.StandardScopes.OfflineAccess)
                     {
                         if (await IsClientAllowedOfflineAccessAsync(client))

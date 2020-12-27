@@ -17,6 +17,8 @@ namespace FluffyBunny4
 
         public const string ReservedSubject = "e461a271-1ec7-42aa-b6d3-915d8865ee5b";
         public const string ArbitraryClaims = "arbitrary_claims";
+        public const string ArbitraryJson = "arbitrary_json";
+        
         public const string ArbitraryAmrs = "arbitrary_amrs";
         public const string ArbitraryAudiences = "arbitrary_audiences";
         public const string Scope = "scope";
@@ -69,9 +71,11 @@ namespace FluffyBunny4
         }
         public class GrantType
         {
+            public const string ArbitraryIdentity = "arbitrary_identity";
             public const string ArbitraryToken = "arbitrary_token";
             public const string TokenExchange = "urn:ietf:params:oauth:grant-type:token-exchange";
             public const string TokenExchangeMutate = "urn:ietf:params:oauth:grant-type:token-exchange-mutate";
+            public const string TokenExchangeStoreDownstream = "urn:ietf:params:oauth:grant-type:token-store-downstream";
             public const string DeviceAuthorization = "DeviceAuthorization";
         }
 

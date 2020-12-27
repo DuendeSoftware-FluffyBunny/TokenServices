@@ -6,5 +6,6 @@ namespace FluffyBunny4.Services
     public interface IScopedOptionalClaims
     {
         List<Claim> Claims { get; }
+        List<Claim> ArbitraryIdentityAccessTokenClaims { get; }
     }
 }

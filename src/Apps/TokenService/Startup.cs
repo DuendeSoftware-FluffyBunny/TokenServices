@@ -228,6 +228,7 @@ namespace TokenService
                     //  .AddCosmosTenantResourceStore()
                     .AddEntityFrameworkStores()
                     .AddInMemoryCaching()
+                    .AddExtensionGrantValidator<ArbitraryIdentityGrantValidator>()
                     .AddExtensionGrantValidator<ArbitraryTokenGrantValidator>()
                     .AddExtensionGrantValidator<TokenExchangeGrantValidator>()
                     .AddExtensionGrantValidator<TokenExchangeMutateGrantValidator>()

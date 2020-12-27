@@ -1,6 +1,7 @@
 ﻿using IdentityModel;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Dynamic;
@@ -67,63 +68,12 @@ namespace FluffyBunny4.Extensions
             {
                 foreach (var jClaim in jsonClaims)
                 {
+                   // dynamic stuff = JObject.Parse(jClaim.Value);
                     var converter = new ExpandoObjectConverter();
                     dynamic expando = JsonConvert.DeserializeObject<ExpandoObject>(jClaim.Value, converter);
                     payload.Add(jClaim.Type, expando);
                 }
-                /*
-                var jsonTokens = jsonClaims.Select(x => new { x.Type, JsonValue = JRaw.Parse(x.Value) }).ToArray();
-
-                var jsonObjects = jsonTokens.Where(x => x.JsonValue.Type == JTokenType.Object).ToArray();
-                var jsonObjectGroups = jsonObjects.GroupBy(x => x.Type).ToArray();
-                foreach (var group in jsonObjectGroups)
-                {
-                    if (payload.ContainsKey(group.Key))
-                    {
-                        throw new Exception(string.Format("Can't add two claims where one is a JSON object and the other is not a JSON object ({0})", group.Key));
-                    }
-
-                    if (group.Skip(1).Any())
-                    {
-                        // add as array
-                        payload.Add(group.Key, group.Select(x => x.JsonValue).ToArray());
-                    }
-                    else
-                    {
-                        // add just one
-                        var jsonValue = group.First().JsonValue;
-                        payload.Add(group.Key, jsonValue);
-                    }
-                }
-
-                var jsonArrays = jsonTokens.Where(x => x.JsonValue.Type == JTokenType.Array).ToArray();
-                var jsonArrayGroups = jsonArrays.GroupBy(x => x.Type).ToArray();
-                foreach (var group in jsonArrayGroups)
-                {
-                    if (payload.ContainsKey(group.Key))
-                    {
-                        throw new Exception(string.Format("Can't add two claims where one is a JSON array and the other is not a JSON array ({0})", group.Key));
-                    }
-
-                    var newArr = new List<JToken>();
-                    foreach (var arrays in group)
-                    {
-                        var arr = (JArray)arrays.JsonValue;
-                        newArr.AddRange(arr);
-                    }
-
-                    // add just one array for the group/key/claim type
-                    payload.Add(group.Key, newArr.ToArray());
-                }
-
-                var unsupportedJsonTokens = jsonTokens.Except(jsonObjects).Except(jsonArrays);
-                var unsupportedJsonClaimTypes = unsupportedJsonTokens.Select(x => x.Type).Distinct();
-                if (unsupportedJsonClaimTypes.Any())
-                {
-                    throw new Exception(string.Format("Unsupported JSON type for claim types: {0}", unsupportedJsonClaimTypes.Aggregate((x, y) => x + ", " + y)));
-                }
-                */
-
+ 
                 return payload;
             }
             catch (Exception ex)

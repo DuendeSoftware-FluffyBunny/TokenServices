@@ -64,7 +64,7 @@ namespace FluffyBunny4.Validation
             IConsentDiscoveryCacheAccessor consentDiscoveryCacheAccessor,
             IOptions<TokenExchangeOptions> tokenExchangeOptions,
             ITokenValidator tokenValidator,
-            ILogger<ArbitraryTokenGrantValidator> logger)
+            ILogger<TokenExchangeMutateGrantValidator> logger)
         {
             _persistedGrantStore = persistedGrantStore;
             _referenceTokenStore = referenceTokenStore;
