@@ -19,7 +19,7 @@ The top OAuth2 services I have seen are;
   This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and if a JWT key signing managment.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  
 
 5. **token_exchange_mutate**  
-   This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but better, to the a "On Behalf Of" flow.  This flow requires that reference_tokens be used, because we want to modify the backend database of what scopes a refererence_token type access_token is pointing to.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token.     
+   This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but [better](docs/mutate-vs-on-behalf-of.md), to the a ["On Behalf Of" flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow).  This flow requires that reference_tokens be used, because we want to modify the backend database of what scopes a refererence_token type access_token is pointing to.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token.     
 
 
 # OIDC Orchestrator
