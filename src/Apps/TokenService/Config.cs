@@ -60,7 +60,7 @@ namespace Duende.IdentityServer
                     RequireRefreshClientSecret = false,
                     IncludeClientId = false,
                     IncludeAmr = false,
-                    TenantId = "zeke"
+                    TenantName = "zeke"
                 }
             };
     }

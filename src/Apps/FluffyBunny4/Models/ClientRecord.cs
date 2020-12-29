@@ -171,8 +171,8 @@ namespace FluffyBunny4.Models
         [JsonProperty("ClientClaimsPrefix")]
         public string ClientClaimsPrefix { get; set; }
 
-        [JsonProperty("TenantId")]
-        public string TenantId { get; internal set; }
+        [JsonProperty("TenantName")]
+        public string TenantName { get; internal set; }
 
         public bool? _includeClientId { get; set; }
         [JsonProperty("IncludeClientId")]

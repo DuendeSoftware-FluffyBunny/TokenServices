@@ -42,7 +42,7 @@ namespace FluffyBunny4.Stores
             var query =
                 from client in _clients
                 let c = client as ClientExtra
-                where client.ClientId == clientId && c.TenantId == tenantId
+                where client.ClientId == clientId && c.TenantName == tenantId
                 select client;
             return Task.FromResult(query.SingleOrDefault());
         }

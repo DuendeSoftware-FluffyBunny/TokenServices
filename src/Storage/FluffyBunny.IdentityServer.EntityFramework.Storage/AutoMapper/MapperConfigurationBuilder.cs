@@ -71,8 +71,10 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                 FluffyBunny.EntityFramework.Entities.ClientExtra>();
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ClientExtra,
                     FluffyBunny4.Models.ClientExtra>()
+                .ForMember(dest => dest.AllowedArbitraryIssuers, opt => opt.ConvertUsing(new ClientAllowedArbitraryIssuerConverter()))
                 .ForMember(dest => dest.AllowedScopes, opt => opt.ConvertUsing(new ClientScopeConverter()))
                 .ForMember(dest => dest.AllowedGrantTypes, opt => opt.ConvertUsing(new ClientGrantTypeConverter()));
+
 
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.PersistedGrantExtra,
                 FluffyBunny.EntityFramework.Entities.PersistedGrantExtra>();

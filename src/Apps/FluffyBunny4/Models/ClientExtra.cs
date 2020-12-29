@@ -1,5 +1,6 @@
  
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace FluffyBunny4.Models
@@ -89,6 +90,8 @@ namespace FluffyBunny4.Models
             set { _includeAmr = value; }
         }
 
-        public string TenantId { get; set; }
+        public string TenantName { get; set; }
+
+        public ICollection<string> AllowedArbitraryIssuers { get; set; } = new HashSet<string>();
     }
 }

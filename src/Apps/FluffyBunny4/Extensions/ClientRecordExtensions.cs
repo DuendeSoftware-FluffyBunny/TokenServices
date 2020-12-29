@@ -51,7 +51,7 @@ namespace FluffyBunny4.Extensions
                 RequireRefreshClientSecret = self.RequireRefreshClientSecret,
                 SlidingRefreshTokenLifetime = self.SlidingRefreshTokenLifetime,
                 IncludeJwtId = self.IncludeJwtId,
-                TenantId = self.TenantId,
+                TenantName = self.TenantName,
                 IncludeClientId = self.IncludeClientId,
                 AllowGlobalSubjectRevocation = self.AllowGlobalSubjectRevocation,
                 RefreshTokenGraceEnabled = self.RefreshTokenGraceEnabled,

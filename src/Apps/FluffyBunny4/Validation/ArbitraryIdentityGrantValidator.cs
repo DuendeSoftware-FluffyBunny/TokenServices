@@ -20,6 +20,7 @@ using Duende.IdentityServer.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -66,6 +67,8 @@ namespace FluffyBunny4.Validation
 
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
+            var client = context.Request.Client as ClientExtra;
+
             var form = context.Request.Raw;
             var error = false;
             var los = new List<string>();
@@ -81,7 +84,18 @@ namespace FluffyBunny4.Validation
             var issuer = form.Get("issuer");
             if (string.IsNullOrEmpty(issuer))
             {
-                issuer = _contextAccessor.HttpContext.GetIdentityServerIssuerUri();
+                error = true;
+                los.Add($"issuer must be present.");
+            }
+            else
+            {
+                issuer = issuer.ToLower();
+                var foundIssuer = client.AllowedArbitraryIssuers.FirstOrDefault(x => x == issuer);
+                if (string.IsNullOrWhiteSpace(foundIssuer))
+                {
+                    error = true;
+                    los.Add($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
+                }
             }
 
             // make sure nothing is malformed
@@ -141,7 +155,7 @@ namespace FluffyBunny4.Validation
             err = false;
 
 
-            var client = context.Request.Client as ClientExtra;
+          
           
             if (!error)
             {
