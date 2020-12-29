@@ -11,7 +11,9 @@ using Duende.IdentityServer.Stores;
 using Microsoft.EntityFrameworkCore;
 using TestWebApp;
 using FluentAssertions;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Context;
+using FluffyBunny.EntityFramework.Entities;
+
 
 namespace XUnitTest_EntityFramework
 {

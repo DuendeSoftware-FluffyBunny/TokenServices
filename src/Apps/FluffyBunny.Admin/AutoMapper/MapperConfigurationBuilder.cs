@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny4.DotNetCore.Extensions;
 
 namespace FluffyBunny.Admin.AutoMapper

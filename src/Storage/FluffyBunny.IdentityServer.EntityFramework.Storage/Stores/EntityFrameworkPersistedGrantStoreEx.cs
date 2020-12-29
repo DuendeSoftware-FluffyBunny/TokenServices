@@ -9,7 +9,8 @@ using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Context;
+using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny4;
 using FluffyBunny4.DotNetCore.Services;
@@ -161,16 +162,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
             {
                 Logger.LogDebug("{persistedGrantKey} not found in database", token.Key);
 
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra persistedGrant = null;
+                PersistedGrantExtra persistedGrant = null;
                 if (extra != null)
                 {
                     persistedGrant = _entityFrameworkMapperAccessor.MapperOneToOne
-                        .Map<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra>(extra);
+                        .Map<PersistedGrantExtra>(extra);
                 }
                 else
                 {
                     persistedGrant = _entityFrameworkMapperAccessor.MapperOneToOne
-                        .Map<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra>(token);
+                        .Map<PersistedGrantExtra>(token);
                 }
                 context.PersistedGrants.Add(persistedGrant);
             }

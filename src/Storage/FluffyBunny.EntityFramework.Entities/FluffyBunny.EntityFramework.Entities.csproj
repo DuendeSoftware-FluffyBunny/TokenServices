@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>FluffyBunny.EntityFramework.Entities</RootNamespace>
+    <AssemblyName>FluffyBunny.EntityFramework.Entities</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="5.0.0-preview.2.13" />
+  </ItemGroup>
+
+</Project>

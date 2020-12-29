@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Entities;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Context;
+using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny4.DotNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -30,18 +31,23 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         }
         public async Task EnsureMainConfigurationDatabaseAsync()
         {
-            await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
+            // BEWARE.
+            // EnsureCreatedAsync DOES NOT add migrations
+            // MigrateAsync MUST be first.
             await _mainEntityCoreContext.DbContext.Database.MigrateAsync();
+            await _mainEntityCoreContext.DbContext.Database.EnsureCreatedAsync();
         }
         public async Task EnsureTenantDatabaseAsync(string name)
         {
+            // BEWARE.
+            // EnsureCreatedAsync DOES NOT add migrations
+            // MigrateAsync MUST be first.
             Guard.ArgumentNotNullOrEmpty(nameof(name), name);
             var tenantContext =
                 _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
             Guard.NotNull(nameof(tenantContext), tenantContext);
-            await tenantContext.DbContext.Database.EnsureCreatedAsync();
             await tenantContext.DbContext.Database.MigrateAsync();
-
+            await tenantContext.DbContext.Database.EnsureCreatedAsync();
         }
 
         public async Task CreateTenantAsync(string name)

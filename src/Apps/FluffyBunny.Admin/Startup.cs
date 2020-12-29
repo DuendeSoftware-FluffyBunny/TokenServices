@@ -16,7 +16,8 @@ using Duende.IdentityServer.EntityFramework.Options;
 using FluffyBunny.Admin.AutoMapper;
 using FluffyBunny.Admin.Model;
 using FluffyBunny.Admin.Services;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
+using FluffyBunny.EntityFramework.Context;
+using FluffyBunny.EntityFramework.Context.Extensions;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions;
 using FluffyBunny4.DotNetCore;
 using FluffyBunny4.DotNetCore.Identity;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
+ 
 
 namespace FluffyBunny.Admin
 {
@@ -112,6 +114,7 @@ namespace FluffyBunny.Admin
                         services.AddPostgresDbContextOptionsProvider();
                         break;
                     case AppOptions.DatabaseTypes.SqlServer:
+                        services.AddSingleton<IMigrationsAssemblyProvider, SqlServerMigrationsAssemblyProvider>();
                         services.AddSqlServerDbContextOptionsProvider();
                         break;
 

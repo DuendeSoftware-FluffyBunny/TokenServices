@@ -7,6 +7,7 @@ using Duende.IdentityServer.EntityFramework.Stores;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Stores.Serialization;
+using FluffyBunny.EntityFramework.Context;
 using FluffyBunny4.Models;
 using FluffyBunny4.Services;
 using IdentityModel;

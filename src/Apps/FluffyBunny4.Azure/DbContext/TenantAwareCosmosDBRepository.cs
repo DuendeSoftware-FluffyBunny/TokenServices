@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
+using FluffyBunny.EntityFramework.Context;
 
 namespace FluffyBunny4.Azure.DbContext
 {

@@ -1,3 +1,5 @@
+using FluffyBunny.EntityFramework.Context;
+
 namespace Microsoft.EntityFrameworkCore
 {
     public interface ITenantAwareConfigurationDbContextAccessor

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
+using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+ 
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

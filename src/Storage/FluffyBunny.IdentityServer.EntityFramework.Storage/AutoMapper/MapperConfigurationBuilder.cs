@@ -14,16 +14,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
 
         public static MapperConfiguration BuidIgnoreBaseMapperConfiguration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService,
-                    FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService>()
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
+                    FluffyBunny.EntityFramework.Entities.ExternalService>()
                 .Ignore(record => record.Id);
 
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant,
-                    FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant>()
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Tenant,
+                    FluffyBunny.EntityFramework.Entities.Tenant>()
                 .Ignore(record => record.Id);
 
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra,
-                    FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>()
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ClientExtra,
+                    FluffyBunny.EntityFramework.Entities.ClientExtra>()
                 .Ignore(record => record.Id)
                 .Ignore(record => record.ClientSecrets)
                 .Ignore(record => record.AllowedGrantTypes)
@@ -49,14 +49,14 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
 
         public static MapperConfiguration BuidOneToOneMapperConfiguration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService>();
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ExternalService,
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
+                FluffyBunny.EntityFramework.Entities.ExternalService>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
                 FluffyBunny4.Models.ExternalService>();
 
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant>();
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant,
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Tenant,
+                FluffyBunny.EntityFramework.Entities.Tenant>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Tenant,
                 FluffyBunny4.Models.TenantHandle>();
 
 
@@ -67,23 +67,23 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                 Duende.IdentityServer.Models.Secret>();
 
 
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra>();
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.ClientExtra,
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ClientExtra,
+                FluffyBunny.EntityFramework.Entities.ClientExtra>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ClientExtra,
                     FluffyBunny4.Models.ClientExtra>()
                 .ForMember(dest => dest.AllowedScopes, opt => opt.ConvertUsing(new ClientScopeConverter()))
                 .ForMember(dest => dest.AllowedGrantTypes, opt => opt.ConvertUsing(new ClientGrantTypeConverter()));
 
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra>();
-            cfg.CreateMap<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra,
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.PersistedGrantExtra,
+                FluffyBunny.EntityFramework.Entities.PersistedGrantExtra>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.PersistedGrantExtra,
                 FluffyBunny4.Models.PersistedGrantExtra>();
             cfg.CreateMap<FluffyBunny4.Models.PersistedGrantExtra,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra>();
+                FluffyBunny.EntityFramework.Entities.PersistedGrantExtra>();
             cfg.CreateMap<FluffyBunny4.Models.PersistedGrantExtra, Duende.IdentityServer.Models.PersistedGrant>();
             cfg.CreateMap<Duende.IdentityServer.Models.PersistedGrant, FluffyBunny4.Models.PersistedGrantExtra>();
             cfg.CreateMap<Duende.IdentityServer.Models.PersistedGrant,
-                FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.PersistedGrantExtra>();
+                FluffyBunny.EntityFramework.Entities.PersistedGrantExtra>();
 
 
             cfg.CreateMap<Duende.IdentityServer.EntityFramework.Entities.ApiResource,

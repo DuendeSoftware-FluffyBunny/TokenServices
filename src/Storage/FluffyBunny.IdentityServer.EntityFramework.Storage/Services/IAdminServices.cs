@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Castle.Core.Logging;
 using Duende.IdentityServer.EntityFramework.Entities;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Entities;
+ 
 
 namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 {

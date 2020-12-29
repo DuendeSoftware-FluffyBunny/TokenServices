@@ -20,7 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Storage\FluffyBunny.EntityFramework.Postgres\FluffyBunny.EntityFramework.Postgres.csproj" />
     <ProjectReference Include="..\..\Storage\FluffyBunny.IdentityServer.EntityFramework.Storage\FluffyBunny.IdentityServer.EntityFramework.Storage.csproj" />
+    <ProjectReference Include="..\..\Storage\Migrations.SqlServer\Migrations.SqlServer.csproj" />
     <ProjectReference Include="..\FluffyBunny4\FluffyBunny4.csproj" />
   </ItemGroup>
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Castle.Core.Logging;
 using Duende.IdentityServer.EntityFramework;
 using Duende.IdentityServer.EntityFramework.Options;
+using FluffyBunny.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

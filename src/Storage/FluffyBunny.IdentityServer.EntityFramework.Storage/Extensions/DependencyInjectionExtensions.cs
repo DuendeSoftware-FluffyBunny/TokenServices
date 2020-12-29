@@ -5,8 +5,9 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Interfaces;
 using Duende.IdentityServer.EntityFramework.Options;
 using Duende.IdentityServer.Stores;
+using FluffyBunny.EntityFramework.Context;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
+
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Stores;
 using FluffyBunny4.Stores;
@@ -19,30 +20,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddSqlServerDbContextOptionsProvider(
-            this IServiceCollection services)
-        {
-            services.AddSingleton<IDbContextOptionsProvider, SqlServerDbContextOptionsProvider>();
-            return services;
-        }
-        public static IServiceCollection AddPostgresDbContextOptionsProvider(
-            this IServiceCollection services)
-        {
-            services.AddSingleton<IDbContextOptionsProvider, PostgresDbContextOptionsProvider>();
-            return services;
-        }
-        public static IServiceCollection AddCosmosDbContextOptionsProvider(
-            this IServiceCollection services)
-        {
-            services.AddSingleton<IDbContextOptionsProvider, CosmosDbContextOptionsProvider>();
-            return services;
-        }
-        public static IServiceCollection AddInMemoryDbContextOptionsProvider(
-            this IServiceCollection services)
-        {
-            services.AddSingleton<IDbContextOptionsProvider, InMemoryDbContextOptionsProvider>();
-            return services;
-        }
+       
+       
 
         public static IIdentityServerBuilder AddEntityFrameworkStores(
             this IIdentityServerBuilder builder)

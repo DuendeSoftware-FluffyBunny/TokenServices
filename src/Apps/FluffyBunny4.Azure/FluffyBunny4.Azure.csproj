@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.12.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Storage\FluffyBunny.EntityFramework.Context\FluffyBunny.EntityFramework.Context.csproj" />
     <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
     <ProjectReference Include="..\FluffyBunny4\FluffyBunny4.csproj" />
   </ItemGroup>

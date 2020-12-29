@@ -1,5 +1,6 @@
 ﻿using System;
 using Duende.IdentityServer.EntityFramework.Options;
+using FluffyBunny.EntityFramework.Context;
 
 namespace Microsoft.EntityFrameworkCore
 {
@@ -7,9 +8,9 @@ namespace Microsoft.EntityFrameworkCore
     {
 
         private IServiceProvider _serviceProvider;
+        private IDbContextOptionsProvider _dbContextOptionsProvider;
         private ConfigurationStoreOptions _storeOptions;
         private OperationalStoreOptions _operationalStoreOptions;
-        private IDbContextOptionsProvider _dbContextOptionsProvider;
 
         public TenantAwareConfigurationDbContextAccessor(
             IServiceProvider serviceProvider,
@@ -27,5 +28,7 @@ namespace Microsoft.EntityFrameworkCore
             var dbContext = new TenantAwareConfigurationDbContext(tenantId, _storeOptions, _operationalStoreOptions, _dbContextOptionsProvider);
             return dbContext;
         }
+
+      
     }
 }

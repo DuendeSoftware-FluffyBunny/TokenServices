@@ -35,8 +35,8 @@ namespace FluffyBunny.Admin.Pages.Tenants
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public PaginatedList<IdentityServer.EntityFramework.Storage.Entities.Tenant> PagedEntities { get; private set; }
-        public IEnumerable<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant> Tenants { get; private set; }
+        public PaginatedList<EntityFramework.Entities.Tenant> PagedEntities { get; private set; }
+        public IEnumerable<EntityFramework.Entities.Tenant> Tenants { get; private set; }
 
         [ViewData]
         public TenantsSortType NameSortType { get; set; }

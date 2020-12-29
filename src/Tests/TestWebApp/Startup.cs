@@ -9,12 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Options;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.DbContexts;
+ 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SqlServer;
 using TestWebApp.Models;
+using FluffyBunny.EntityFramework.Context;
+using FluffyBunny.EntityFramework.Context.Extensions;
 
 namespace TestWebApp
 {

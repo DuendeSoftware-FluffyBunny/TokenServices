@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models;
 using FluffyBunny.Admin.Services;
-using FluffyBunny.IdentityServer.EntityFramework.Storage.Entities;
+using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

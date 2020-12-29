@@ -20,7 +20,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
         private ILogger<IndexModel> _logger;
         [BindProperty]
         public string TenantId { get; set; }
-        public IdentityServer.EntityFramework.Storage.Entities.Tenant Tenant { get; private set; }
+        public  EntityFramework.Entities.Tenant Tenant { get; private set; }
 
         public class InputModel
         {
@@ -28,7 +28,7 @@ namespace FluffyBunny.Admin.Pages.Tenant
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public IEnumerable<FluffyBunny.IdentityServer.EntityFramework.Storage.Entities.Tenant> Tenants { get; private set; }
+        public IEnumerable< EntityFramework.Entities.Tenant> Tenants { get; private set; }
 
         public IndexModel(
             IAdminServices adminServices,

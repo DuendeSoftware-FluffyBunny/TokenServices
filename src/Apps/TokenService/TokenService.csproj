@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Storage\FluffyBunny.EntityFramework.Postgres\FluffyBunny.EntityFramework.Postgres.csproj" />
     <ProjectReference Include="..\..\Storage\FluffyBunny.IdentityServer.EntityFramework.Storage\FluffyBunny.IdentityServer.EntityFramework.Storage.csproj" />
     <ProjectReference Include="..\FluffyBunny4.Azure\FluffyBunny4.Azure.csproj" />
     <ProjectReference Include="..\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
