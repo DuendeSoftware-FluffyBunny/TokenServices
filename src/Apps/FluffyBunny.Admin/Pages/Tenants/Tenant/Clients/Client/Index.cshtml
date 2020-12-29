@@ -76,20 +76,34 @@
                                 <input disabled asp-for="Entity.Description" class="form-control" />
                             </td>
                         </tr>
-                        <tr>
-                            <td class="w-50">
-                                @nameof(Model.Entity.AllowedGrantTypes)
-                            </td>
-                            <td class="w-50">
-                                @foreach (var allowedGrantType in Model.Entity.AllowedGrantTypes)
-                                {
-                                    <div class="checkbox">
-                                        @allowedGrantType.GrantType
-                                    </div>
-                                }
+                    <tr>
+                        <td class="w-50">
+                            @nameof(Model.Entity.AllowedGrantTypes)
+                        </td>
+                        <td class="w-50">
+                            @foreach (var allowedGrantType in Model.Entity.AllowedGrantTypes)
+                            {
+                                <div class="checkbox">
+                                    @allowedGrantType.GrantType
+                                </div>
+                            }
 
-                            </td>
-                        </tr>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="w-50">
+                            @nameof(Model.Entity.AllowedArbitraryIssuers)
+                        </td>
+                        <td class="w-50">
+                            @foreach (var allowedArbitraryIssuer in Model.Entity.AllowedArbitraryIssuers)
+                            {
+                                <div class="checkbox">
+                                    @allowedArbitraryIssuer.Issuer
+                                </div>
+                            }
+
+                        </td>
+                    </tr>
                         <tr>
                             <td class="w-50">
                                 @nameof(Model.Entity.AllowedScopes)
