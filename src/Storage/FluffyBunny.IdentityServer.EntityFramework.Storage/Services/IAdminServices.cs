@@ -54,6 +54,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         NameDesc,
         NameAsc
     }
+    public enum ClientAllowedArbitraryIssuersSortType
+    {
+        NameDesc,
+        NameAsc
+    }
     public enum SecretsSortType
     {
         DescriptionDesc,
@@ -124,6 +129,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task DeleteClientByNameAsync(string tenantName, string name);
         Task DeleteClientByIdAsync(string tenantName, int id);
         Task<PaginatedList<ClientExtra>> PageClientsAsync(string tenantName, int pageNumber, int pageSize, ClientsSortType sortType);
+        #endregion
+
+        #region ClientAllowedArbitraryIssuers
+        Task UpsertClientAllowedArbitraryIssuerAsync(string tenantName, int clientId, AllowedArbitraryIssuer entity);
+
+        Task<AllowedArbitraryIssuer> GetClientAllowedArbitraryIssuerByIdAsync(string tenantName, int clientId, int id);
+        Task<AllowedArbitraryIssuer> GetClientAllowedArbitraryIssuerByNameAsync(string tenantName, int clientId, string name);
+        Task DeleteClientAllowedArbitraryIssuerByIdAsync(string tenantName, int clientId, int id);
+        Task<IEnumerable<AllowedArbitraryIssuer>> GetAllClientAllowedArbitraryIssuersAsync(string tenantName, int clientId, ClientAllowedArbitraryIssuersSortType sortType = ClientAllowedArbitraryIssuersSortType.NameDesc);
         #endregion
 
         #region ClientSecret

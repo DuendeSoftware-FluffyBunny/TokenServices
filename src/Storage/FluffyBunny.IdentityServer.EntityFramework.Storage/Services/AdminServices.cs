@@ -726,6 +726,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedGrantTypes)
                 .Include(x => x.AllowedScopes)
                 .Include(x => x.Claims)
+                .Include(x => x.AllowedArbitraryIssuers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -742,6 +743,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedScopes)
                 .Include(x => x.AllowedGrantTypes)
                 .Include(x => x.Claims)
+                .Include(x => x.AllowedArbitraryIssuers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -1059,6 +1061,129 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             return entities;
         }
 
-       
+        public async Task UpsertClientAllowedArbitraryIssuerAsync(string tenantName, int clientId, AllowedArbitraryIssuer entity)
+        {
+            entity.Issuer = entity.Issuer.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+
+           
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedArbitraryIssuers)
+                .FirstOrDefaultAsync();
+
+            var existingIssuer = (from item in clientInDb.AllowedArbitraryIssuers
+                where item.Issuer == entity.Issuer
+                                 select item).FirstOrDefault();
+            if (existingIssuer != null)
+            {
+                return; // already here
+            }
+            existingIssuer = (from item in clientInDb.AllowedArbitraryIssuers
+                             where item.Id == entity.Id
+                select item).FirstOrDefault();
+
+            if (existingIssuer != null)
+            {
+                // name update
+                existingIssuer.Issuer = entity.Issuer;
+            }
+            else
+            {
+                // brand new
+                clientInDb.AllowedArbitraryIssuers.Add(entity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<AllowedArbitraryIssuer> GetClientAllowedArbitraryIssuerByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+            
+            var clientInDb = await query
+                .Include(x => x.AllowedArbitraryIssuers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedArbitraryIssuers.FirstOrDefault(x => x.Id == id);
+
+            return existing;
+        }
+
+        public async Task<AllowedArbitraryIssuer> GetClientAllowedArbitraryIssuerByNameAsync(string tenantName, int clientId, string name)
+        {
+            name = name.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedArbitraryIssuers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            var existing = clientInDb.AllowedArbitraryIssuers.FirstOrDefault(x => x.Issuer == name);
+            return existing;
+        }
+
+        public async Task DeleteClientAllowedArbitraryIssuerByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedArbitraryIssuers)
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedArbitraryIssuers.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                clientInDb.AllowedArbitraryIssuers.Remove(existing);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<AllowedArbitraryIssuer>> GetAllClientAllowedArbitraryIssuersAsync(string tenantName, int clientId, ClientAllowedArbitraryIssuersSortType sortType = ClientAllowedArbitraryIssuersSortType.NameDesc)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedArbitraryIssuers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var entities = from item in clientInDb.AllowedArbitraryIssuers
+                select item;
+            switch (sortType)
+            {
+                case ClientAllowedArbitraryIssuersSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.Issuer);
+                    break;
+                case ClientAllowedArbitraryIssuersSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.Issuer);
+                    break;
+
+            }
+
+            return entities;
+
+        }
     }
 }

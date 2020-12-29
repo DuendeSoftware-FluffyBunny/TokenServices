@@ -1,3 +1,4 @@
+using Duende.IdentityServer.EntityFramework.Entities;
 using FluffyBunny.EntityFramework.Entities;
  
 namespace FluffyBunny.EntityFramework.Entities

@@ -44,6 +44,7 @@ namespace FluffyBunny.EntityFramework.Context
         public DbSet<IdentityResource> IdentityResources { get; set; }
         public DbSet<ApiResource> ApiResources { get; set; }
         public DbSet<ApiScope> ApiScopes { get; set; }
+        public DbSet<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -60,11 +61,20 @@ namespace FluffyBunny.EntityFramework.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.ConfigureAllowedArbitraryIssuerContext();
             modelBuilder.ConfigureExternalServicesContext();
             modelBuilder.ConfigureClientContext(_storeOptions);
             modelBuilder.ConfigureResourcesContext(_storeOptions);
             modelBuilder.ConfigurePersistedGrantContext(_operationalStoreOptions);
+
+            modelBuilder.Entity<ClientExtra>(client =>
+            {
+                client.HasMany(x => x.AllowedArbitraryIssuers)
+                    .WithOne(x => x.Client)
+                    .HasForeignKey(x => x.ClientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+
+            });
+
         }
         public async Task<int> SaveChangesAsync()
         {

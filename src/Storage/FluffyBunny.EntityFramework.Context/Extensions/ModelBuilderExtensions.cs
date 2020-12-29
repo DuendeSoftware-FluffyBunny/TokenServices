@@ -23,6 +23,18 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
         /// </summary>
         /// <param name="modelBuilder">The model builder.</param>
 
+        public static void ConfigureAllowedArbitraryIssuerContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AllowedArbitraryIssuer>(allowedArbitraryIssuer =>
+            {
+                allowedArbitraryIssuer.ToTable("AllowedArbitraryIssuer");
+                allowedArbitraryIssuer.HasKey(x => x.Id);
+                allowedArbitraryIssuer.Property(x => x.Issuer).HasMaxLength(2000).IsRequired();
+                allowedArbitraryIssuer.HasIndex(x => x.Issuer).IsUnique();
+
+            });
+
+        }
         public static void ConfigureExternalServicesContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExternalService>(externalService =>
@@ -35,7 +47,6 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
             });
 
         }
-
         public static void ConfigureTenantContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tenant>(tenant =>
