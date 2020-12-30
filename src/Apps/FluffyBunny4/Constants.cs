@@ -24,6 +24,8 @@ namespace FluffyBunny4
         public const string Scope = "scope";
         public const string CustomPayload = "custom_payload";
         public const string AccessTokenLifetime = "access_token_lifetime";
+        public const string IdTokenLifetime = "id_token_lifetime";
+        
         public const string AccessTokenType = "access_token_type";
 
         public static class Discovery

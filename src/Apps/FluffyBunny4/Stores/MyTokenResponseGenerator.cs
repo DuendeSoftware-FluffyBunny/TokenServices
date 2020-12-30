@@ -58,72 +58,146 @@ namespace FluffyBunny4.Stores
         {
             switch (validationResult.ValidatedRequest.GrantType)
             {
+                case FluffyBunny4.Constants.GrantType.ArbitraryToken:
+                    return await ProcessArbitraryTokenTokenResponse(validationResult);
+                    break;
                 case FluffyBunny4.Constants.GrantType.ArbitraryIdentity:
-
-                    var subject =
-                                           validationResult.ValidatedRequest.Subject.Claims.FirstOrDefault(x =>
-                                               x.Type == JwtClaimTypes.Subject);
-                    var resultClaims = new List<Claim>
-                    {
-                        subject,
-                        new Claim(JwtClaimTypes.AuthenticationTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-                    };
-                    var accessTokenResultClaims = new List<Claim>(resultClaims);
-
-                    resultClaims.AddRange(_scopedOptionalClaims.Claims);
-                    accessTokenResultClaims.AddRange(_scopedOptionalClaims.ArbitraryIdentityAccessTokenClaims);
- 
-                    var issuer = validationResult.ValidatedRequest.Raw.Get("issuer");
-                    if (string.IsNullOrEmpty(issuer))
-                    {
-                        issuer = _contextAccessor.HttpContext.GetIdentityServerIssuerUri();
-                    }
-
-                    var atClaims = accessTokenResultClaims.Distinct(new ClaimComparer()).ToList();
- 
-                    var at = new Token(OidcConstants.TokenTypes.AccessToken)
-                    {
-                        CreationTime = Clock.UtcNow.UtcDateTime,
-                        Issuer = issuer,
-                        Lifetime = validationResult.ValidatedRequest.Client.IdentityTokenLifetime,
-                        Claims = atClaims,
-                        ClientId = validationResult.ValidatedRequest.ClientId,
-                        //    Description = request.Description,
-                        AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
-                        AllowedSigningAlgorithms = validationResult.ValidatedRequest.Client.AllowedIdentityTokenSigningAlgorithms,
- 
-                    };
-
-                    //  var at = await TokenService.CreateAccessTokenAsync(tokenRequest);
-                    var accessToken = await TokenService.CreateSecurityTokenAsync(at);
-
-
-                    var idToken = new Token(OidcConstants.TokenTypes.IdentityToken)
-                    {
-                        CreationTime = Clock.UtcNow.UtcDateTime,
-                      //  Audiences = { aud },
-                        Issuer = issuer,
-                        Lifetime = validationResult.ValidatedRequest.Client.IdentityTokenLifetime,
-                        Claims = resultClaims.Distinct(new ClaimComparer()).ToList(),
-                        ClientId = validationResult.ValidatedRequest.ClientId,
-                        AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
-                        AllowedSigningAlgorithms = validationResult.ValidatedRequest.Client.AllowedIdentityTokenSigningAlgorithms
-                    };
-                    var jwtIdToken = await TokenService.CreateSecurityTokenAsync(idToken);
-                    var tokenResonse = new TokenResponse
-                    {
-                        AccessToken = accessToken,
-                        IdentityToken = jwtIdToken,
-                        AccessTokenLifetime = validationResult.ValidatedRequest.Client.IdentityTokenLifetime,
-                    };
-                    return tokenResonse;
+                    return await ProcessArbitraryIdentityTokenResponse(validationResult);
                     break;
                 default:
-                   
-
                     return await base.ProcessTokenRequestAsync(validationResult);
                     break;
             }
+        }
+
+        private async Task<TokenResponse> ProcessArbitraryIdentityTokenResponse(TokenRequestValidationResult validationResult)
+        {
+            var form = validationResult.ValidatedRequest.Raw;
+            var subject =
+                validationResult.ValidatedRequest.Subject.Claims.FirstOrDefault(x =>
+                    x.Type == JwtClaimTypes.Subject);
+            var resultClaims = new List<Claim>
+            {
+                subject,
+                new Claim(JwtClaimTypes.AuthenticationTime, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                    ClaimValueTypes.Integer64),
+            };
+            var accessTokenResultClaims = new List<Claim>(resultClaims);
+
+            resultClaims.AddRange(_scopedOptionalClaims.Claims);
+            accessTokenResultClaims.AddRange(_scopedOptionalClaims.ArbitraryIdentityAccessTokenClaims);
+
+            var issuer = validationResult.ValidatedRequest.Raw.Get("issuer");
+            if (string.IsNullOrEmpty(issuer))
+            {
+                issuer = _contextAccessor.HttpContext.GetIdentityServerIssuerUri();
+            }
+
+            var atClaims = accessTokenResultClaims.Distinct(new ClaimComparer()).ToList();
+
+            var tokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
+            int tokenLifetime = 0;
+            int.TryParse(tokenLifetimeOverride, out tokenLifetime);
+
+            var at = new Token(OidcConstants.TokenTypes.AccessToken)
+            {
+                CreationTime = Clock.UtcNow.UtcDateTime,
+                Issuer = issuer,
+                Lifetime = tokenLifetime,
+                Claims = atClaims,
+                ClientId = validationResult.ValidatedRequest.ClientId,
+                //    Description = request.Description,
+                AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
+                AllowedSigningAlgorithms = validationResult.ValidatedRequest.Client.AllowedIdentityTokenSigningAlgorithms,
+            };
+
+            //  var at = await TokenService.CreateAccessTokenAsync(tokenRequest);
+            var accessToken = await TokenService.CreateSecurityTokenAsync(at);
+
+
+            var idToken = new Token(OidcConstants.TokenTypes.IdentityToken)
+            {
+                CreationTime = Clock.UtcNow.UtcDateTime,
+                //  Audiences = { aud },
+                Issuer = issuer,
+                Lifetime = tokenLifetime,
+                Claims = resultClaims.Distinct(new ClaimComparer()).ToList(),
+                ClientId = validationResult.ValidatedRequest.ClientId,
+                AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
+                AllowedSigningAlgorithms = validationResult.ValidatedRequest.Client.AllowedIdentityTokenSigningAlgorithms
+            };
+            var jwtIdToken = await TokenService.CreateSecurityTokenAsync(idToken);
+            var tokenResonse = new TokenResponse
+            {
+                AccessToken = accessToken,
+                IdentityToken = jwtIdToken,
+                AccessTokenLifetime = tokenLifetime
+            };
+            return tokenResonse;
+        }
+
+        private async Task<TokenResponse> ProcessArbitraryTokenTokenResponse(TokenRequestValidationResult validationResult)
+        {
+            var subject =
+                validationResult.ValidatedRequest.Subject.Claims.FirstOrDefault(x =>
+                    x.Type == JwtClaimTypes.Subject);
+
+
+            var form = validationResult.ValidatedRequest.Raw;
+            var resultClaims = new List<Claim>()
+            {
+                subject
+            };
+            resultClaims.AddRange(_scopedOptionalClaims.Claims);
+            var issuer = validationResult.ValidatedRequest.Raw.Get("issuer");
+            if (string.IsNullOrEmpty(issuer))
+            {
+                issuer = _contextAccessor.HttpContext.GetIdentityServerIssuerUri();
+            }
+
+            var atClaims = resultClaims.Distinct(new ClaimComparer()).ToList();
+
+            bool createRefreshToken;
+
+            var offlineAccessClaim =
+                atClaims.FirstOrDefault(x =>
+                    x.Type == JwtClaimTypes.Scope && x.Value == IdentityServerConstants.StandardScopes.OfflineAccess);
+            createRefreshToken = offlineAccessClaim != null;
+
+            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            int accessTokenLifetime = 0;
+            int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime);
+
+            var at = new Token(OidcConstants.TokenTypes.AccessToken)
+            {
+                CreationTime = Clock.UtcNow.UtcDateTime,
+                Issuer = issuer,
+                Lifetime = accessTokenLifetime,
+                Claims = atClaims,
+                ClientId = validationResult.ValidatedRequest.ClientId,
+                //    Description = request.Description,
+                AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
+                AllowedSigningAlgorithms = validationResult.ValidatedRequest.Client.AllowedIdentityTokenSigningAlgorithms,
+            };
+            var accessToken = await TokenService.CreateSecurityTokenAsync(at);
+
+            string refreshToken = null;
+            if (createRefreshToken)
+            {
+                refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(
+                    validationResult.ValidatedRequest.Subject,
+                    at,
+                    validationResult.ValidatedRequest.Client);
+            }
+
+            var tokenResonse = new TokenResponse
+            {
+                AccessToken = accessToken,
+                IdentityToken = null,
+                RefreshToken = refreshToken,
+                AccessTokenLifetime = accessTokenLifetime
+            };
+            return tokenResonse;
         }
 
         protected async override Task<(string accessToken, string refreshToken)> CreateAccessTokenAsync(ValidatedTokenRequest request)

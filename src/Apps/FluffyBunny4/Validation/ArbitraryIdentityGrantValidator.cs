@@ -69,8 +69,11 @@ namespace FluffyBunny4.Validation
         {
             var client = context.Request.Client as ClientExtra;
 
+            // make sure nothing is malformed
+            bool err = false;
+            bool error = false;
+
             var form = context.Request.Raw;
-            var error = false;
             var los = new List<string>();
             
             var oneMustExistResult = (from item in OneMustExitsArguments
@@ -81,6 +84,9 @@ namespace FluffyBunny4.Validation
                 error = true;
                 los.AddRange(OneMustExitsArguments.Select(item => $"[one or the other] {item} is missing!"));
             }
+
+            // VALIDATE issuer must exist and must be allowed
+            // -------------------------------------------------------------------
             var issuer = form.Get("issuer");
             if (string.IsNullOrEmpty(issuer))
             {
@@ -97,15 +103,18 @@ namespace FluffyBunny4.Validation
                     los.Add($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
                 }
             }
+            error = error || err;
+            err = false;
 
-            // make sure nothing is malformed
-            bool err = false;
-
+            // VALIDATE arbitrary_claims is in the correct format
+            // -------------------------------------------------------------------
             Dictionary<string, List<string>> idTokenArbitraryClaims = null;
             (err, idTokenArbitraryClaims) = los.ValidateFormat<Dictionary<string, List<string>>>(Constants.ArbitraryClaims, form[Constants.ArbitraryClaims]);
             error = error || err;
-            
+            err = false;
 
+            // VALIDATE arbitrary_json is in the correct format
+            // -------------------------------------------------------------------
             var arbitraryJsonClaims = new Dictionary<string, string>();
             var arbitraryJson = form[Constants.ArbitraryJson];
             if (!string.IsNullOrWhiteSpace(arbitraryJson))
@@ -134,6 +143,8 @@ namespace FluffyBunny4.Validation
             error = error || err;
             err = false;
 
+            // VALIDATE arbitrary_json and arbitrary_claims don't intersect
+            // -------------------------------------------------------------------
             if (!error)
             {
                 var query = from item in arbitraryJsonClaims
@@ -176,24 +187,6 @@ namespace FluffyBunny4.Validation
                         {
                             los.Add($"The {Constants.ArbitraryClaims} claim: '{invalidClaim}' is not allowed.");
                         }
-                    }
-                }
-            }
-            error = error || err;
-            err = false;
-
-
-            var customPayload = form[Constants.CustomPayload];
-            if (!error)
-            {
-                
-                if (!string.IsNullOrWhiteSpace(customPayload))
-                {
-                    var isValidJson = !customPayload.IsValidJson();
-                    if (!isValidJson)
-                    {
-                        err = true;
-                        los.Add($"{Constants.CustomPayload} is not valid json: '{customPayload}'.");
                     }
                 }
             }
@@ -247,14 +240,14 @@ namespace FluffyBunny4.Validation
             }
             
             // optional stuff;
-            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
-            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            var idTokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(idTokenLifetimeOverride))
             {
-                int accessTokenLifetime = 0;
+                int idTokenLifetime = 0;
                 error = true;
-                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
+                if (int.TryParse(idTokenLifetimeOverride, out idTokenLifetime))
                 {
-                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
+                    if (idTokenLifetime > 0 && idTokenLifetime <= client.AccessTokenLifetime)
                     {
                         // HERB: Setting this sets it for the global config.
                         //client.AccessTokenLifetime = accessTokenLifetime;
@@ -264,7 +257,7 @@ namespace FluffyBunny4.Validation
                 if (error)
                 {
                     var errorDescription =
-                        $"{Constants.AccessTokenLifetime} out of range.   Must be > 0 and <= configured AccessTokenLifetime.";
+                        $"{Constants.IdTokenLifetime} out of range.   Must be > 0 and <= configured IdTokenLifetime.";
                     LogError(errorDescription);
                     context.Result.IsError = true;
                     context.Result.Error = errorDescription;
@@ -303,13 +296,6 @@ namespace FluffyBunny4.Validation
                         IdentityServerConstants.ClaimValueTypes.Json));
                 }
                
-            }
-            
-            
-            if (!string.IsNullOrWhiteSpace(customPayload))
-            {
-                _scopedOptionalClaims.Claims.Add(new Claim(Constants.CustomPayload, customPayload,
-                    IdentityServerConstants.ClaimValueTypes.Json));
             }
 
             context.Result = new GrantValidationResult(subject, GrantType, new List<Claim>());
