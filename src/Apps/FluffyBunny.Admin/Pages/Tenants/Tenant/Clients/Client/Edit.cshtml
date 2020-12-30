@@ -39,14 +39,23 @@
                                     <label>Enabled</label>
                                 </td>
                             </tr>
-                            <tr>
-                                <td class="w-50">
-                                    @nameof(Model.Input.ClientId)
-                                </td>
-                                <td class="w-50">
-                                    @Model.Input.ClientId
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.ClientId)
+                            </td>
+                            <td class="w-50">
+                                @Model.Input.ClientId
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.Issuer)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.Issuer" class="form-control" />
+                                <span asp-validation-for="Input.Issuer" class="text-danger"></span>
+                            </td>
+                        </tr>
                             <tr>
                                 <td class="w-50">
                                     <label asp-for="Input.RequireClientSecret"></label>

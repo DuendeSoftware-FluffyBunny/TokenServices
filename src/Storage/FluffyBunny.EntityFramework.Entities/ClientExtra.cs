@@ -13,6 +13,7 @@ namespace FluffyBunny.EntityFramework.Entities
         public bool IncludeClientId { get; set; } = false;
         public bool IncludeAmr { get; set; } = false;
         public string TenantName { get; set; }
+        public string Issuer { get; set; }
         public List<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
        
     }

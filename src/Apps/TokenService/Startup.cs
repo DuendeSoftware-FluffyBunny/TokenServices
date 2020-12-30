@@ -236,7 +236,8 @@ namespace TokenService
                     .SwapOutRefreshTokenStore()
                     .SwapOutReferenceTokenStore()
                     .SwapOutTokenRevocationRequestValidator()
-                    .SwapOutTokenRevocationResponseGenerator();
+                    .SwapOutTokenRevocationResponseGenerator()
+                    .SwapOutTokenService<MyDefaultTokenService>();
 
                 // services.AddTenantAdminServices();
                 var entityFrameworkConnectionOptions = Configuration

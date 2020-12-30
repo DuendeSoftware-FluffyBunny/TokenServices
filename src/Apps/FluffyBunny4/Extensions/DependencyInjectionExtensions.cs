@@ -239,7 +239,22 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-      
+        public static IIdentityServerBuilder SwapOutTokenService<T>(
+            this IIdentityServerBuilder builder) where T : class, ITokenService
+        {
+            builder.Services.SwapOutTokenService<T>();
+            return builder;
+        }
+
+        public static IServiceCollection SwapOutTokenService<T>(
+            this IServiceCollection services) where T : class, ITokenService
+        {
+
+            services.RemoveAll<ITokenService>();
+            services.AddTransient<ITokenService, T>();
+            return services;
+        }
+
         public static IServiceCollection AddClaimsService<T>(this IServiceCollection services)
             where T : class, IClaimsService
         {

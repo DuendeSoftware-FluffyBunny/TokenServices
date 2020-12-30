@@ -40,7 +40,8 @@ namespace FluffyBunny4.Services.Default
                     ValidateAudience = false,
                     NameClaimType = JwtClaimTypes.Name,
                     RoleClaimType = JwtClaimTypes.Role,
-                    ClockSkew = new TimeSpan(0, 5, 0)
+                    ClockSkew = new TimeSpan(0, 5, 0),
+                    ValidateLifetime = false
                 };
                 // read the token signing algorithm
                 JwtSecurityToken jwt;
