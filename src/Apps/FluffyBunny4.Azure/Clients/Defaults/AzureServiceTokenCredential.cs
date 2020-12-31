@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Identity.Client;
+using ClientCredential = Microsoft.IdentityModel.Clients.ActiveDirectory.ClientCredential;
 
 namespace FluffyBunny4.Azure.Clients
 
@@ -14,14 +17,15 @@ namespace FluffyBunny4.Azure.Clients
     public abstract class AzureServiceTokenCredential<T> : TokenCredential 
         where T:class 
     {
-        public AzureServiceTokenCredential(string endPoint,ILogger<T> logger)
+        
+        public AzureServiceTokenCredential(string scope,ILogger<T> logger)
         {
-            if (string.IsNullOrWhiteSpace(endPoint))
+            if (string.IsNullOrWhiteSpace(scope))
             {
-                throw new ArgumentException("message", nameof(endPoint));
+                throw new ArgumentException("scope is required", nameof(scope));
             }
 
-            EndPoint = endPoint;
+            _scope = scope;
             ArmClientId = Environment.GetEnvironmentVariable("ARM_CLIENT_ID");
             ArmClientSecret = Environment.GetEnvironmentVariable("ARM_CLIENT_SECRET");
             ArmSubscriptionId = Environment.GetEnvironmentVariable("ARM_SUBSCRIPTION_ID");
@@ -29,7 +33,10 @@ namespace FluffyBunny4.Azure.Clients
             _logger = logger;
         }
 
-        public string EndPoint { get; }
+      
+
+        private string _scope;
+
         public string ArmClientId { get; }
         public string ArmClientSecret { get; }
         public string ArmSubscriptionId { get; }
@@ -53,12 +60,30 @@ namespace FluffyBunny4.Azure.Clients
             )
             {
                 _logger.LogInformation("AzureServiceTokenCredential Utilizing ARM_* Environment Variables");
-                var credential = new ClientCredential(ArmClientId, ArmClientSecret);
-                var tokenProvider = new AzureServiceTokenProvider();
-                var authenticationContext = new AuthenticationContext($"https://login.microsoftonline.com/{ArmTenantId}");
+                var instance = "https://login.microsoftonline.com/";
 
-                var result = await authenticationContext.AcquireTokenAsync(EndPoint, credential);
-                return new AccessToken(result.AccessToken, result.ExpiresOn);
+                var conClient = ConfidentialClientApplicationBuilder.Create(ArmClientId)
+                    .WithAuthority($"{instance}{ArmTenantId}")
+                    .WithClientSecret(ArmClientSecret)
+                    .Build();
+
+                var clientResult = await conClient.AcquireTokenForClient(new[] {_scope}).ExecuteAsync();
+              
+                /*
+                var clientResult = conClient.AcquireTokenForClient(
+                        new[] { _scope })
+                    .ExecuteAsync().Result;
+                
+                var kc = new KeyVaultCredential((authority, resource, scope) =>
+                {
+                    Console.WriteLine($"Authority: {authority}, Resource: {resource}, Scope: {scope}");
+                    return Task.FromResult(clientResult.AccessToken);
+                });
+
+                var kvClient = new KeyVaultClient(kc);
+            */
+
+                return new AccessToken(clientResult.AccessToken, clientResult.ExpiresOn);
             }
             else
             {
@@ -66,7 +91,7 @@ namespace FluffyBunny4.Azure.Clients
 
                 var tokenProvider = new AzureServiceTokenProvider();
                 var accessToken = await tokenProvider
-                    .GetAccessTokenAsync(EndPoint, null, cancellationToken)
+                    .GetAccessTokenAsync(_scope, null, cancellationToken)
                     .ContinueWith(task => {
                         return new AccessToken(task.Result, DateTimeOffset.MaxValue);
                     });
