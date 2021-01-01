@@ -67,12 +67,12 @@ namespace Microsoft.Extensions.DependencyInjection
             Action<KeyVaultStoreOptions> options)
         {
             services.AddTransient<KeyVaultECDsaKeyStore>();
-            services.AddSingleton<IJwksDiscovery>(sp =>
+            services.AddScoped<IJwksDiscovery>(sp =>
             {
                 var implementation = sp.GetRequiredService<KeyVaultECDsaKeyStore>();
                 return implementation;
             });
-            services.AddSingleton<IKeyVaultECDsaKeyStore>(sp =>
+            services.AddScoped<IKeyVaultECDsaKeyStore>(sp =>
             {
                 var implementation = sp.GetRequiredService<KeyVaultECDsaKeyStore>();
                 return implementation;

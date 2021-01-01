@@ -36,23 +36,19 @@ namespace FluffyBunny4.Stores
                 public const string P521 = "1.3.132.0.35";
             }
         }
-        private IConfiguration _configuration;
         private IAzureKeyVaultClients _azureKeyVaultClients;
         private IMemoryCache _memoryCache;
         private KeyVaultStoreOptions _options;
         private TimedLock _lock;
         private ILogger<KeyVaultECDsaKeyStore> _logger;
-        private const string CacheKey = "3bac4de0-ae68-4dd9-1111-4e0b92558426";
         private const string ECDsaKeyCacheKey = "3bac4de0-ae68-4dd9-2222-4e0b92558426";
 
         public KeyVaultECDsaKeyStore(
-              IConfiguration configuration,
               IAzureKeyVaultClients azureKeyVaultClients,
               IMemoryCache memoryCache,
               IOptions<KeyVaultStoreOptions> options,
               ILogger<KeyVaultECDsaKeyStore> logger)
         {
-            _configuration = configuration;
             _azureKeyVaultClients = azureKeyVaultClients;
             _memoryCache = memoryCache;
             _options = options.Value;
