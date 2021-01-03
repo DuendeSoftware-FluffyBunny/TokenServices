@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Services;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace FluffyBunny4.Stores
 {
@@ -16,7 +17,7 @@ namespace FluffyBunny4.Stores
         private readonly ICache<ExternalService> _cacheExternalService;
         private readonly ICache<List<ExternalService>> _cacheExternalServices;
         private readonly IExternalServicesStore _inner;
-        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
+        private readonly  IScopedContext<TenantContext> _scopedTenantContext;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -29,14 +30,14 @@ namespace FluffyBunny4.Stores
         public CachingTenantExternalServicesStore(
             IdentityServerOptions options,
             T inner,
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedContext<TenantContext> scopedTenantContext,
             ICache<ExternalService> cacheExternalService,
             ICache<List<ExternalService>> cacheExternalServices,
             ILogger<CachingTenantExternalServicesStore<T>> logger)
         {
             _options = options;
             _inner = inner;
-            _scopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _cacheExternalService = cacheExternalService;
             _cacheExternalServices = cacheExternalServices;
             _logger = logger;
@@ -46,7 +47,7 @@ namespace FluffyBunny4.Stores
         {
             if (string.IsNullOrEmpty(serviceName)) return null;
 
-            var key = $"{_scopedTenantRequestContext.TenantId}.{serviceName}";
+            var key = $"{_scopedTenantContext.Context.TenantName}.{serviceName}";
             var item = await _cacheExternalService.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.GetExternalServiceByNameAsync(serviceName),
@@ -57,7 +58,7 @@ namespace FluffyBunny4.Stores
 
         public async Task<List<ExternalService>> GetExternalServicesAsync()
         {
-            var key = $"{_scopedTenantRequestContext.TenantId}.GetExternalServicesAsync";
+            var key = $"{_scopedTenantContext.Context.TenantName}.GetExternalServicesAsync";
             var item = await _cacheExternalServices.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.GetExternalServicesAsync(),

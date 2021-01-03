@@ -64,11 +64,8 @@ namespace FluffyBunny4.Services
 
         public async Task<string> CreateJwtAsync(Token token)
         {
-            var ecdsaCache = await _keyVaultECDsaKeyStore.FetchCacheAsync();
- 
             var jwtSecurityToken = token.CreateJwtSecurityToken(null, _logger);
             var jwtToken = await CreateJwtAsync(jwtSecurityToken);
-
             return jwtToken;
         }
         
@@ -77,7 +74,5 @@ namespace FluffyBunny4.Services
         {
             _keyVaultECDsaKeyStore = keyVaultECDsaKeyStore;
         }
-
-
     }
 }

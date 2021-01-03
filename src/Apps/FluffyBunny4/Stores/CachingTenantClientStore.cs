@@ -6,6 +6,8 @@ using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
+using FluffyBunny4.DotNetCore.Services;
+using FluffyBunny4.Models;
 
 namespace FluffyBunny4.Stores
 {
@@ -15,7 +17,7 @@ namespace FluffyBunny4.Stores
         private readonly IdentityServerOptions _options;
         private readonly ICache<Client> _cache;
         private readonly IClientStore _inner;
-        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
+        private readonly IScopedContext<TenantContext> _scopedTenantContext;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -28,13 +30,13 @@ namespace FluffyBunny4.Stores
         public CachingTenantClientStore(
             IdentityServerOptions options, 
             T inner, 
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedContext<TenantContext> scopedTenantContext,
             ICache<Client> cache, 
             ILogger<CachingTenantClientStore<T>> logger)
         {
             _options = options;
             _inner = inner;
-            _scopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _cache = cache;
             _logger = logger;
         }
@@ -48,7 +50,7 @@ namespace FluffyBunny4.Stores
         /// </returns>
         public async Task<Client> FindClientByIdAsync(string clientId)
         {
-            var key = $"{_scopedTenantRequestContext.TenantId}.{clientId}";
+            var key = $"{_scopedTenantContext.Context.TenantName}.{clientId}";
             var client = await _cache.GetAsync(key,
                 _options.Caching.ClientStoreExpiration,
                 () => _inner.FindClientByIdAsync(clientId),

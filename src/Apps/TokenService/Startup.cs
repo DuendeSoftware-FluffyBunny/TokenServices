@@ -303,7 +303,7 @@ namespace TokenService
                 ///////////////////////////////////////////////////////////////////////////////
                 // if you add this it locks you into an url that is {identityServerBase}/{tenantId}/{endpoints} vs
                 // {identityServerBase}/{endpoints}
-                // I utilize IScopedTenantRequestContext a SCOPED object that you can inject anywhere in the pipeline to tell you what tenant we have.
+                // I utilize IScopedContext<TenantContext> a SCOPED object that you can inject anywhere in the pipeline to tell you what tenant we have.
                 ///////////////////////////////////////////////////////////////////////////////
                 _logger.LogInformation("ConfigureServices - AddTenantServices ");
                 services.AddTenantServices();

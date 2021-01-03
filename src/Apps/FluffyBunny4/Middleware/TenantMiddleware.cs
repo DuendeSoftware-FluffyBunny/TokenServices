@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using FluffyBunny4.DotNetCore.Services;
+using FluffyBunny4.Models;
 
 namespace FluffyBunny4.Middleware
 {
@@ -23,7 +25,7 @@ namespace FluffyBunny4.Middleware
             _logger = logger;
         }
         public async Task Invoke(HttpContext context, 
-            IScopedTenantRequestContext scopedTenantRequestContext, 
+            IScopedContext<TenantContext> scopedTenantContext,
             ITenantStore tenantStore)
         {
             try
@@ -32,11 +34,11 @@ namespace FluffyBunny4.Middleware
                 string[] parts = context.Request.Path.Value.Split('/');
                 if (parts.Count() > 1)
                 {
-                    string tenantId = parts[1];
-                    scopedTenantRequestContext.TenantId = tenantId;
-                    if (string.IsNullOrWhiteSpace(tenantId) || !await tenantStore.IsTenantValidAsync(tenantId))
+                    string tenantName = parts[1];
+                    scopedTenantContext.Context.TenantName = tenantName;
+                    if (string.IsNullOrWhiteSpace(tenantName) || !await tenantStore.IsTenantValidAsync(tenantName))
                     {
-                        _logger.LogWarning($"TenantId={tenantId}, does not exist!");
+                        _logger.LogWarning($"TenantId={tenantName}, does not exist!");
                         context.Response.Clear();
                         context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                         await context.Response.WriteAsync("");
@@ -58,7 +60,7 @@ namespace FluffyBunny4.Middleware
                     }
                     string newPath = sb.ToString();
                     context.Request.Path = newPath;
-                    context.Request.PathBase = $"/{tenantId}";
+                    context.Request.PathBase = $"/{tenantName}";
                 }
 
             }

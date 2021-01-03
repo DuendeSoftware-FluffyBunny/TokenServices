@@ -193,11 +193,12 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection AddTenantServices(this IServiceCollection services)
         {
-            services.AddScoped<IScopedTenantRequestContext, ScopedTenantRequestContext>();
+            services.AddTransient<TenantContext>();
             return services;
         }
         public static IServiceCollection AddScopedServices(this IServiceCollection services)
         {
+            services.AddScopedContex();
             services.AddScoped<IScopedHttpContextRequestForm, ScopedHttpContextRequestForm>();
             services.AddScoped<IScopedOptionalClaims, ScopedOptionalClaims>();
             services.AddScoped<IScopedOverrideRawScopeValues, ScopedOverrideRawScopeValues>();

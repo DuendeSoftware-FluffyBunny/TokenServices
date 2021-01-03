@@ -12,23 +12,21 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace FluffyBunny4.Services.Default
 {
 
     public class GraceRefreshTokenService : DefaultRefreshTokenService
     {
-        private IScopedTenantRequestContext _scopedTenantRequestContext;
 
         public GraceRefreshTokenService(
             IRefreshTokenStore refreshTokenStore,
             IProfileService profile,
-            IScopedTenantRequestContext scopedTenantRequestContext,
             ISystemClock clock,
             ILogger<DefaultRefreshTokenService> logger) :
             base(refreshTokenStore, profile, clock, logger)
         {
-            _scopedTenantRequestContext = scopedTenantRequestContext;
         }
         public override async Task<string> CreateRefreshTokenAsync(
             ClaimsPrincipal subject, Token accessToken, Client client)

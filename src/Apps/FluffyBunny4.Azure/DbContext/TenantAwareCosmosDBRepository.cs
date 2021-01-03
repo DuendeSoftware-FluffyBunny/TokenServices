@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using FluffyBunny.EntityFramework.Context;
+using FluffyBunny4.Models;
 
 namespace FluffyBunny4.Azure.DbContext
 {
@@ -31,19 +32,19 @@ namespace FluffyBunny4.Azure.DbContext
             public string DatabaseName { get; set; }
         
         }
-        protected IScopedTenantRequestContext ScopedTenantRequestContext;
+        protected IScopedContext<TenantContext> _scopedTenantContext;
         protected ITenantStore _tenantStore;
         private IHostStorage _hostStorage;
 
         public TenantAwareCosmosDBRepository(
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedContext<TenantContext> scopedTenantContext,
             ITenantStore tenantStore,
             IHostStorage hostStorage,
             IOptions<CosmosDbConfiguration> settings,
             ConnectionPolicy connectionPolicy = null,
             ILogger logger = null) : base(settings, connectionPolicy, logger)
         {
-            ScopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _tenantStore = tenantStore;
             _hostStorage = hostStorage;
         }

@@ -18,25 +18,25 @@ namespace FluffyBunny4.Stores
     {
         static ConcurrentDictionary<string, IPersistedGrantStore> _tenantStores = new ConcurrentDictionary<string, IPersistedGrantStore>();
         private IScopedStorage _scopedStorage;
-        private IScopedTenantRequestContext _scopedTenantRequestContext;
+        private IScopedContext<TenantContext> _scopedTenantContext;
         private ICoreMapperAccessor _coreMapperAccessor;
         private IPersistedGrantStore _innerPersistedGrantStore;
         public InMemoryTenantAwarePersistedGrantStore(
-            IScopedStorage scopedStorage, 
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedStorage scopedStorage,
+            IScopedContext<TenantContext> scopedTenantContext,
             ICoreMapperAccessor coreMapperAccessor)
         {
             _scopedStorage = scopedStorage;
-            _scopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _coreMapperAccessor = coreMapperAccessor;
-            if (!string.IsNullOrWhiteSpace(_scopedTenantRequestContext.TenantId))
+            if (!string.IsNullOrWhiteSpace(_scopedTenantContext.Context.TenantName))
             {
-                if (!_tenantStores.ContainsKey(_scopedTenantRequestContext.TenantId))
+                if (!_tenantStores.ContainsKey(_scopedTenantContext.Context.TenantName))
                 {
-                    _tenantStores.TryAdd(_scopedTenantRequestContext.TenantId, new InMemoryPersistedGrantStore());
+                    _tenantStores.TryAdd(_scopedTenantContext.Context.TenantName, new InMemoryPersistedGrantStore());
                 }
 
-                _tenantStores.TryGetValue(_scopedTenantRequestContext.TenantId, out _innerPersistedGrantStore);
+                _tenantStores.TryGetValue(_scopedTenantContext.Context.TenantName, out _innerPersistedGrantStore);
 
             }
         }

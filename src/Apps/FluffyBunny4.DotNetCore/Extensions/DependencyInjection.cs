@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using FluffyBunny4.DotNetCore.Services.Defaults;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -21,15 +22,19 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IDataProtection, DataProtection>();
             return services;
         }
-
+        public static IServiceCollection AddScopedContex(this IServiceCollection services)
+        {
+            services.TryAddScoped(typeof(IScopedContext<>), typeof(ScopedContext<>));
+            return services;
+        }
         public static IServiceCollection AddScopedStorage(this IServiceCollection services)
         {
-            services.AddScoped<IScopedStorage, ThreadSafeScopedStorage>();
+            services.TryAddScoped<IScopedStorage, ThreadSafeScopedStorage>();
             return services;
         }
         public static IServiceCollection AddHostStorage(this IServiceCollection services)
         {
-            services.AddSingleton<IHostStorage, ThreadSafeHostStorage>();
+            services.TryAddSingleton<IHostStorage, ThreadSafeHostStorage>();
             return services;
         }
         public static IServiceCollection AddSerializers(this IServiceCollection services)

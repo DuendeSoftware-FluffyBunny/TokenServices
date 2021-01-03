@@ -11,6 +11,7 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace FluffyBunny4.Validation
 {
@@ -19,7 +20,7 @@ namespace FluffyBunny4.Validation
         private readonly ILogger _logger;
         private readonly IClientStore _clients;
         private readonly IEventService _events;
-        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
+        private readonly IScopedContext<TenantContext> _scopedTenantContext;
         private readonly ISecretsListValidator _validator;
         private readonly ISecretsListParser _parser;
 
@@ -36,14 +37,14 @@ namespace FluffyBunny4.Validation
             ISecretsListParser parser, 
             ISecretsListValidator validator, 
             IEventService events,
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedContext<TenantContext> scopedTenantContext,
             ILogger<ClientSecretValidator> logger)
         {
             _clients = clients;
             _parser = parser;
             _validator = validator;
             _events = events;
-            _scopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _logger = logger;
         }
 
@@ -74,9 +75,9 @@ namespace FluffyBunny4.Validation
             var client = await _clients.FindEnabledClientByIdAsync(parsedSecret.Id) as ClientExtra;
             if (client == null)
             {
-                await RaiseFailureEventAsync(parsedSecret.Id, $"Unknown client for tenant: '{_scopedTenantRequestContext.TenantId}'");
+                await RaiseFailureEventAsync(parsedSecret.Id, $"Unknown client for tenant: '{_scopedTenantContext.Context.TenantName}'");
 
-                _logger.LogError($"No client with id '{parsedSecret.Id}' for tenant: '{_scopedTenantRequestContext.TenantId}' found. aborting");
+                _logger.LogError($"No client with id '{parsedSecret.Id}' for tenant: '{_scopedTenantContext.Context.TenantName}' found. aborting");
                 return fail;
             }
             

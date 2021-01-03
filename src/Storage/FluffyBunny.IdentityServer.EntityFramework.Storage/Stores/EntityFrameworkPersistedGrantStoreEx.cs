@@ -10,20 +10,21 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
 using FluffyBunny.EntityFramework.Context;
-using FluffyBunny.EntityFramework.Entities;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
 using FluffyBunny4;
 using FluffyBunny4.DotNetCore.Services;
+using FluffyBunny4.Models;
 using FluffyBunny4.Services;
 using FluffyBunny4.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PersistedGrantExtra = FluffyBunny.EntityFramework.Entities.PersistedGrantExtra;
 
 namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     class EntityFrameworkPersistedGrantStoreEx : IPersistedGrantStoreEx
     {
-        private IScopedTenantRequestContext _scopedTenantRequestContext;
+        private IScopedContext<TenantContext> _scopedTenantContext;
         private IScopedStorage _scopedStorage;
         private IAdminServices _adminServices;
         private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
@@ -31,14 +32,14 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         private ILogger<EntityFrameworkPersistedGrantStoreEx> Logger;
 
         public EntityFrameworkPersistedGrantStoreEx(
-            IScopedTenantRequestContext scopedTenantRequestContext,
+            IScopedContext<TenantContext> scopedTenantContext,
             IScopedStorage scopedStorage,
             IAdminServices adminServices,
             IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ITenantAwareConfigurationDbContextAccessor tenantAwareConfigurationDbContextAccessor,
             ILogger<EntityFrameworkPersistedGrantStoreEx> logger)
         {
-            _scopedTenantRequestContext = scopedTenantRequestContext;
+            _scopedTenantContext = scopedTenantContext;
             _scopedStorage = scopedStorage;
             _adminServices = adminServices;
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
@@ -47,7 +48,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         }
         ITenantAwareConfigurationDbContext GetTenantContext()
         {
-            var name = _scopedTenantRequestContext.TenantId;
+            var name = _scopedTenantContext.Context.TenantName;
             name = name.ToLower();
             return _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
         }

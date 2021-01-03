@@ -7,21 +7,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
+using FluffyBunny4.DotNetCore.Services;
 
 namespace FluffyBunny4.Stores
 {
     public class InMemoryClientStoreExtra : IClientStore
     {
+        private readonly IScopedContext<TenantContext> _scopedTenantContext;
         private readonly IEnumerable<Client> _clients;
-        private readonly IScopedTenantRequestContext _scopedTenantRequestContext;
 
         public InMemoryClientStoreExtra(
-            IEnumerable<Client> clients,
-            IScopedTenantRequestContext scopedTenantRequestContext
-            ) 
+            IScopedContext<TenantContext> scopedTenantContext,
+            IEnumerable<Client> clients
+            )
         {
+            _scopedTenantContext = scopedTenantContext;
             _clients = clients;
-            _scopedTenantRequestContext = scopedTenantRequestContext;
         }
 
 
@@ -34,7 +35,7 @@ namespace FluffyBunny4.Stores
         /// </returns>
         public Task<Client> FindClientByIdAsync(string clientId)
         {
-            return FindClientByIdAsync(clientId, _scopedTenantRequestContext.TenantId);
+            return FindClientByIdAsync(clientId, _scopedTenantContext.Context.TenantName);
         }
 
         public Task<Client> FindClientByIdAsync(string clientId, string tenantId)
