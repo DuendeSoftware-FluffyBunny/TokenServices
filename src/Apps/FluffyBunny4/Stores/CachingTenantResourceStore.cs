@@ -33,7 +33,7 @@ namespace FluffyBunny4.Stores
         private readonly ICache<Resources> _allCache;
 
         private readonly IResourceStore _inner;
-        private readonly IScopedContext<TenantContext> _scopedTenantContext;
+        private readonly IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace FluffyBunny4.Stores
         /// <param name="logger">The logger.</param>
         public CachingTenantResourceStore(
             IdentityServerOptions options, T inner,
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ICache<IEnumerable<IdentityResource>> identityCache,
             ICache<IEnumerable<ApiResource>> apiByScopeCache,
             ICache<IEnumerable<ApiResource>> apisCache,
@@ -59,7 +59,7 @@ namespace FluffyBunny4.Stores
         {
             _options = options;
             _inner = inner;
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _identityCache = identityCache;
             _apiByScopeCache = apiByScopeCache;
             _apiResourceCache = apisCache;
@@ -91,7 +91,7 @@ namespace FluffyBunny4.Stores
         public async Task<IEnumerable<ApiResource>> FindApiResourcesByNameAsync(IEnumerable<string> apiResourceNames)
         {
             var key = GetKey(apiResourceNames);
-            key = $"[{_scopedTenantContext.Context.TenantName}][api-resources-by-name][{key}]";
+            key = $"[{_scopedTenantRequestContext.Context.TenantName}][api-resources-by-name][{key}]";
             var apis = await _apiResourceCache.GetAsync(key,
                 _options.Caching.ResourceStoreExpiration,
                 () => _inner.FindApiResourcesByNameAsync(apiResourceNames),
@@ -104,7 +104,7 @@ namespace FluffyBunny4.Stores
         public async Task<IEnumerable<IdentityResource>> FindIdentityResourcesByScopeNameAsync(IEnumerable<string> names)
         {
             var key = GetKey(names);
-            key = $"[{_scopedTenantContext.Context.TenantName}][identity-resources-by-scope-name][{key}]";
+            key = $"[{_scopedTenantRequestContext.Context.TenantName}][identity-resources-by-scope-name][{key}]";
             var identities = await _identityCache.GetAsync(key,
                 _options.Caching.ResourceStoreExpiration,
                 () => _inner.FindIdentityResourcesByScopeNameAsync(names),
@@ -117,7 +117,7 @@ namespace FluffyBunny4.Stores
         public async Task<IEnumerable<ApiResource>> FindApiResourcesByScopeNameAsync(IEnumerable<string> names)
         {
             var key = GetKey(names);
-            key = $"[{_scopedTenantContext.Context.TenantName}][api-resources-by-scope-name][{key}]";
+            key = $"[{_scopedTenantRequestContext.Context.TenantName}][api-resources-by-scope-name][{key}]";
             var apis = await _apiByScopeCache.GetAsync(key,
                 _options.Caching.ResourceStoreExpiration,
                 () => _inner.FindApiResourcesByScopeNameAsync(names),
@@ -130,7 +130,7 @@ namespace FluffyBunny4.Stores
         public async Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
         {
             var key = GetKey(scopeNames);
-            key = $"[{_scopedTenantContext.Context.TenantName}][api-scopes-by-name][{key}]";
+            key = $"[{_scopedTenantRequestContext.Context.TenantName}][api-scopes-by-name][{key}]";
             var apis = await _apiScopeCache.GetAsync(key,
                 _options.Caching.ResourceStoreExpiration,
                 () => _inner.FindApiScopesByNameAsync(scopeNames),

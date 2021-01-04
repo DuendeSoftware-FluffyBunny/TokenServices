@@ -35,6 +35,7 @@ using FluffyBunny4.Validation;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.HttpOverrides;
 using FluffyBunny4.Azure.Configuration.CosmosDB;
+using FluffyBunny4.ResponseHandling;
 using FluffyBunny4.Stores;
 
 namespace TokenService
@@ -303,7 +304,7 @@ namespace TokenService
                 ///////////////////////////////////////////////////////////////////////////////
                 // if you add this it locks you into an url that is {identityServerBase}/{tenantId}/{endpoints} vs
                 // {identityServerBase}/{endpoints}
-                // I utilize IScopedContext<TenantContext> a SCOPED object that you can inject anywhere in the pipeline to tell you what tenant we have.
+                // I utilize IScopedContext<TenantRequestContext> a SCOPED object that you can inject anywhere in the pipeline to tell you what tenant we have.
                 ///////////////////////////////////////////////////////////////////////////////
                 _logger.LogInformation("ConfigureServices - AddTenantServices ");
                 services.AddTenantServices();

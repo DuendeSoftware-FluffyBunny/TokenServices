@@ -16,7 +16,7 @@ namespace FluffyBunny4.ResponseHandling
     /// Default revocation response generator
     /// </summary>
     /// <seealso cref="ITokenRevocationResponseGenerator" />
-    public class TokenRevocationResponseGenerator : ITokenRevocationResponseGenerator
+    public class MyTokenRevocationResponseGenerator : ITokenRevocationResponseGenerator
     {
         private IBackgroundTaskQueue<Delete> _taskQueueDelete;
         private readonly IPersistedGrantStore _persistedGrantStore;
@@ -31,15 +31,15 @@ namespace FluffyBunny4.ResponseHandling
         protected readonly ILogger Logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TokenRevocationResponseGenerator" /> class.
+        /// Initializes a new instance of the <see cref="MyTokenRevocationResponseGenerator" /> class.
         /// </summary>
-        /// <param name="idsTokenRevocationResponseGenerator">The original IdentityServer4 TokenRevocationResponseGenerator.</param>
+        /// <param name="idsTokenRevocationResponseGenerator">The original IdentityServer4 MyTokenRevocationResponseGenerator.</param>
         /// <param name="logger">The logger.</param>
-        public TokenRevocationResponseGenerator(
+        public MyTokenRevocationResponseGenerator(
             IPersistedGrantStore persistedGrantStore,
             IBackgroundTaskQueue<Delete> taskQueueDelete,
             Duende.IdentityServer.ResponseHandling.TokenRevocationResponseGenerator idsTokenRevocationResponseGenerator,
-            ILogger<TokenRevocationResponseGenerator> logger)
+            ILogger<MyTokenRevocationResponseGenerator> logger)
         {
             _persistedGrantStore = persistedGrantStore;
             _taskQueueDelete = taskQueueDelete;

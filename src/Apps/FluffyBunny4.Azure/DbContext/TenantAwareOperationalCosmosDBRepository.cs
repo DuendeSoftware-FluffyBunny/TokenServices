@@ -18,15 +18,15 @@ namespace FluffyBunny4.Azure.DbContext
 
         public string Key { get; }
         public TenantAwareOperationalCosmosDBRepository(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ITenantStore tenantStore,
             IHostStorage hostStorage,
             IOptions<CosmosDbConfiguration> settings,
             ConnectionPolicy connectionPolicy = null,
             ILogger logger = null) :
-            base(scopedTenantContext, tenantStore, hostStorage, settings, connectionPolicy, logger)
+            base(scopedTenantRequestContext, tenantStore, hostStorage, settings, connectionPolicy, logger)
         {
-            Key = $"{scopedTenantContext.Context.TenantName}:{this.GetType().FullName}:{TenantContainerType.Operational}";
+            Key = $"{scopedTenantRequestContext.Context.TenantName}:{this.GetType().FullName}:{TenantContainerType.Operational}";
         }
         protected override string GetPartitionKeyPath()
         {
@@ -45,7 +45,7 @@ namespace FluffyBunny4.Azure.DbContext
         {
             if(_collectionConfiguration == null)
             {
-                var tenant = await _tenantStore.FindTenantByIdAsync(_scopedTenantContext.Context.TenantName);
+                var tenant = await _tenantStore.FindTenantByIdAsync(_scopedTenantRequestContext.Context.TenantName);
                 _collectionConfiguration = new CollectionConfiguration
                 {
                     Collection = new Collection

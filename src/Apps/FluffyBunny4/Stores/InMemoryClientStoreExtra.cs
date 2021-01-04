@@ -13,15 +13,15 @@ namespace FluffyBunny4.Stores
 {
     public class InMemoryClientStoreExtra : IClientStore
     {
-        private readonly IScopedContext<TenantContext> _scopedTenantContext;
+        private readonly IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private readonly IEnumerable<Client> _clients;
 
         public InMemoryClientStoreExtra(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IEnumerable<Client> clients
             )
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _clients = clients;
         }
 
@@ -35,7 +35,7 @@ namespace FluffyBunny4.Stores
         /// </returns>
         public Task<Client> FindClientByIdAsync(string clientId)
         {
-            return FindClientByIdAsync(clientId, _scopedTenantContext.Context.TenantName);
+            return FindClientByIdAsync(clientId, _scopedTenantRequestContext.Context.TenantName);
         }
 
         public Task<Client> FindClientByIdAsync(string clientId, string tenantId)

@@ -13,18 +13,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     class EntityFrameworkClientStore : IClientStore
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IAdminServices _adminServices;
         private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
         private ILogger<EntityFrameworkClientStore> _logger;
 
         public EntityFrameworkClientStore(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IAdminServices adminServices,
             IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ILogger<EntityFrameworkClientStore> logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _adminServices = adminServices;
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
@@ -33,7 +33,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         public async Task<Client> FindClientByIdAsync(string clientId)
         {
             
-            var tenantName = _scopedTenantContext.Context.TenantName;
+            var tenantName = _scopedTenantRequestContext.Context.TenantName;
             var clientEntity = await _adminServices.GetClientByClientIdAsync(tenantName, clientId);
             var clientExtra = _entityFrameworkMapperAccessor.MapperOneToOne.Map<ClientExtra>(clientEntity);
             return clientExtra;

@@ -12,23 +12,23 @@ namespace FluffyBunny4.Stores
 {
     public class TenantValidationKeyStore : IValidationKeysStore
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IKeyVaultTenantResolver _tenantResolver;
         private ILogger _logger;
 
         public TenantValidationKeyStore(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IKeyVaultTenantResolver tenantResolver,
             ILogger<TenantValidationKeyStore> logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _tenantResolver = tenantResolver;
             _logger = logger;
 
         }
         public async Task<IEnumerable<SecurityKeyInfo>> GetValidationKeysAsync()
         {
-            var keyVaultECDsaKeyStore = await _tenantResolver.GetKeyVaultECDsaKeyStoreAsync(_scopedTenantContext.Context.TenantName);
+            var keyVaultECDsaKeyStore = await _tenantResolver.GetKeyVaultECDsaKeyStoreAsync(_scopedTenantRequestContext.Context.TenantName);
             var cache = await keyVaultECDsaKeyStore.FetchCacheAsync();
             return cache.SecurityKeyInfos;
         }

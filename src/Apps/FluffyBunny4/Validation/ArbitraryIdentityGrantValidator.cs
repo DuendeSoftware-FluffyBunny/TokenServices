@@ -17,6 +17,7 @@ using Duende.IdentityServer;
 using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.DotNetCore.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -41,6 +42,7 @@ namespace FluffyBunny4.Validation
             JwtClaimTypes.Issuer
         };
 
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IHttpContextAccessor _contextAccessor;
         private IResourceStore _resourceStore;
         private IScopedOptionalClaims _scopedOptionalClaims;
@@ -52,11 +54,13 @@ namespace FluffyBunny4.Validation
         };
 
         public ArbitraryIdentityGrantValidator(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IHttpContextAccessor contextAccessor,
             IResourceStore resourceStore,
             IScopedOptionalClaims scopedOptionalClaims,
             ILogger<ArbitraryIdentityGrantValidator> logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _contextAccessor = contextAccessor;
             _resourceStore = resourceStore;
             _scopedOptionalClaims = scopedOptionalClaims;
@@ -68,6 +72,7 @@ namespace FluffyBunny4.Validation
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
             var client = context.Request.Client as ClientExtra;
+            _scopedTenantRequestContext.Context.Client = client;
 
             // make sure nothing is malformed
             bool err = false;
@@ -103,6 +108,7 @@ namespace FluffyBunny4.Validation
                     los.Add($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
                 }
             }
+            _scopedTenantRequestContext.Context.Issuer = issuer;
             error = error || err;
             err = false;
 

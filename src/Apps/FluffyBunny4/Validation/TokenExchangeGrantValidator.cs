@@ -42,14 +42,16 @@ namespace FluffyBunny4.Validation
         private TokenExchangeOptions _tokenExchangeOptions;
         private IIdentityTokenValidator _identityTokenValidator;
         private ILogger _logger;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
 
         private static List<string> OneMustExitsArguments => _oneMustExitsArguments ??
-                                                                  (_oneMustExitsArguments =
-                                                                      new List<string>
-                                                                      {
-                                                                      });
+                                                             (_oneMustExitsArguments =
+                                                                 new List<string>
+                                                                 {
+                                                                 });
 
         public TokenExchangeGrantValidator(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IScopedStorage scopedStorage,
             IResourceStore resourceStore,
             IScopedOptionalClaims scopedOptionalClaims,
@@ -62,6 +64,7 @@ namespace FluffyBunny4.Validation
             IIdentityTokenValidator identityTokenValidator,
             ILogger<TokenExchangeGrantValidator> logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _scopedStorage = scopedStorage;
             _serializer = serializer;
             _resourceStore = resourceStore;
@@ -97,6 +100,7 @@ namespace FluffyBunny4.Validation
 
         string SubjectFromClaimsPrincipal(ClaimsPrincipal principal)
         {
+            if (principal == null) return null;
             var subjectClaim = principal.Claims.FirstOrDefault(a => a.Type == JwtClaimTypes.Subject);
             if (subjectClaim != null)
             {
@@ -113,34 +117,55 @@ namespace FluffyBunny4.Validation
         }
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
-            //TODO FANOUT
+            var client = context.Request.Client as ClientExtra;
+            _scopedTenantRequestContext.Context.Client = client;
 
-
-            var externalServices = await _externalServicesStore.GetExternalServicesAsync();
             var form = context.Request.Raw;
             var error = false;
-            var los = new List<string>();
-            
             // make sure nothing is malformed
             bool err = false;
+            var los = new List<string>();
+
+            // VALIDATE issuer must exist and must be allowed
+            // -------------------------------------------------------------------
+            var issuer = form.Get("issuer");
+            if (string.IsNullOrEmpty(issuer))
+            {
+                error = true;
+                los.Add($"issuer must be present.");
+            }
+            else
+            {
+                issuer = issuer.ToLower();
+                var foundIssuer = client.AllowedArbitraryIssuers.FirstOrDefault(x => x == issuer);
+                if (string.IsNullOrWhiteSpace(foundIssuer))
+                {
+                    error = true;
+                    los.Add($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
+                }
+            }
+            _scopedTenantRequestContext.Context.Issuer = issuer;
+            error = error || err;
+            err = false;
 
             // MUST have subject
             var subjectToken = form.Get(FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken);
             if (string.IsNullOrWhiteSpace(subjectToken))
             {
-                context.Result.IsError = true;
+                err = true;
                 los.Add($"{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken} is required");
-                context.Result.Error = string.Join<string>(" | ", los);
-                return;
             }
+            error = error || err;
+            err = false;
+
             var subjectTokenType = form.Get(FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType);
             if (string.IsNullOrWhiteSpace(subjectTokenType))
             {
-                context.Result.IsError = true;
+                err = true;
                 los.Add($"{FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType} is required");
-                context.Result.Error = string.Join<string>(" | ", los);
-                return;
             }
+            error = error || err;
+            err = false;
 
             var subject = "";
             switch (subjectTokenType)
@@ -151,24 +176,37 @@ namespace FluffyBunny4.Validation
                     var validatedResult = await _identityTokenValidator.ValidateIdTokenAsync(subjectToken, _tokenExchangeOptions.AuthorityKey);
                     if (validatedResult.IsError)
                     {
-                        throw new Exception(
-                            $"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}",
-                            new  Exception(validatedResult.Error));
+                        err = true;
+                        los.Add($"failed to validate id_token");
+                        _logger.LogError( $"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}\nError={validatedResult.Error}");
                     }
 
                     subject = SubjectFromClaimsPrincipal(validatedResult.User);
                     if (string.IsNullOrWhiteSpace(subject))
                     {
-                        throw new Exception($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                        err = true;
+                        los.Add($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
                     }
+                   
 
                     break;
                 default:
-                    throw new Exception($"not supported: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                    err = true;
+                    los.Add( $"not supported: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
                     break;
             }
+            error = error || err;
+            err = false;
 
-            var client = context.Request.Client as ClientExtra;
+            if (error)
+            {
+                context.Result.IsError = true;
+                context.Result.Error = string.Join<string>(" | ", los);
+                _logger.LogError($"context.Result.Error");
+                return;
+            }
+
+           
 
             var finalCustomPayload = new Dictionary<string, object>();
          

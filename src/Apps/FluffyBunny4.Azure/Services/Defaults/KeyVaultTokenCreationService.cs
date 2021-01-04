@@ -13,23 +13,23 @@ namespace FluffyBunny4.Services
 {
     public class KeyVaultTokenCreationService : DefaultTokenCreationService
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private ITenantResolver _tenantResolver;
 
         public KeyVaultTokenCreationService(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ITenantResolver tenantResolver,
             ISystemClock clock,
             IKeyMaterialService keys,
             IdentityServerOptions options,
             ILogger<DefaultTokenCreationService> logger) : base(clock, keys, options, logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _tenantResolver = tenantResolver;
         }
         public override async Task<string> CreateTokenAsync(Token token)
         {
-            var signatureProvider = await _tenantResolver.GetSignatureProviderAsync(_scopedTenantContext.Context.TenantName);
+            var signatureProvider = await _tenantResolver.GetSignatureProviderAsync(_scopedTenantRequestContext.Context.TenantName);
             var jwtToken = await signatureProvider.CreateJwtAsync(token);
             return jwtToken;
         }

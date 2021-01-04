@@ -1,2 +1,2 @@
-﻿﻿add-migration initial -c TenantAwareConfigurationDbContext -o Migrations/Tenant
-add-migration initial -c MainEntityCoreContext -o Migrations/Main
+﻿Add-Migration initial -c TenantAwareConfigurationDbContext	-StartupProject MigrateHost  -Project Migrations.SqlServer -o Migrations/Tenant
+Add-Migration initial -c MainEntityCoreContext				-StartupProject MigrateHost  -Project Migrations.SqlServer -o Migrations/Main

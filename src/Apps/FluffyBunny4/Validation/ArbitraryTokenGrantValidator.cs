@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.DotNetCore.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -35,14 +36,16 @@ namespace FluffyBunny4.Validation
                                                                          JwtClaimTypes.Subject
                                                                      };
 
-      
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IScopedOptionalClaims _scopedOptionalClaims;
         private ILogger _logger;
 
         public ArbitraryTokenGrantValidator(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IScopedOptionalClaims scopedOptionalClaims,
             ILogger<ArbitraryTokenGrantValidator> logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _scopedOptionalClaims = scopedOptionalClaims;
             _logger = logger;
         }
@@ -52,7 +55,8 @@ namespace FluffyBunny4.Validation
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
             var client = context.Request.Client as ClientExtra;
-            
+            _scopedTenantRequestContext.Context.Client = client;
+
             // make sure nothing is malformed
             bool err = false;
             bool error = false;
@@ -90,6 +94,7 @@ namespace FluffyBunny4.Validation
                     los.Add($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
                 }
             }
+            _scopedTenantRequestContext.Context.Issuer = issuer;
             error = error || err;
             err = false;
 

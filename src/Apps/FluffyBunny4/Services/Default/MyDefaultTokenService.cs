@@ -11,6 +11,7 @@ using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
+using FluffyBunny4.DotNetCore.Services;
 using FluffyBunny4.Extensions;
 using FluffyBunny4.Models;
 using IdentityModel;
@@ -23,7 +24,10 @@ namespace FluffyBunny4.Services.Default
 {
     public class MyDefaultTokenService : DefaultTokenService
     {
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
+
         public MyDefaultTokenService(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IClaimsService claimsProvider,
             IReferenceTokenStore referenceTokenStore,
             ITokenCreationService creationService,
@@ -34,11 +38,11 @@ namespace FluffyBunny4.Services.Default
             ILogger<DefaultTokenService> logger) : base(claimsProvider, referenceTokenStore, creationService,
             contextAccessor, clock, keyMaterialService, options, logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
         }
 
         public override async Task<Token> CreateAccessTokenAsync(TokenCreationRequest request)
         {
-            var client = request.ValidatedRequest.Client as ClientExtra;
             Logger.LogTrace("Creating access token");
             request.Validate();
 
@@ -58,7 +62,7 @@ namespace FluffyBunny4.Services.Default
                 claims.Add(new Claim(JwtClaimTypes.SessionId, request.ValidatedRequest.SessionId));
             }
 
-            var issuer = client.Issuer;
+            var issuer = _scopedTenantRequestContext.Context.Issuer;
 
             if (string.IsNullOrWhiteSpace(issuer))
             {

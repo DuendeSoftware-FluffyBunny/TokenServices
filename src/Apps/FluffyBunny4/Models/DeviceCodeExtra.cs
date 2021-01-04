@@ -11,5 +11,6 @@ namespace FluffyBunny4.Models
     public class DeviceCodeExtra: DeviceCode
     {
         public IEnumerable<Claim> AuthorizedClaims { get; set; }
+        public string Issuer { get; set; }
     }
 }

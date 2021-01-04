@@ -963,9 +963,6 @@ namespace SqlServer.Migrations.Tenant
                     b.Property<bool>("IncludeClientId")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Issuer")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("RefreshTokenGraceEnabled")
                         .HasColumnType("bit");
 

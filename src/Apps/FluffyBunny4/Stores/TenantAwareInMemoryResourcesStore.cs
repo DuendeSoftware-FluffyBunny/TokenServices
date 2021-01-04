@@ -14,20 +14,20 @@ namespace FluffyBunny4.Stores
 {
     public class TenantAwareInMemoryResourcesStore: IResourceStore
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IMapper _mapper;
         private readonly IEnumerable<IdentityResource> _identityResources;
         private readonly IEnumerable<TenantApiResourceHandle> _apiResources;
         private readonly IEnumerable<TenantApiScopeHandle> _apiScopes;
 
         public TenantAwareInMemoryResourcesStore(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IMapper mapper,
             IEnumerable<IdentityResource> identityResources = null,
             IEnumerable<TenantApiResourceHandle> apiResources = null,
             IEnumerable<TenantApiScopeHandle> apiScopes = null)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _mapper = mapper;
 
 
@@ -57,12 +57,12 @@ namespace FluffyBunny4.Stores
         {
             var queryApiScopes =
               from x in _apiScopes
-              where x.TenantId == _scopedTenantContext.Context.TenantName
+              where x.TenantId == _scopedTenantRequestContext.Context.TenantName
               let xx = _mapper.Map<ApiScope>(x)
               select xx;
             var queryApiResources =
              from x in _apiResources
-             where x.TenantId == _scopedTenantContext.Context.TenantName
+             where x.TenantId == _scopedTenantRequestContext.Context.TenantName
              let xx = _mapper.Map<ApiResource>(x)
              select xx;
             var result = new Resources(_identityResources, queryApiResources, queryApiScopes);
@@ -75,7 +75,7 @@ namespace FluffyBunny4.Stores
             if (apiResourceNames == null) throw new ArgumentNullException(nameof(apiResourceNames));
 
             var query = from a in _apiResources
-                        where apiResourceNames.Contains(a.Name) && a.TenantId == _scopedTenantContext.Context.TenantName
+                        where apiResourceNames.Contains(a.Name) && a.TenantId == _scopedTenantRequestContext.Context.TenantName
                         let xx = _mapper.Map<ApiResource>(a)
                         select xx;
             return Task.FromResult(query);
@@ -100,7 +100,7 @@ namespace FluffyBunny4.Stores
             if (scopeNames == null) throw new ArgumentNullException(nameof(scopeNames));
 
             var query = from a in _apiResources
-                        where a.Scopes.Any(x => scopeNames.Contains(x)) && a.TenantId == _scopedTenantContext.Context.TenantName
+                        where a.Scopes.Any(x => scopeNames.Contains(x)) && a.TenantId == _scopedTenantRequestContext.Context.TenantName
                         let xx = _mapper.Map<ApiResource>(a)
                         select xx;
         
@@ -114,7 +114,7 @@ namespace FluffyBunny4.Stores
 
             var query =
                 from x in _apiScopes
-                where scopeNames.Contains(x.Name) && x.TenantId == _scopedTenantContext.Context.TenantName
+                where scopeNames.Contains(x.Name) && x.TenantId == _scopedTenantRequestContext.Context.TenantName
                 let xx = _mapper.Map<ApiScope>(x)
                 select xx;
             return Task.FromResult(query);

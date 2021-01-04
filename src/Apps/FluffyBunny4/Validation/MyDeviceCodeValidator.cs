@@ -8,6 +8,7 @@ using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.DotNetCore.Services;
 using FluffyBunny4.Models;
 using FluffyBunny4.Services;
 using IdentityModel;
@@ -18,6 +19,7 @@ namespace FluffyBunny4.Validation
 {
     public class MyDeviceCodeValidator : IDeviceCodeValidator
     {
+        private readonly IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private readonly IScopedOptionalClaims _scopedOptionalClaims;
         private readonly IDeviceFlowCodeService _devices;
         private readonly IProfileService _profile;
@@ -34,6 +36,7 @@ namespace FluffyBunny4.Validation
         /// <param name="systemClock">The system clock.</param>
         /// <param name="logger">The logger.</param>
         public MyDeviceCodeValidator(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IScopedOptionalClaims scopedOptionalClaims,
             IDeviceFlowCodeService devices,
             IProfileService profile,
@@ -41,6 +44,7 @@ namespace FluffyBunny4.Validation
             ISystemClock systemClock,
             ILogger<MyDeviceCodeValidator> logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _scopedOptionalClaims = scopedOptionalClaims;
             _devices = devices;
             _profile = profile;
@@ -56,8 +60,12 @@ namespace FluffyBunny4.Validation
         /// <returns></returns>
         public async Task ValidateAsync(DeviceCodeValidationContext context)
         {
+            var client = context.Request.Client as ClientExtra;
+            _scopedTenantRequestContext.Context.Client = client;
+
             var deviceCode = await _devices.FindByDeviceCodeAsync(context.DeviceCode);
             var deviceCodeExtra = deviceCode as DeviceCodeExtra;
+            _scopedTenantRequestContext.Context.Issuer = deviceCodeExtra.Issuer;
             if (deviceCode == null)
             {
                 _logger.LogError("Invalid device code");

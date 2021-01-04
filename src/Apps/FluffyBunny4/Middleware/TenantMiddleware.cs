@@ -25,7 +25,7 @@ namespace FluffyBunny4.Middleware
             _logger = logger;
         }
         public async Task Invoke(HttpContext context, 
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ITenantStore tenantStore)
         {
             try
@@ -35,7 +35,7 @@ namespace FluffyBunny4.Middleware
                 if (parts.Count() > 1)
                 {
                     string tenantName = parts[1];
-                    scopedTenantContext.Context.TenantName = tenantName;
+                    scopedTenantRequestContext.Context.TenantName = tenantName;
                     if (string.IsNullOrWhiteSpace(tenantName) || !await tenantStore.IsTenantValidAsync(tenantName))
                     {
                         _logger.LogWarning($"TenantId={tenantName}, does not exist!");

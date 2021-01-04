@@ -35,7 +35,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         /// The logger.
         /// </summary>
         protected readonly ILogger Logger;
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private readonly ITenantAwareConfigurationDbContextAccessor _tenantAwareConfigurationDbContextAccessor;
 
         /// <summary>
@@ -45,15 +45,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         /// <param name="serializer">The serializer</param>
         /// <param name="logger">The logger.</param>
         public EntityFrameworkDeviceFlowStoreExtra(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ITenantAwareConfigurationDbContextAccessor tenantAwareConfigurationDbContextAccessor,
             IPersistentGrantSerializer serializer,
             ICoreMapperAccessor coreMapperAccessor,
             ILogger<EntityFrameworkDeviceFlowStoreExtra> logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _tenantAwareConfigurationDbContextAccessor = tenantAwareConfigurationDbContextAccessor;
-            var tenant = _scopedTenantContext.Context.TenantName;
+            var tenant = _scopedTenantRequestContext.Context.TenantName;
             Context = _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(tenant);
 
             Serializer = serializer;

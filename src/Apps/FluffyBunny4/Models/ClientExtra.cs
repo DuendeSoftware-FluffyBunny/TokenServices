@@ -93,6 +93,6 @@ namespace FluffyBunny4.Models
         public string TenantName { get; set; }
 
         public ICollection<string> AllowedArbitraryIssuers { get; set; } = new HashSet<string>();
-        public string Issuer { get; set; }
+ 
     }
 }

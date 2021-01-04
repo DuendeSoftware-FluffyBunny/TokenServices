@@ -13,18 +13,18 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     class EntityFrameworkResourceStore : IResourceStore
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IAdminServices _adminServices;
         private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
         private ILogger<EntityFrameworkResourceStore> _logger;
 
         public EntityFrameworkResourceStore(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IAdminServices adminServices,
             IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ILogger<EntityFrameworkResourceStore> logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _adminServices = adminServices;
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
             _logger = logger;
@@ -32,7 +32,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
         public async Task<IEnumerable<ApiResource>> FindApiResourcesByNameAsync(IEnumerable<string> apiResourceNames)
         {
-            var tenantName = _scopedTenantContext.Context.TenantName;
+            var tenantName = _scopedTenantRequestContext.Context.TenantName;
             var apiResources = await _adminServices.GetAllApiResourcesAsync(tenantName);
 
             var query = from item in apiResources
@@ -44,7 +44,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
         public async Task<IEnumerable<ApiResource>> FindApiResourcesByScopeNameAsync(IEnumerable<string> scopeNames)
         {
-            var tenantName = _scopedTenantContext.Context.TenantName;
+            var tenantName = _scopedTenantRequestContext.Context.TenantName;
             var apiResourceEntities = await _adminServices.GetAllApiResourcesAsync(tenantName);
             var finalList = new List<ApiResource>();
 
@@ -66,7 +66,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
         public async Task<IEnumerable<ApiScope>> FindApiScopesByNameAsync(IEnumerable<string> scopeNames)
         {
-            var tenantName = _scopedTenantContext.Context.TenantName;
+            var tenantName = _scopedTenantRequestContext.Context.TenantName;
             var apiResourceScopes = await _adminServices.GetAllApiResourceScopesAsync(tenantName, ClientScopesSortType.NameDesc);
 
             var apiResourceScopeNames = (from item in apiResourceScopes
@@ -91,7 +91,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
         public async Task<Resources> GetAllResourcesAsync()
         {
-            var tenantName = _scopedTenantContext.Context.TenantName;
+            var tenantName = _scopedTenantRequestContext.Context.TenantName;
             var apiResources = await _adminServices.GetAllApiResourcesAsync(tenantName);
             var queryApiResources = from item in apiResources
                 let c = _entityFrameworkMapperAccessor.MapperOneToOne.Map<ApiResource>(item)

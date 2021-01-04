@@ -24,7 +24,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     class EntityFrameworkPersistedGrantStoreEx : IPersistedGrantStoreEx
     {
-        private IScopedContext<TenantContext> _scopedTenantContext;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IScopedStorage _scopedStorage;
         private IAdminServices _adminServices;
         private IEntityFrameworkMapperAccessor _entityFrameworkMapperAccessor;
@@ -32,14 +32,14 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         private ILogger<EntityFrameworkPersistedGrantStoreEx> Logger;
 
         public EntityFrameworkPersistedGrantStoreEx(
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IScopedStorage scopedStorage,
             IAdminServices adminServices,
             IEntityFrameworkMapperAccessor entityFrameworkMapperAccessor,
             ITenantAwareConfigurationDbContextAccessor tenantAwareConfigurationDbContextAccessor,
             ILogger<EntityFrameworkPersistedGrantStoreEx> logger)
         {
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _scopedStorage = scopedStorage;
             _adminServices = adminServices;
             _entityFrameworkMapperAccessor = entityFrameworkMapperAccessor;
@@ -48,7 +48,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         }
         ITenantAwareConfigurationDbContext GetTenantContext()
         {
-            var name = _scopedTenantContext.Context.TenantName;
+            var name = _scopedTenantRequestContext.Context.TenantName;
             name = name.ToLower();
             return _tenantAwareConfigurationDbContextAccessor.GetTenantAwareConfigurationDbContext(name);
         }

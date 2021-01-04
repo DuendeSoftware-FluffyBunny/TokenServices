@@ -20,7 +20,7 @@ namespace FluffyBunny4.Validation
         private readonly ILogger _logger;
         private readonly IClientStore _clients;
         private readonly IEventService _events;
-        private readonly IScopedContext<TenantContext> _scopedTenantContext;
+        private readonly IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private readonly ISecretsListValidator _validator;
         private readonly ISecretsListParser _parser;
 
@@ -37,14 +37,14 @@ namespace FluffyBunny4.Validation
             ISecretsListParser parser, 
             ISecretsListValidator validator, 
             IEventService events,
-            IScopedContext<TenantContext> scopedTenantContext,
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             ILogger<ClientSecretValidator> logger)
         {
             _clients = clients;
             _parser = parser;
             _validator = validator;
             _events = events;
-            _scopedTenantContext = scopedTenantContext;
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _logger = logger;
         }
 
@@ -75,9 +75,9 @@ namespace FluffyBunny4.Validation
             var client = await _clients.FindEnabledClientByIdAsync(parsedSecret.Id) as ClientExtra;
             if (client == null)
             {
-                await RaiseFailureEventAsync(parsedSecret.Id, $"Unknown client for tenant: '{_scopedTenantContext.Context.TenantName}'");
+                await RaiseFailureEventAsync(parsedSecret.Id, $"Unknown client for tenant: '{_scopedTenantRequestContext.Context.TenantName}'");
 
-                _logger.LogError($"No client with id '{parsedSecret.Id}' for tenant: '{_scopedTenantContext.Context.TenantName}' found. aborting");
+                _logger.LogError($"No client with id '{parsedSecret.Id}' for tenant: '{_scopedTenantRequestContext.Context.TenantName}' found. aborting");
                 return fail;
             }
             

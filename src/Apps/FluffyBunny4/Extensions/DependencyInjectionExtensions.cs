@@ -63,8 +63,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             builder.Services.RemoveAll<ITokenRevocationResponseGenerator>();
             builder.Services.AddTransient<Duende.IdentityServer.ResponseHandling.TokenRevocationResponseGenerator>();
-            builder.Services.TryAddTransient<ITokenRevocationResponseGenerator, FluffyBunny4.ResponseHandling.TokenRevocationResponseGenerator>();
-            builder.Services.AddBackgroundServices<FluffyBunny4.ResponseHandling.TokenRevocationResponseGenerator.Delete>();
+            builder.Services.TryAddTransient<ITokenRevocationResponseGenerator, FluffyBunny4.ResponseHandling.MyTokenRevocationResponseGenerator>();
+            builder.Services.AddBackgroundServices<FluffyBunny4.ResponseHandling.MyTokenRevocationResponseGenerator.Delete>();
             return builder;
         } 
 
@@ -193,7 +193,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection AddTenantServices(this IServiceCollection services)
         {
-            services.AddTransient<TenantContext>();
+            services.AddTransient<TenantRequestContext>();
             return services;
         }
         public static IServiceCollection AddScopedServices(this IServiceCollection services)
@@ -231,6 +231,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClientSecretValidator, T>();
             return services;
         }
+         
+ 
         public static IServiceCollection SwapOutIntrospectionResponseGenerator<T>(
             this IServiceCollection services) where T : class, IIntrospectionResponseGenerator
         {

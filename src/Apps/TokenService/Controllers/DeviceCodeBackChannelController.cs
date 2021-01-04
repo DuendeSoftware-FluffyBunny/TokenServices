@@ -109,6 +109,7 @@ namespace TokenService.Controllers
         {
             public string IdToken { get; set; }
             public string UserCode { get; set; }
+            public string Issuer { get; set; }
         }
 
         string SubjectFromClaimsPrincipal(ClaimsPrincipal principal)
@@ -163,6 +164,23 @@ namespace TokenService.Controllers
             if (deviceAuth == null)
                 return NotFound($"Invalid user code, Device authorization failure - user code is invalid");
 
+
+            // VALIDATE issuer must exist and must be allowed
+            // -------------------------------------------------------------------
+            var issuer = data.Issuer;
+            if (string.IsNullOrEmpty(data.Issuer))
+            {
+                return NotFound($"Issuer is required");
+            }
+            else
+            {
+                issuer = issuer.ToLower();
+                var foundIssuer = client.AllowedArbitraryIssuers.FirstOrDefault(x => x == issuer);
+                if (string.IsNullOrWhiteSpace(foundIssuer))
+                {
+                    return NotFound($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
+                }
+            }
 
             string subject = "";
             try
@@ -290,6 +308,7 @@ namespace TokenService.Controllers
                 deviceAuth.AuthorizedScopes = allowedScopes;
                 var deviceExtra = _coreMapperAccessor.Mapper.Map<DeviceCodeExtra>(deviceAuth);
                 deviceExtra.AuthorizedClaims = allowedClaims;
+                deviceExtra.Issuer = issuer;
 
                 await _deviceFlowStore.UpdateByUserCodeAsync(data.UserCode.Sha256(), deviceExtra);
                 return Ok();

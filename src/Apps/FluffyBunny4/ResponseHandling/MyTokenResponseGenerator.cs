@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Extensions;
@@ -15,12 +14,13 @@ using FluffyBunny4.DotNetCore.Services;
 using FluffyBunny4.Extensions;
 using FluffyBunny4.Models;
 using FluffyBunny4.Services;
+using FluffyBunny4.Stores;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny4.Stores
+namespace FluffyBunny4.ResponseHandling
 {
     public class MyTokenResponseGenerator: TokenResponseGenerator
     {
