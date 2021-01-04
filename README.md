@@ -5,7 +5,7 @@ This project requires Duende as its base and as such you must agree to the Duend
 # OAuth2 Services
 Whilst IdentityServer provides OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
 
-The top OAuth2 services I have seen are;
+The OAuth2 services supported are;
 
 1. **client_credentials**    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
@@ -22,7 +22,7 @@ The top OAuth2 services I have seen are;
   Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating he user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
 
 5. **arbitrary_token**  
-  This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and if a JWT key signing managment.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  Here the only real requirement is that the caller has to take responsibility of becoming the issuer.
+  This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and in the case of a JWT key signing management.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  Here the only real requirement is that the caller has to take responsibility of becoming the issuer.
 
 6. **arbitrary_identity**  
   Its essentially externalizes the creation of an id_token and access_token by providing commodity services like storage and if a JWT key signing managment.   Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  Here the only real requirement is that the caller has to take responsibility of becoming the issuer.  This api could be used as the id_token and access_token minter for an OIDC provider.  The access_token created is only meant to call the issuers user_info endpoint and thus forces that opinion in the implementation.  You can have a truely arbitrary identity, but NOT an arbitrary access_token.
