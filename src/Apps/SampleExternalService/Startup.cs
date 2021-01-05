@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluffyBunny4.Configuration;
+using FluffyBunny4.Services;
+using FluffyBunny4.Services.Default;
 using SampleExternalService.Models;
 
 namespace SampleExternalService
@@ -41,6 +44,8 @@ namespace SampleExternalService
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SampleExternalService", Version = "v1" });
             });
+            services.Configure<TokenExchangeOptions>(Configuration.GetSection("TokenExchangeOptions"));
+            services.AddSingleton<IDiscoveryCacheAccessor, DiscoveryCacheAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

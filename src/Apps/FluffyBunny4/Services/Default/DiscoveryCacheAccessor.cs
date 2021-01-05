@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluffyBunny4.Services.Default
 {
-    class DiscoveryCacheAccessor : IDiscoveryCacheAccessor
+    public class DiscoveryCacheAccessor : IDiscoveryCacheAccessor
     {
         private TokenExchangeOptions _tokenExchangeOptions;
         private ConcurrentDictionary<string, IDiscoveryCache> _authorityMap;
