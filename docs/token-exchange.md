@@ -11,6 +11,7 @@ The token exchange implementation here is fanning out calls to external services
 | scope | offline_access <br>https://www.companyapis.com/auth/myphotos <br>https://www.companyapis.com/auth/myphotos.readonly <br>https://www.companyapis.com/auth/myphotos.modify |
 | subject_token_type | urn:ietf:params:oauth:token-type:id_token |
 | subject_token | {id_token} |
+| issuer | {issuer} |  
 
 This is custom and there are no reference example of this exchange.  This is the closest I got to designing one and used Google's login with consent to model mine.  Thank You Google designer.  
 
