@@ -7,7 +7,7 @@ Whilst IdentityServer provides OIDC functionality, this assumes that SSO service
 
 The OAuth2 services supported are;
 
-1. **client_credentials**    
+1. [**client_credentials**](https://identityserver4.readthedocs.io/en/latest/endpoints/token.html?highlight=client_credentials#token-endpoint)    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
   
 2.  [**token_exchange**](docs/token-exchange.md)  
