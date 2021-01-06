@@ -10,7 +10,7 @@ The OAuth2 services supported are;
 1. **client_credentials**    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
   
-2.  **token_exchange**  
+2.  [**token_exchange**](docs/token-exchange.md)  
   This is custom because there is no reference answer when it comes to exchanging an id_token (issued by google) for an access_token to services that I control.  
   This is used for granting authorization to services that a user can access.  
   In this flow I fan out calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requested scopes.  The real control of what a user gets access to is delegated to the actual services.  
@@ -38,10 +38,7 @@ The what next for a simple orchestrator is calling the TokenService's token_exch
 
 # [External Services](docs/external-services.md)
  These should be considered islands. Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
-
-# [Token Exchange](docs/token-exchange.md)
-This is exchanging an id_token + requested scopes for access.
-The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services. The requested scopes are follow a well known format.
+ 
 
  
 
