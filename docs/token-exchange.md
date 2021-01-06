@@ -66,4 +66,6 @@ Any scope that matches this pattern is sent to the matching service authorizatio
     "scope": "https://www.companyapis.com/auth/myphotos https://www.companyapis.com/auth/myphotos.modify https://www.companyapis.com/auth/myphotos.readonly offline_access"
 }
 ```
+![your-UML-diagram-name](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/DuendeSoftware-FluffyBunny/TokenServices/main/docs/token-exchange.iuml)
+
 
