@@ -1,0 +1,85 @@
+@startuml
+
+Client -> TokenService: token-exchange
+note right
+    **grant_type**: urn:ietf:params:oauth:grant-type:token-exchange
+    **scope**: offline_access https://www.companyapis.com/auth/{{external_service}} https://www.companyapis.com/auth/{{external_service}}.readonly
+    **subject_token_type**: urn:ietf:params:oauth:token-type:id_token
+    **subject_token**: {{id_token}}
+    **issuer**: https://accounts.mycompany.com
+end note
+ loop foreach registred External Service
+    TokenService -> ExternalService: Authorization Request
+    note right
+        {
+          "**authorization_type**": "subject_and_scopes",
+          "**subject**": "**{{subject}}**",
+          "**scopes**": [
+            "https://www.companyapis.com/auth/{{external_service}}",
+            "https://www.companyapis.com/auth/{{external_service}}.readonly",
+          ] 
+        }
+    end note
+    TokenService <- ExternalService: Respond
+    note right
+        {
+          "authorized": true,
+          "scopes": [
+            "https://www.companyapis.com/auth/**{{external_service}}**",
+            "https://www.companyapis.com/auth/**{{external_service}}**.readonly"
+          ],
+          "subject": "**{{subject}}**",
+          "claims": [
+            {
+              "type": "geo_location",
+              "value": "Canada"
+            }
+          ],
+          "custom_payload": {
+            "name": "MyCustom",
+            "value": 1234
+          }
+        }
+    end note 
+ end
+ TokenService->TokenService: Build final Token
+ TokenService->PersistedStorage: Store reference_tokens
+ TokenService->Client: Respond
+note right
+{
+    "**access_token**": "11CC7839397FC522AC4D6CC1A030AC05A4534F8BA7E201B220AE8AA760703772",
+    "**expires_in**": 3600,
+    "**token_type**": "Bearer",
+    "**refresh_token**": "BB152EE154E6AE14BEA3FF34D0085E8C79D28887008DF4573820C4EB94B4D609",
+    "**scope**": "https://www.companyapis.com/auth/{{external_service}}offline_access"
+}
+end note  
+==time==
+Client->TokenService: introspection
+note right
+    **token**: 11CC7839397FC522AC4D6CC1A030AC05A4534F8BA7E201B220AE8AA760703772
+end note
+Client<-TokenService: respond
+note right
+{
+    "iss": "https://accounts.mycompany.com",
+    "nbf": 1609950477,
+    "iat": 1609950477,
+    "exp": 1609954077,
+    "client_id": "a1ce197b-dd13-43a0-8376-7b762304fdd5",
+    "sub": "104758924428036663951",
+    "auth_time": 1609950477,
+    "idp": "local",
+    "amr": "urn:ietf:params:oauth:grant-type:token-exchange",
+    "**{{external_service}}**.geo_location": "Canada",
+    "custom_payload": {
+        "**{{external_service}}**": {
+            "name": "MyCustom",
+            "value": 1234
+        }
+    },
+    "active": true,
+    "scope": "https://www.companyapis.com/auth/**{{external_service}}**.readonly https://www.companyapis.com/auth/**{{external_service}}**.modify  offline_access"
+}
+end note 
+@enduml
