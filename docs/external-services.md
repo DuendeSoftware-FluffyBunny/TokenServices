@@ -68,7 +68,7 @@ The following is an example of what gets posted to the **myphotos** service auth
   }
 }
 ```
-The response comming back from the service must be honored.  The resulting access_token will **ONLY** have the scopes that the service responded with.  In the above example what was requested was given, but the service can remove or add at its discretion.  The service also has the right to add custom claims and a custom json payload.  These custom claims will be automatically namespaced into ;
+The response comming back from the service must be honored.  The resulting access_token will **ONLY** have the scopes that the service responded with.  In the above example what was requested was given, but the service can remove or add at its discretion.  The service also has the right to add custom claims and a custom json payload.  These custom claims will be automatically namespaced in the final token.
 ```
 {
     "iss": "https://accounts.google.com",
