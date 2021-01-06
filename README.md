@@ -37,18 +37,13 @@ The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary re
 The what next for a simple orchestrator is calling the TokenService's token_exchange flow.
 
 # [External Services](docs/external-services.md)
+ These should be considered islands. Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
+
+# [Token Exchange](docs/token-exchange.md)
+This is exchanging an id_token + requested scopes for access.
+The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services. The requested scopes are follow a well known format.
+
  
-
-# Token Exchange
-This is exchanging an id_token + requested scopes for access.  
-The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services.  The requested scopes are follow a well known format.  
-
-| paramater  | Description |
-| ---------  | -------- |
-| grant_type | urn:ietf:params:oauth:grant-type:token-exchange |
-| scope | offline_access <br>https://www.companyapis.com/auth/myphotos <br>https://www.companyapis.com/auth/myphotos.readonly <br>https://www.companyapis.com/auth/myphotos.modify |
-| subject_token_type | urn:ietf:params:oauth:token-type:id_token |
-| subject_token | {id_token} |
 
 
 
