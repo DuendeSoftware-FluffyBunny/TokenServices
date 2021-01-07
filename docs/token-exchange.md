@@ -47,24 +47,34 @@ Any scope that matches this pattern is sent to the matching service authorizatio
 # Introspection  
 ```
 {
-    "iss": "https://localhost:7001/zep",
-    "nbf": 1608750808,
-    "iat": 1608750808,
-    "exp": 1608754408,
+    "iss": "https://accounts.google.com",
+    "nbf": 1610026880,
+    "iat": 1610026880,
+    "exp": 1610030480,
     "client_id": "a1ce197b-dd13-43a0-8376-7b762304fdd5",
     "sub": "104758924428036663951",
-    "auth_time": 1608750642,
+    "auth_time": 1610026880,
     "idp": "local",
     "amr": "urn:ietf:params:oauth:grant-type:token-exchange",
     "myphotos.geo_location": "Canada",
     "custom_payload": {
         "myphotos": {
             "name": "MyCustom",
-            "value": 1234
+            "value": 1234,
+            "properties": [
+                {
+                    "name": "2f090494-919e-4e93-a4b1-effc1fcf7036",
+                    "value": 1
+                },
+                {
+                    "name": "f41f6041-d750-4656-a9be-34a1da49b56b",
+                    "value": 2
+                }
+            ]
         }
     },
     "active": true,
-    "scope": "https://www.companyapis.com/auth/myphotos https://www.companyapis.com/auth/myphotos.modify https://www.companyapis.com/auth/myphotos.readonly offline_access"
+    "scope": "https://www.companyapis.com/auth/myphotos.readonly https://www.companyapis.com/auth/myphotos.modify offline_access"
 }
 ```
 ![your-UML-diagram-name](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/DuendeSoftware-FluffyBunny/TokenServices/main/docs/token-exchange.iuml)
