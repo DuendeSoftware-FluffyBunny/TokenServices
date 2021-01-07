@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using FluffyBunny4;
 using FluffyBunny4.Models;
-using FluffyBunny4.Services;
 using Microsoft.Azure.KeyVault.Models;
 using Microsoft.Extensions.Options;
 using SampleExternalService.Models;
@@ -19,45 +17,22 @@ using SampleExternalService.Models;
 
 namespace SampleExternalService.Controllers
 {
-    [Route("{tenant}/api/oauth2-authority")]
-    [ApiController]
-    public class AbstractAuthorityController : ControllerBase
-    {
-        private IDiscoveryCacheAccessor _discoveryCacheAccessor;
-        private ILogger<AbstractAuthorityController> _logger;
-
-        public AbstractAuthorityController(IDiscoveryCacheAccessor discoveryCacheAccessor,
-            ILogger<AbstractAuthorityController> logger)
-        {
-            _discoveryCacheAccessor = discoveryCacheAccessor;
-            _logger = logger;
-        }
-        [HttpGet(".well-known/openid-configuration")]
-        public async Task<Duende.IdentityServer.Models.DiscoveryDocument> GetDiscoveryDocumentAsync(string tenant)
-        {
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                IgnoreNullValues = true,
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var discoveryCache = _discoveryCacheAccessor.GetCache("google");
-            var doco = await discoveryCache.GetAsync();
-            var disco = JsonSerializer.Deserialize<Duende.IdentityServer.Models.DiscoveryDocument>(doco.Raw, options);
-            disco.issuer = $"https://accounts.{tenant}.com";
-            return disco;
-        }
-    }
-
     [Route("{tenant}/api/[controller]")]
     [ApiController]
     public class ConsentController : ControllerBase
     {
+        private static string GuidS => Guid.NewGuid().ToString();
         public class MyCustom
         {
+            public class Inner
+            {
+                public string Name { get; set; }
+                public int Value { get; set; }
+            }
             public string Name { get; set; }
             public int Value { get; set; }
+            public List<Inner> Properties { get; set; }
+
         }
 
         private AppOptions _options;
@@ -138,7 +113,23 @@ namespace SampleExternalService.Controllers
                         Value = "Canada"
                     }
                 };
-                authorizeResponse.CustomPayload = new MyCustom { Name = nameof(MyCustom), Value = 1234 };
+                authorizeResponse.CustomPayload = new MyCustom
+                {
+                    Name = nameof(MyCustom), Value = 1234,
+                    Properties =  new List<MyCustom.Inner>()
+                    {
+                        new MyCustom.Inner()
+                        {
+                            Name = GuidS,
+                            Value = 1
+                        },
+                        new MyCustom.Inner()
+                        {
+                            Name = GuidS,
+                            Value = 2
+                        }
+                    }
+                };
             }
             else
             {
