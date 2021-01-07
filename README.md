@@ -1,21 +1,21 @@
 # TokenServices
 
-This project requires Duende as its base and as such you must agree to the Duende Software [licensing terms](https://github.com/DuendeSoftware/IdentityServer/blob/main/LICENSE).
+This project requires [Duende](https://duendesoftware.com/) as its base and as such you must agree to the Duende Software [licensing terms](https://github.com/DuendeSoftware/IdentityServer/blob/main/LICENSE).
 
 # OAuth2 Services
 Whilst IdentityServer provides OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
 
 The OAuth2 services supported are;
 
-1. **client_credentials**    
+1. [**client_credentials**](https://identityserver4.readthedocs.io/en/latest/endpoints/token.html?highlight=client_credentials#token-endpoint)    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
   
-2.  **token_exchange**  
+2.  [**token_exchange**](docs/token-exchange.md)  
   This is custom because there is no reference answer when it comes to exchanging an id_token (issued by google) for an access_token to services that I control.  
   This is used for granting authorization to services that a user can access.  
   In this flow I fan out calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requested scopes.  The real control of what a user gets access to is delegated to the actual services.  
 
-3. **token_exchange_mutate**  
+3. [**token_exchange_mutate**](docs/token-exchange-mutate.md)  
    This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but [better](docs/mutate-vs-on-behalf-of.md), to the a ["On Behalf Of" flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow).  This flow requires that reference_tokens be used, because we want to modify the backend database by changing the scopes the original access_token is pointing to.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token.     
 
 4. **device_code_flow**   
@@ -30,25 +30,17 @@ The OAuth2 services supported are;
 
 
 # OIDC Orchestrator
-The role of an orchestrator is to take care of what comes after a login.  Authentication is NOT Authorization.  All an SSO/IDP does is provide proof-of-life, what an orchestrator does is lookup what the user has access to and issues in EVERY CASE authorization tokens AKA access_tokens to a meriade or services.  A simple example is that the user hasn't bought a subscription to the service, having an account is good because we can start asking for money so that finally we can issue access_tokens to paid services.
+The role of an orchestrator is to take care of what comes after a login.  Authentication is NOT Authorization.  All an SSO/IDP does is provide proof-of-life, what an orchestrator does is lookup what the user has access to and issues in EVERY CASE authorization tokens AKA access_tokens to a meriade of services.  A simple example is that the user hasn't bought a subscription to the service.  Having an account is NOT good enough to grant you access to a downstream service, so pay up and then the access_token issued will have the scopes to the paid service.
 
-The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary reason is that it allows clients (Web or Native) to pick an OIDC library for their particual app.  I wanted to avoid a custom protocol.  The orchestorator, being an OIDC compliant service, has the ```/.well-known/openid-configuration``` endpoint.  However, the orchestrator is NOT a real OIDC IDP.  It doesn't issue id_tokens.   It relys on the downstream IDP to do that, and as an orchestrator, it holds on to the id_token until its work is done (The work of what comes next).  When the orchestrator replys to the client, it delivers the id_tokens from the downstream IDP, along with access_tokens to various servies that were produced separate from the IDP.  
+The OIDC Orchestrator here exposes itself via the OIDC protocol.  The primary reason is that it allows clients (Web or Native) to pick an OIDC library for their particual app.  I wanted to avoid a custom protocol.  The orchestorator, being an OIDC compliant service, has the ```/.well-known/openid-configuration``` endpoint.  However, the orchestrator is NOT a real OIDC IDP.  It doesn't issue id_tokens.   It relys on the downstream IDP to do that, and as an orchestrator, it holds on to the id_token until its work is done (The work of what comes next).  When the orchestrator responds to the client, it delivers the id_tokens from the downstream IDP, along with access_tokens to various servies that were produced separate from the IDP.  
 
 The what next for a simple orchestrator is calling the TokenService's token_exchange flow.
 
 # [External Services](docs/external-services.md)
+ These should be considered islands. Islands that expose a discovery endpoint that is very similar to how OIDC exposes a discovery endpoint.  
  
 
-# Token Exchange
-This is exchanging an id_token + requested scopes for access.  
-The token exchange implementation here is fanning out calls to external services asking for consent to issue an access token with the requested scopes to those services.  The requested scopes are follow a well known format.  
-
-| paramater  | Description |
-| ---------  | -------- |
-| grant_type | urn:ietf:params:oauth:grant-type:token-exchange |
-| scope | offline_access <br>https://www.companyapis.com/auth/myphotos <br>https://www.companyapis.com/auth/myphotos.readonly <br>https://www.companyapis.com/auth/myphotos.modify |
-| subject_token_type | urn:ietf:params:oauth:token-type:id_token |
-| subject_token | {id_token} |
+ 
 
 
 

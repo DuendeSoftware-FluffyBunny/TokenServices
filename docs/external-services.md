@@ -68,20 +68,28 @@ The following is an example of what gets posted to the **myphotos** service auth
   }
 }
 ```
-The response comming back from the service must be honored.  The resulting access_token will **ONLY** have the scopes that the service responded with.  In the above example what was requested was given, but the service can remove or add at its discretion.  The service also has the right to add custom claims and a custom json payload.  These custom claims will be automatically namespaced into ;
+The response comming back from the service must be honored.  The resulting access_token will **ONLY** have the scopes that the service responded with.  In the above example what was requested was given, but the service can remove or add at its discretion.  The service also has the right to add custom claims and a custom json payload.  These custom claims will be automatically namespaced in the final token.
 ```
-"claims": [
-    {
-      "type": "myphotos.geo_location",
-      "value": "Canada"
-    }
-  ],
-  custom_payload:{
-    "myphotos:": {
-      "name": "MyCustom",
-      "value": 1234
-    }
-   }
+{
+    "iss": "https://accounts.google.com",
+    "nbf": 1609950477,
+    "iat": 1609950477,
+    "exp": 1609954077,
+    "client_id": "a1ce197b-dd13-43a0-8376-7b762304fdd5",
+    "sub": "104758924428036663951",
+    "auth_time": 1609950477,
+    "idp": "local",
+    "amr": "urn:ietf:params:oauth:grant-type:token-exchange",
+    "myphotos.geo_location": "Canada",
+    "custom_payload": {
+        "myphotos": {
+            "name": "MyCustom",
+            "value": 1234
+        } 
+    },
+    "active": true,
+    "scope": "https://www.companyapis.com/auth/myphotos https://www.companyapis.com/auth/myphotos.readonly https://www.companyapis.com/auth/myphotos.modify offline_access"
+}
 ```
 
 # Multiple Expernal Services
