@@ -126,6 +126,28 @@ namespace FluffyBunny4.Validation
             bool err = false;
             var los = new List<string>();
 
+            // optional stuff;
+            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            {
+                int accessTokenLifetime = 0;
+                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
+                {
+                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
+                    {
+                        context.Request.AccessTokenLifetime = accessTokenLifetime;
+                    }
+                    else
+                    {
+                        los.Add($"{Constants.AccessTokenLifetime}:{accessTokenLifetimeOverride} is out of range.");
+                        err = true;
+                    }
+                }
+                 
+            }
+            error = error || err;
+            err = false;
+
             // VALIDATE issuer must exist and must be allowed
             // -------------------------------------------------------------------
             var issuer = form.Get("issuer");
@@ -218,6 +240,7 @@ namespace FluffyBunny4.Validation
                 var externalService = await _externalServicesStore.GetExternalServiceByNameAsync(serviceScopeSet.Key);
                 if (externalService == null)
                 {
+                    _logger.LogError($"external service: {serviceScopeSet.Key} does not exist");
                     continue;
                 }
 
@@ -257,7 +280,12 @@ namespace FluffyBunny4.Validation
                         Subject = subject
                     };
                     var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
-                    if (response.Authorized)
+                    if (response.Error != null)
+                    {
+                        _logger.LogError($"ExternalService:{serviceScopeSet.Key},Error:{response.Error.Message}");
+
+                    }
+                    else if (response.Authorized)
                     {
                         switch (doco.AuthorizationType)
                         {
@@ -287,6 +315,7 @@ namespace FluffyBunny4.Validation
                                 break;
                         }
                     }
+                    _logger.LogInformation($"ExternalService:{serviceScopeSet.Key},Authorized:{response.Authorized}");
                 }
             }
             if (finalCustomPayload.Any())

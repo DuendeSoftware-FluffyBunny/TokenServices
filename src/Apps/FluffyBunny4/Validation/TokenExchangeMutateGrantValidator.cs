@@ -44,14 +44,16 @@ namespace FluffyBunny4.Validation
         private ILogger _logger;
         private IPersistedGrantStore _persistedGrantStore;
         private IReferenceTokenStore _referenceTokenStore;
+        private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
 
         private static List<string> OneMustExitsArguments => _oneMustExitsArguments ??
-                                                                  (_oneMustExitsArguments =
-                                                                      new List<string>
-                                                                      {
-                                                                      });
+                                                             (_oneMustExitsArguments =
+                                                                 new List<string>
+                                                                 {
+                                                                 });
 
         public TokenExchangeMutateGrantValidator(
+            IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IReferenceTokenStore referenceTokenStore,
             IPersistedGrantStore persistedGrantStore,
             IScopedStorage scopedStorage,
@@ -66,6 +68,7 @@ namespace FluffyBunny4.Validation
             ITokenValidator tokenValidator,
             ILogger<TokenExchangeMutateGrantValidator> logger)
         {
+            _scopedTenantRequestContext = scopedTenantRequestContext;
             _persistedGrantStore = persistedGrantStore;
             _referenceTokenStore = referenceTokenStore;
             _scopedStorage = scopedStorage;
@@ -119,8 +122,8 @@ namespace FluffyBunny4.Validation
         }
         public async Task ValidateAsync(ExtensionGrantValidationContext context)
         {
-            //TODO FANOUT
-
+            var client = context.Request.Client as ClientExtra;
+            _scopedTenantRequestContext.Context.Client = client;
 
             var externalServices = await _externalServicesStore.GetExternalServicesAsync();
             var form = context.Request.Raw;
@@ -130,21 +133,56 @@ namespace FluffyBunny4.Validation
             // make sure nothing is malformed
             bool err = false;
 
+
+            // optional stuff;
+            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            {
+                int accessTokenLifetime = 0;
+                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
+                {
+                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
+                    {
+                        context.Request.AccessTokenLifetime = accessTokenLifetime;
+                    }
+                    else
+                    {
+                        los.Add($"{Constants.AccessTokenLifetime}:{accessTokenLifetimeOverride} is out of range.");
+                        err = true;
+                    }
+                }
+
+            }
+            error = error || err;
+            err = false;
+
             // MUST have subject
+            // -------------------------------------------------------------------
             var subjectToken = form.Get(FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken);
             if (string.IsNullOrWhiteSpace(subjectToken))
             {
-                context.Result.IsError = true;
+                err = true;
                 los.Add($"{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken} is required");
-                context.Result.Error = string.Join<string>(" | ", los);
-                return;
             }
+            error = error || err;
+            err = false;
+
+            // MUST have SubjectTokenType
+            // -------------------------------------------------------------------
             var subjectTokenType = form.Get(FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType);
             if (string.IsNullOrWhiteSpace(subjectTokenType))
             {
-                context.Result.IsError = true;
+                err = true;
                 los.Add($"{FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType} is required");
+            }
+            error = error || err;
+            err = false;
+
+            if (error)
+            {
+                context.Result.IsError = true;
                 context.Result.Error = string.Join<string>(" | ", los);
+                _logger.LogError($"context.Result.Error");
                 return;
             }
 
@@ -156,16 +194,14 @@ namespace FluffyBunny4.Validation
                 case FluffyBunny4.Constants.TokenExchangeTypes.AccessToken:
                     if (subjectToken.Contains('.'))
                     {
-                        // only refrerence tokens accepted.
-                        throw new Exception(
-                            $"failed to validate, not a reference_token: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
+                        err = true;
+                        los.Add($"failed to validate, not a reference_token: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
                     var validatedResultAccessToken = await _tokenValidator.ValidateAccessTokenAsync(subjectToken);
                     if (validatedResultAccessToken.IsError)
                     {
-                        throw new Exception(
-                            $"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}",
-                            new Exception(validatedResultAccessToken.Error));
+                        err = true;
+                        los.Add($"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
 
                     subject = validatedResultAccessToken.Claims
@@ -177,17 +213,16 @@ namespace FluffyBunny4.Validation
 
                     if (amr == null)
                     {
-                        throw new Exception(
-                            $"failed to validate, missing amr={Constants.GrantType.TokenExchange}: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}",
-                            new Exception(validatedResultAccessToken.Error));
+                        err = true;
+                        los.Add($"failed to validate, missing amr={Constants.GrantType.TokenExchange}: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
 
                     var issuedAt = claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.IssuedAt);
                     if (issuedAt == null)
                     {
-                        throw new Exception(
-                            $"failed to validate, {JwtClaimTypes.IssuedAt} is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}",
-                            new Exception(validatedResultAccessToken.Error));
+                        err = true;
+                        los.Add(
+                            $"failed to validate, {JwtClaimTypes.IssuedAt} is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
 
                     var unixSeconds = Convert.ToInt64(issuedAt.Value);
@@ -200,8 +235,8 @@ namespace FluffyBunny4.Validation
                     var accessTokenPersitedGrant = await _persistedGrantStore.GetAsync(hashKey);
                     if (accessTokenPersitedGrant == null)
                     {
-                        throw new Exception(
-                            $"failed to validate, accessTokenPersitedGrant is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
+                        err = true;
+                        los.Add($"failed to validate, accessTokenPersitedGrant is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
                     _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.SubjectToken, subjectToken);
                     _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.PersistedGrantExtra, accessTokenPersitedGrant as PersistedGrantExtra);
@@ -212,8 +247,16 @@ namespace FluffyBunny4.Validation
                     throw new Exception($"not supported: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
                     break;
             }
+            error = error || err;
+            err = false;
+            if (error)
+            {
+                context.Result.IsError = true;
+                context.Result.Error = string.Join<string>(" | ", los);
+                _logger.LogError($"context.Result.Error");
+                return;
+            }
 
-            var client = context.Request.Client as ClientExtra;
 
             var finalCustomPayload = new Dictionary<string, object>();
          
@@ -224,12 +267,21 @@ namespace FluffyBunny4.Validation
                 var externalService = await _externalServicesStore.GetExternalServiceByNameAsync(serviceScopeSet.Key);
                 if (externalService == null)
                 {
+                    _logger.LogError($"external service: {serviceScopeSet.Key} does not exist");
                     continue;
                 }
 
                 var discoCache =
                     await _consentDiscoveryCacheAccessor.GetConsentDiscoveryCacheAsync(serviceScopeSet.Key);
                 var doco = await discoCache.GetAsync();
+                if (doco.IsError)
+                {
+                    // OPINION: If I have a lot of external services it it probably better to let this continue even it if 
+                    //          results in an access_token that is missing this bad service's scopes.
+
+                    _logger.LogError(doco.Error);
+                    continue;
+                }
 
                 List<string> scopes = null;
                 switch (doco.AuthorizationType)
@@ -255,7 +307,12 @@ namespace FluffyBunny4.Validation
                         Subject = subject
                     };
                     var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
-                    if (response.Authorized)
+                    if (response.Error != null)
+                    {
+                        _logger.LogError($"ExternalService:{serviceScopeSet.Key},Error:{response.Error.Message}");
+
+                    }
+                    else if (response.Authorized)
                     {
                         switch (doco.AuthorizationType)
                         {
@@ -285,6 +342,8 @@ namespace FluffyBunny4.Validation
                                 break;
                         }
                     }
+                    _logger.LogInformation($"ExternalService:{serviceScopeSet.Key},Authorized:{response.Authorized}");
+
                 }
             }
             if (finalCustomPayload.Any())
@@ -296,7 +355,8 @@ namespace FluffyBunny4.Validation
             }
             claims = new List<Claim>
             {
-                new Claim(JwtClaimTypes.AuthenticationMethod, GrantType)
+                // in this case we want to preserve that the original came from Constants.GrantType.TokenExchange
+                new Claim(JwtClaimTypes.AuthenticationMethod, Constants.GrantType.TokenExchange)
             };
 
             context.Result = new GrantValidationResult(subject, GrantType, tokenIssuedAtTime,claims);

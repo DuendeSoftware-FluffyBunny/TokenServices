@@ -55,6 +55,7 @@ namespace FluffyBunny4.Services
                             where claim.Type != JwtClaimTypes.ClientId
                             select claim;
             }
+            /*
             if (!clientExtra.IncludeAmr)
             {
                 var queryAmr = from claim in claims
@@ -67,7 +68,7 @@ namespace FluffyBunny4.Services
                              where claim.Type != JwtClaimTypes.AuthenticationMethod
                             select claim;
                 }
-            }
+            }*/
             var subjectClaim = (from claim in claims
                             where claim.Type == JwtClaimTypes.Subject
                             select claim).FirstOrDefault();
