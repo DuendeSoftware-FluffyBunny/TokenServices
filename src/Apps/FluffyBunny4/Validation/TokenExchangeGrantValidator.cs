@@ -148,15 +148,10 @@ namespace FluffyBunny4.Validation
             error = error || err;
             err = false;
 
-            // VALIDATE issuer must exist and must be allowed
+            // VALIDATE if issuer must be allowed
             // -------------------------------------------------------------------
             var issuer = form.Get("issuer");
-            if (string.IsNullOrEmpty(issuer))
-            {
-                error = true;
-                los.Add($"issuer must be present.");
-            }
-            else
+            if (!string.IsNullOrEmpty(issuer))
             {
                 issuer = issuer.ToLower();
                 var foundIssuer = client.AllowedArbitraryIssuers.FirstOrDefault(x => x == issuer);

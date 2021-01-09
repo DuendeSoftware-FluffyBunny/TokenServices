@@ -124,7 +124,7 @@ namespace FluffyBunny4.Validation
         {
             var client = context.Request.Client as ClientExtra;
             _scopedTenantRequestContext.Context.Client = client;
-
+            _scopedOverrideRawScopeValues.IsOverride = true;
             var externalServices = await _externalServicesStore.GetExternalServicesAsync();
             var form = context.Request.Raw;
             var error = false;
@@ -238,8 +238,31 @@ namespace FluffyBunny4.Validation
                         err = true;
                         los.Add($"failed to validate, accessTokenPersitedGrant is missing: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
+
+                    var accessTokenPersitedGrantExtra = accessTokenPersitedGrant as PersistedGrantExtra;
                     _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.SubjectToken, subjectToken);
-                    _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.PersistedGrantExtra, accessTokenPersitedGrant as PersistedGrantExtra);
+                    _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.PersistedGrantExtra, accessTokenPersitedGrantExtra);
+
+                    var requestedScopes = context.Request.RequestedScopes.ToList();
+                    if (!string.IsNullOrWhiteSpace(accessTokenPersitedGrantExtra.RefreshTokenKey))
+                    {
+                        _scopedOverrideRawScopeValues.Scopes.Add(IdentityServerConstants.StandardScopes.OfflineAccess);
+                        _scopedOptionalClaims.Claims.Add(new Claim(JwtClaimTypes.Scope, IdentityServerConstants.StandardScopes.OfflineAccess));
+                        if (!requestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess))
+                        {
+                            requestedScopes.Add(IdentityServerConstants.StandardScopes.OfflineAccess);
+                        }
+                        
+                    }
+                    else
+                    {
+                        if (requestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess))
+                        {
+                            requestedScopes.Remove(IdentityServerConstants.StandardScopes.OfflineAccess);
+                        }
+                    }
+
+                    context.Request.RequestedScopes = requestedScopes;
                     break;
 
                 
@@ -261,6 +284,7 @@ namespace FluffyBunny4.Validation
             var finalCustomPayload = new Dictionary<string, object>();
          
             var requestedScopesRaw = form[Constants.Scope].Split(' ').ToList();
+          
             var requestedServiceScopes = GetServiceToScopesFromRequest(requestedScopesRaw);
             foreach (var serviceScopeSet in requestedServiceScopes)
             {
@@ -346,6 +370,7 @@ namespace FluffyBunny4.Validation
 
                 }
             }
+
             if (finalCustomPayload.Any())
             {
                 _scopedOptionalClaims.Claims.Add(new Claim(
@@ -365,10 +390,7 @@ namespace FluffyBunny4.Validation
             return;
         }
 
-        private T2 Dictionary<T1, T2>()
-        {
-            throw new NotImplementedException();
-        }
+     
 
         [ExcludeFromCodeCoverage]
         private void LogError(string message = null, params object[] values)

@@ -258,7 +258,7 @@ namespace FluffyBunny4.ResponseHandling
             }
             else
             {
-                createRefreshToken = request.ValidatedResources.Resources.OfflineAccess;
+                createRefreshToken = request.RequestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess);
 
                 tokenRequest = new TokenCreationRequest
                 {
@@ -276,6 +276,24 @@ namespace FluffyBunny4.ResponseHandling
                 DateTime issuedAtTime = obj is DateTime ? (DateTime) obj : default;
                 at.CreationTime = issuedAtTime;
             }
+
+            var finalScopes = at.Scopes.ToList();
+            if (createRefreshToken)
+            {
+                if (!finalScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess))
+                {
+                    finalScopes.Add(IdentityServerConstants.StandardScopes.OfflineAccess);
+                }
+            }
+            else
+            {
+                if (finalScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess))
+                {
+                    finalScopes.Remove(IdentityServerConstants.StandardScopes.OfflineAccess);
+                }
+            }
+
+         
             var accessToken = await TokenService.CreateSecurityTokenAsync(at);
 
             string refreshToken = null;
