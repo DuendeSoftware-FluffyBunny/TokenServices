@@ -25,4 +25,14 @@ Lets go through an extreme example of an reference_token type access_token
 
 
   
+ # The problem with reference_tokens
+ It requires that your backend store them and more problematic to be a good backend service it obligates each service to cache the introspection responses so not to bring down the OAuth2 service.  
+ So its the cache in the backend that now becomes the issue;
+ 
+ 1. Make the introspection call the cache  
+  The problem here is that its introducing a hop when it would be better and faster for the services to talk direction to the cache  
+ 2. Each service has their own cache  
+ The problem here is redundancy of data in caches.  The OAuth2 service has the reference_token stored, and now a different cache has it stored as well.  
+ I still like this better than hitting the OAuth2 introspection endpoint and to reduce the redundancy I would recommend that cache sharing be going on between friendly backend services.  
+ 
  
