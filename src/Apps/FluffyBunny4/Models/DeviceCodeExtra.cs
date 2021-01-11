@@ -12,5 +12,6 @@ namespace FluffyBunny4.Models
     {
         public IEnumerable<Claim> AuthorizedClaims { get; set; }
         public string Issuer { get; set; }
+        public int? AccessTokenLifetime { get; set; }
     }
 }

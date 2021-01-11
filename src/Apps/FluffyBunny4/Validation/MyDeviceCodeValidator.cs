@@ -65,6 +65,10 @@ namespace FluffyBunny4.Validation
 
             var deviceCode = await _devices.FindByDeviceCodeAsync(context.DeviceCode);
             var deviceCodeExtra = deviceCode as DeviceCodeExtra;
+            if (deviceCodeExtra.AccessTokenLifetime != null)
+            {
+                context.Request.AccessTokenLifetime = (int) deviceCodeExtra.AccessTokenLifetime;
+            }
             _scopedTenantRequestContext.Context.Issuer = deviceCodeExtra.Issuer;
             if (deviceCode == null)
             {

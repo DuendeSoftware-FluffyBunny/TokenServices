@@ -110,6 +110,7 @@ namespace TokenService.Controllers
             public string IdToken { get; set; }
             public string UserCode { get; set; }
             public string Issuer { get; set; }
+            public int? AccessTokenLifetime { get; set; }
         }
 
         string SubjectFromClaimsPrincipal(ClaimsPrincipal principal)
@@ -165,14 +166,10 @@ namespace TokenService.Controllers
                 return NotFound($"Invalid user code, Device authorization failure - user code is invalid");
 
 
-            // VALIDATE issuer must exist and must be allowed
+            // VALIDATE if issuer must exist and must be allowed
             // -------------------------------------------------------------------
             var issuer = data.Issuer;
-            if (string.IsNullOrEmpty(data.Issuer))
-            {
-                return NotFound($"Issuer is required");
-            }
-            else
+            if (!string.IsNullOrEmpty(data.Issuer))
             {
                 issuer = issuer.ToLower();
                 var foundIssuer = client.AllowedArbitraryIssuers.FirstOrDefault(x => x == issuer);
@@ -180,6 +177,27 @@ namespace TokenService.Controllers
                 {
                     return NotFound($"issuer:{issuer} is NOT in the AllowedArbitraryIssuers collection.");
                 }
+            }
+
+            // VALIDATE if AccessTokenLifetime must exist and must be allowed
+            // -------------------------------------------------------------------
+            int lifetime = client.AccessTokenLifetime;
+            if (data.AccessTokenLifetime != null)
+            {
+                var requestedAccessTokenLifetime = (int) data.AccessTokenLifetime;
+                if (requestedAccessTokenLifetime > 0 && requestedAccessTokenLifetime <= client.AccessTokenLifetime)
+                {
+                    lifetime = requestedAccessTokenLifetime;
+                }
+                else
+                {
+                    return NotFound($"AccessTokenLifetime:{requestedAccessTokenLifetime} is NOT in range 0-{client.AccessTokenLifetime}.");
+                }
+            }
+
+            if (data.AccessTokenLifetime != null)
+            {
+                deviceAuth.Lifetime = (int)data.AccessTokenLifetime;
             }
 
             string subject = "";
@@ -232,7 +250,12 @@ namespace TokenService.Controllers
                     var discoCache =
                         await _consentDiscoveryCacheAccessor.GetConsentDiscoveryCacheAsync(serviceScopeSet.Key);
                     var doco = await discoCache.GetAsync();
-
+                    if (doco.IsError)
+                    {
+                         
+                        _logger.LogError(doco.Error);
+                        continue;
+                    }
                     List<string> scopes = null;
                     switch (doco.AuthorizationType)
                     {
@@ -257,6 +280,11 @@ namespace TokenService.Controllers
                             Subject = subject
                         };
                         var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
+                        if (response.Error != null)
+                        {
+                            _logger.LogError(response.Error.Message);
+                            continue;
+                        }
                         if (response.Authorized)
                         {
                             switch (doco.AuthorizationType)
@@ -306,9 +334,11 @@ namespace TokenService.Controllers
                 }
 
                 deviceAuth.AuthorizedScopes = allowedScopes;
+               
                 var deviceExtra = _coreMapperAccessor.Mapper.Map<DeviceCodeExtra>(deviceAuth);
                 deviceExtra.AuthorizedClaims = allowedClaims;
                 deviceExtra.Issuer = issuer;
+                deviceExtra.AccessTokenLifetime = lifetime;
 
                 await _deviceFlowStore.UpdateByUserCodeAsync(data.UserCode.Sha256(), deviceExtra);
                 return Ok();
