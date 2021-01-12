@@ -14,6 +14,8 @@ namespace FluffyBunny.EntityFramework.Entities
         public bool IncludeAmr { get; set; } = false;
         public string TenantName { get; set; }
         public List<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
-       
+        public List<AllowedRevokeTokenTypeHint> AllowedRevokeTokenTypeHints { get; set; }
+        
+       public string Namespace { get; set; }
     }
 }

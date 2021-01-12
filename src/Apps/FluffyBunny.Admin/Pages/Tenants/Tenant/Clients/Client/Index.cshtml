@@ -26,6 +26,7 @@
             <a class="btn btn-sm btn-primary" asp-page="./AllowedGrantTypes/Index" asp-route-id="@Model.Entity.Id">Allowed Grant Types</a>
             <a class="btn btn-sm btn-primary" asp-page="./AllowedScopes/Index" asp-route-id="@Model.Entity.Id">Allowed Scopes</a>
             <a class="btn btn-sm btn-primary" asp-page="./AllowedArbitraryIssuers/Index" asp-route-id="@Model.Entity.Id">Allowed Arbitrary Issuers</a>
+            <a class="btn btn-sm btn-primary" asp-page="./AllowedRevokeTokenTypeHints/Index" asp-route-id="@Model.Entity.Id">Allowed Revoke Token Type Hints</a>
         </div>
         <div class="card-body">
            
@@ -51,7 +52,14 @@
                             @Model.Entity.ClientId
                         </td>
                     </tr>
-                    
+                    <tr>
+                        <td class="w-50">
+                            @nameof(Model.Entity.Namespace)
+                        </td>
+                        <td class="w-50">
+                            @Model.Entity.Namespace
+                        </td>
+                    </tr>
                         <tr>
                             <td class="w-50">
                                 <label asp-for="Entity.RequireClientSecret"></label>
@@ -100,6 +108,20 @@
                             {
                                 <div class="checkbox">
                                     @allowedArbitraryIssuer.Issuer
+                                </div>
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="w-50">
+                            @nameof(Model.Entity.AllowedRevokeTokenTypeHints)
+                        </td>
+                        <td class="w-50">
+                            @foreach (var item in Model.Entity.AllowedRevokeTokenTypeHints)
+                            {
+                                <div class="checkbox">
+                                    @item.TokenTypeHint
                                 </div>
                             }
 

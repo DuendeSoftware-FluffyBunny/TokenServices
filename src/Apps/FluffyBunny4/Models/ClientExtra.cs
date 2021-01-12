@@ -91,8 +91,9 @@ namespace FluffyBunny4.Models
         }
 
         public string TenantName { get; set; }
-
+        public string Namespace { get; set; }
         public ICollection<string> AllowedArbitraryIssuers { get; set; } = new HashSet<string>();
- 
+        public ICollection<string> AllowedRevokeTokenTypeHints { get; set; } = new HashSet<string>();
+        
     }
 }

@@ -727,6 +727,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedScopes)
                 .Include(x => x.Claims)
                 .Include(x => x.AllowedArbitraryIssuers)
+                .Include(x => x.AllowedRevokeTokenTypeHints)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -744,6 +745,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedGrantTypes)
                 .Include(x => x.Claims)
                 .Include(x => x.AllowedArbitraryIssuers)
+                .Include(x => x.AllowedRevokeTokenTypeHints)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -1184,6 +1186,130 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 
             return entities;
 
+        }
+
+        public async Task UpsertClientAllowedRevokeTokenTypeHintAsync(string tenantName, int clientId, AllowedRevokeTokenTypeHint entity)
+        {
+            entity.TokenTypeHint = entity.TokenTypeHint.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+
+
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedRevokeTokenTypeHints)
+                .FirstOrDefaultAsync();
+
+            var existing = (from item in clientInDb.AllowedRevokeTokenTypeHints
+                                  where item.TokenTypeHint == entity.TokenTypeHint
+                select item).FirstOrDefault();
+            if (existing != null)
+            {
+                return; // already here
+            }
+            existing = (from item in clientInDb.AllowedRevokeTokenTypeHints
+                              where item.Id == entity.Id
+                select item).FirstOrDefault();
+
+            if (existing != null)
+            {
+                // name update
+                existing.TokenTypeHint = entity.TokenTypeHint;
+            }
+            else
+            {
+                // brand new
+                clientInDb.AllowedRevokeTokenTypeHints.Add(entity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<AllowedRevokeTokenTypeHint> GetClientAllowedRevokeTokenTypeHintByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedRevokeTokenTypeHints)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedRevokeTokenTypeHints.FirstOrDefault(x => x.Id == id);
+
+            return existing;
+        }
+
+        public async Task<AllowedRevokeTokenTypeHint> GetClientAllowedRevokeTokenTypeHintByNameAsync(string tenantName, int clientId, string name)
+        {
+            name = name.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedRevokeTokenTypeHints)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            var existing = clientInDb.AllowedRevokeTokenTypeHints.FirstOrDefault(x => x.TokenTypeHint == name);
+            return existing;
+        }
+
+        public async Task DeleteClientAllowedRevokeTokenTypeHintByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedRevokeTokenTypeHints)
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedRevokeTokenTypeHints.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                clientInDb.AllowedRevokeTokenTypeHints.Remove(existing);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<AllowedRevokeTokenTypeHint>> GetAllClientAllowedRevokeTokenTypeHintsAsync(string tenantName, int clientId, ClientAllowedRevokeTokenTypeHintsSortType sortType = ClientAllowedRevokeTokenTypeHintsSortType.NameDesc)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedRevokeTokenTypeHints)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var entities = from item in clientInDb.AllowedRevokeTokenTypeHints
+                           select item;
+            switch (sortType)
+            {
+                case ClientAllowedRevokeTokenTypeHintsSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.TokenTypeHint);
+                    break;
+                case ClientAllowedRevokeTokenTypeHintsSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.TokenTypeHint);
+                    break;
+
+            }
+
+            return entities;
         }
     }
 }

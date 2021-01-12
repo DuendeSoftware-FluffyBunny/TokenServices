@@ -4,14 +4,16 @@ using FluffyBunny.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SqlServer.Migrations.Tenant
 {
     [DbContext(typeof(TenantAwareConfigurationDbContext))]
-    partial class TenantAwareConfigurationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210104170040_RemoveClientExtra")]
+    partial class RemoveClientExtra
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -921,31 +923,6 @@ namespace SqlServer.Migrations.Tenant
                     b.ToTable("AllowedArbitraryIssuer");
                 });
 
-            modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.AllowedRevokeTokenTypeHint", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TokenTypeHint")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
-
-                    b.HasIndex("TokenTypeHint")
-                        .IsUnique();
-
-                    b.ToTable("AllowedRevokeTokenTypeHint");
-                });
-
             modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.ExternalService", b =>
                 {
                     b.Property<int>("Id")
@@ -987,9 +964,6 @@ namespace SqlServer.Migrations.Tenant
 
                     b.Property<bool>("IncludeClientId")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Namespace")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("RefreshTokenGraceEnabled")
                         .HasColumnType("bit");
@@ -1217,17 +1191,6 @@ namespace SqlServer.Migrations.Tenant
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.AllowedRevokeTokenTypeHint", b =>
-                {
-                    b.HasOne("FluffyBunny.EntityFramework.Entities.ClientExtra", "Client")
-                        .WithMany("AllowedRevokeTokenTypeHints")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-                });
-
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.ApiResource", b =>
                 {
                     b.Navigation("Properties");
@@ -1277,8 +1240,6 @@ namespace SqlServer.Migrations.Tenant
             modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.ClientExtra", b =>
                 {
                     b.Navigation("AllowedArbitraryIssuers");
-
-                    b.Navigation("AllowedRevokeTokenTypeHints");
                 });
 #pragma warning restore 612, 618
         }

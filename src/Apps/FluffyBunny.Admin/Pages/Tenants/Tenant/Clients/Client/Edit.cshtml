@@ -47,7 +47,15 @@
                                     @Model.Input.ClientId
                                 </td>
                             </tr>
-                       
+                        <tr>
+                            <td class="w-50">
+                                @nameof(Model.Input.Namespace)
+                            </td>
+                            <td class="w-50">
+                                <input asp-for="Input.Namespace" class="form-control" />
+                                <span asp-validation-for="Input.Namespace" class="text-danger"></span>
+                            </td>
+                        </tr>
                             <tr>
                                 <td class="w-50">
                                     <label asp-for="Input.RequireClientSecret"></label>

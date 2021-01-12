@@ -35,6 +35,18 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
             });
 
         }
+        public static void ConfigureAllowedRevokeTokenTypeHintContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AllowedRevokeTokenTypeHint>(allowedArbitraryIssuer =>
+            {
+                allowedArbitraryIssuer.ToTable("AllowedRevokeTokenTypeHint");
+                allowedArbitraryIssuer.HasKey(x => x.Id);
+                allowedArbitraryIssuer.Property(x => x.TokenTypeHint).HasMaxLength(64).IsRequired();
+                allowedArbitraryIssuer.HasIndex(x => x.TokenTypeHint).IsUnique();
+
+            });
+
+        }
         public static void ConfigureExternalServicesContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExternalService>(externalService =>

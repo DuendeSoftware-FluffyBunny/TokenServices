@@ -59,6 +59,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         NameDesc,
         NameAsc
     }
+    public enum ClientAllowedRevokeTokenTypeHintsSortType
+    {
+        NameDesc,
+        NameAsc
+    }
     public enum SecretsSortType
     {
         DescriptionDesc,
@@ -138,6 +143,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<AllowedArbitraryIssuer> GetClientAllowedArbitraryIssuerByNameAsync(string tenantName, int clientId, string name);
         Task DeleteClientAllowedArbitraryIssuerByIdAsync(string tenantName, int clientId, int id);
         Task<IEnumerable<AllowedArbitraryIssuer>> GetAllClientAllowedArbitraryIssuersAsync(string tenantName, int clientId, ClientAllowedArbitraryIssuersSortType sortType = ClientAllowedArbitraryIssuersSortType.NameDesc);
+        #endregion
+
+        #region ClientAllowedRevokeTokenTypeHints
+        Task UpsertClientAllowedRevokeTokenTypeHintAsync(string tenantName, int clientId, AllowedRevokeTokenTypeHint entity);
+
+        Task<AllowedRevokeTokenTypeHint> GetClientAllowedRevokeTokenTypeHintByIdAsync(string tenantName, int clientId, int id);
+        Task<AllowedRevokeTokenTypeHint> GetClientAllowedRevokeTokenTypeHintByNameAsync(string tenantName, int clientId, string name);
+        Task DeleteClientAllowedRevokeTokenTypeHintByIdAsync(string tenantName, int clientId, int id);
+        Task<IEnumerable<AllowedRevokeTokenTypeHint>> GetAllClientAllowedRevokeTokenTypeHintsAsync(string tenantName, int clientId, ClientAllowedRevokeTokenTypeHintsSortType sortType = ClientAllowedRevokeTokenTypeHintsSortType.NameDesc);
         #endregion
 
         #region ClientSecret

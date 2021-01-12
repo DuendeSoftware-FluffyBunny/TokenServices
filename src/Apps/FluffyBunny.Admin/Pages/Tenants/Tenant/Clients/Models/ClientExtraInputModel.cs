@@ -20,9 +20,8 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Models
         public string ClientId { get; set; }
 
         [Required]
-        [Url]
-        public string Issuer { get; set; }
-
+        [DataType(DataType.Text)]
+        public string Namespace { get; set; }
 
         [Required]
         [DataType(DataType.Text)]

@@ -45,6 +45,7 @@ namespace FluffyBunny.EntityFramework.Context
         public DbSet<ApiResource> ApiResources { get; set; }
         public DbSet<ApiScope> ApiScopes { get; set; }
         public DbSet<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
+        public DbSet<AllowedRevokeTokenTypeHint> AllowedRevokeTokenTypeHints { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -62,6 +63,8 @@ namespace FluffyBunny.EntityFramework.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ConfigureAllowedArbitraryIssuerContext();
+            modelBuilder.ConfigureAllowedRevokeTokenTypeHintContext();
+            
             modelBuilder.ConfigureExternalServicesContext();
             modelBuilder.ConfigureClientContext(_storeOptions);
             modelBuilder.ConfigureResourcesContext(_storeOptions);
@@ -73,6 +76,9 @@ namespace FluffyBunny.EntityFramework.Context
                     .WithOne(x => x.Client)
                     .HasForeignKey(x => x.ClientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
+                client.HasMany(x => x.AllowedRevokeTokenTypeHints)
+                    .WithOne(x => x.Client)
+                    .HasForeignKey(x => x.ClientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
             });
 
         }
