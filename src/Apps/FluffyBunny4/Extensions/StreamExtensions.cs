@@ -1,11 +1,11 @@
 ﻿using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace FluffyBunny4.Extensions
 {
     public static class StreamExtensions
     {
-        private static readonly JsonSerializer Serializer = new JsonSerializer();
+     
         public static T FromStream<T>(this Stream stream)
         {
             using (stream)
@@ -14,13 +14,15 @@ namespace FluffyBunny4.Extensions
                 {
                     return (T)(object)stream;
                 }
-
+                JsonSerializerOptions options = new JsonSerializerOptions
+                {
+                    IgnoreNullValues = true,
+                    PropertyNameCaseInsensitive = true
+                };
+                
                 using (StreamReader sr = new StreamReader(stream))
                 {
-                    using (JsonTextReader jsonTextReader = new JsonTextReader(sr))
-                    {
-                        return Serializer.Deserialize<T>(jsonTextReader);
-                    }
+                    return System.Text.Json.JsonSerializer.Deserialize<T>(sr.ReadToEnd(), options);
                 }
             }
         }

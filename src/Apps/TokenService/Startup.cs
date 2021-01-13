@@ -222,12 +222,9 @@ namespace TokenService
                 services.AddSingleton<IHashFixer, HashFixer>();
                 services.AddTransient<ITokenResponseGenerator, MyTokenResponseGenerator>();
                 var builder = services.AddIdentityServer()
-                    .AddInMemoryIdentityResources(Config.IdentityResources)
-                    .AddTenantAwareInMemoryApiScopes(jsonApiScopesFile, jsonApiResourcesFile)
+                    //.AddInMemoryIdentityResources(Config.IdentityResources)
                     //     .AddInMemoryApiScopes(Config.ApiScopes)
                     //     .AddInMemoryClientExtras(jsonClientFile)
-                    //  .AddCosmosClientExtraStore()
-                    //  .AddCosmosTenantResourceStore()
                     .AddEntityFrameworkStores()
                     .AddInMemoryCaching()
                     .AddExtensionGrantValidator<ArbitraryIdentityGrantValidator>()

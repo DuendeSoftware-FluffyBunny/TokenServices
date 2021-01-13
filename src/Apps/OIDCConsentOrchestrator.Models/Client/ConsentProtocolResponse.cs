@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using OIDCConsentOrchestrator.Models.Internal;
@@ -47,7 +48,7 @@ namespace OIDCConsentOrchestrator.Models.Client
                 {
                     try
                     {
-                        response.Json = JObject.Parse(content);
+                        response.Json = JsonDocument.Parse(content).RootElement;
                     }
                     catch { }
                 }
@@ -66,7 +67,7 @@ namespace OIDCConsentOrchestrator.Models.Client
             {
                 if (content.IsPresent())
                 {
-                    response.Json = JObject.Parse(content);
+                    response.Json = JsonDocument.Parse(content).RootElement;
                 }
             }
             catch (Exception ex)
@@ -130,7 +131,7 @@ namespace OIDCConsentOrchestrator.Models.Client
         /// <value>
         /// The json.
         /// </value>
-        public JObject Json { get; protected set; }
+        public JsonElement Json { get; protected set; }
 
         /// <summary>
         /// Gets the exception (if present).

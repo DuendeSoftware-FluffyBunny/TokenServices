@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿ 
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace OIDCPipeline.Core.Logging
 {
@@ -11,17 +11,13 @@ namespace OIDCPipeline.Core.Logging
     /// </summary>
     internal static class LogSerializer
     {
-        private static readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerOptions options = new JsonSerializerOptions
         {
-            NullValueHandling = NullValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Formatting = Formatting.Indented
+            WriteIndented = true,
+            IgnoreNullValues = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
-        static LogSerializer()
-        {
-            JsonSettings.Converters.Add(new StringEnumConverter());
-        }
 
         /// <summary>
         /// Serializes the specified object.
@@ -30,7 +26,7 @@ namespace OIDCPipeline.Core.Logging
         /// <returns></returns>
         public static string Serialize(object logObject)
         {
-            return JsonConvert.SerializeObject(logObject, JsonSettings);
+            return JsonSerializer.Serialize(logObject, options);
         }
     }
 }

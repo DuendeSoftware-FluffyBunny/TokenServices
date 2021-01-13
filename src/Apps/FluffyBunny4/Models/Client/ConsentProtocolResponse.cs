@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
- 
 using System.Net.Http;
 using System.Net;
-using FluffyBunny4.DotNetCore.Client;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using FluffyBunny4.Models.Internal;
 using IdentityModel;
@@ -18,6 +18,11 @@ namespace FluffyBunny4.Models.Client
     /// </summary>
     public class ConsentProtocolResponse
     {
+        // generic
+        public JsonElement TryGetValue(string name) => Json.TryGetValue(name);
+        public string TryGetString(string name) => Json.TryGetString(name);
+        public bool? TryGetBoolean(string name) => Json.TryGetBoolean(name);
+        public IEnumerable<string> TryGetStringArray(string name) => Json.TryGetStringArray(name);
         /// <summary>
         /// Initializes a protocol response from an HTTP response
         /// </summary>
@@ -52,7 +57,7 @@ namespace FluffyBunny4.Models.Client
                 {
                     try
                     {
-                        response.Json = JObject.Parse(content);
+                        response.Json = JsonDocument.Parse(content).RootElement;
                     }
                     catch { }
                 }
@@ -71,7 +76,7 @@ namespace FluffyBunny4.Models.Client
             {
                 if (content.IsPresent())
                 {
-                    response.Json = JObject.Parse(content);
+                    response.Json = JsonDocument.Parse(content).RootElement;
                 }
             }
             catch (Exception ex)
@@ -129,13 +134,13 @@ namespace FluffyBunny4.Models.Client
         /// </value>
         public string Raw { get; protected set; }
 
-        /// <summary>
+        // <summary>
         /// Gets the protocol response as JSON (if present).
         /// </summary>
         /// <value>
         /// The json.
         /// </value>
-        public JObject Json { get; protected set; }
+        public JsonElement Json { get; protected set; }
 
         /// <summary>
         /// Gets the exception (if present).
@@ -208,15 +213,9 @@ namespace FluffyBunny4.Models.Client
                     return Exception.Message;
                 }
 
-                return TryGet(OidcConstants.TokenResponse.Error);
+                return TryGetString(OidcConstants.TokenResponse.Error);
             }
         }
-
-        /// <summary>
-        /// Tries to get a specific value from the JSON response.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public string TryGet(string name) => FluffyBunny4.DotNetCore.Client.JObjectExtensions.TryGetString(Json,name);
+ 
     }
 }

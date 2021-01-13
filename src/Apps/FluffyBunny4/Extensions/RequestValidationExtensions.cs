@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace FluffyBunny4.Extensions
 {
@@ -15,8 +15,12 @@ namespace FluffyBunny4.Extensions
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
-                    values =
-                        JsonConvert.DeserializeObject<T>(json);
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        IgnoreNullValues = true,
+                        PropertyNameCaseInsensitive = true
+                    };
+                    values =  System.Text.Json.JsonSerializer.Deserialize<T>(json, options);
                 }
 
             }

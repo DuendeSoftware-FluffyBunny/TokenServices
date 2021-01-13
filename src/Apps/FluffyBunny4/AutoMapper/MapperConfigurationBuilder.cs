@@ -15,25 +15,6 @@ namespace FluffyBunny4.AutoMapper
             cfg.CreateMap<PersistedGrant, PersistedGrantExtra>();
             cfg.CreateMap<PersistedGrantExtra, PersistedGrant>();
 
-            cfg.CreateMap<ClientExtra, ClientExtraHandle>();
-            cfg.CreateMap<ClientExtraHandle, ClientExtra>();
-
-            cfg.CreateMap<ApiScope, ApiScopeHandle>();
-            cfg.CreateMap<ApiScopeHandle, ApiScope>();
-
-            cfg.CreateMap<ApiScope, TenantApiScopeHandle>();
-            cfg.CreateMap<TenantApiScopeHandle, ApiScope>();
-
-            cfg.CreateMap<ApiResource, ApiResourceHandle>();
-            cfg.CreateMap<ApiResourceHandle, ApiResource>();
-
-            cfg.CreateMap<Secret, SecretHandle>();
-            cfg.CreateMap<SecretHandle, Secret>();
-
-
-            cfg.CreateMap<ApiResource, TenantApiResourceHandle>();
-            cfg.CreateMap<TenantApiResourceHandle, ApiResource>();
-
             cfg.CreateMap<DeviceCode, DeviceCodeExtra>()
                 .ForMember(dest => dest.AuthorizedScopes, opt => opt.ConvertUsing(new AuthorizedScopesConverter()));
         });

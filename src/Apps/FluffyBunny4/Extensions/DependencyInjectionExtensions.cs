@@ -33,21 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IPasswordGenerator, PasswordGenerator>();
             return services;
         }
-        /// <summary>
-        /// Adds the in memory API scopes.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        /// <param name="apiScopes">The API scopes.</param>
-        /// <returns></returns>
-        public static IIdentityServerBuilder AddTenantAwareInMemoryApiScopes(this IIdentityServerBuilder builder,
-            string jsonApiScopesFile,
-            string jsonApiResourcesFile)
-        {
-            builder.Services.AddInMemoryInMemoryResourcesTenantStore(jsonApiScopesFile, jsonApiResourcesFile);
-            builder.AddResourceStore<TenantAwareInMemoryResourcesStore>();
-
-            return builder;
-        }
 
         public static IIdentityServerBuilder SwapOutTokenRevocationRequestValidator(
             this IIdentityServerBuilder builder)
@@ -68,27 +53,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder;
         } 
 
-        public static IServiceCollection AddInMemoryInMemoryResourcesTenantStore(
-            this IServiceCollection services,
-            string jsonApiScopesFile,
-            string jsonApiResourcesFile)
-        {
-            services.AddSingleton<IEnumerable<TenantApiScopeHandle>>(sp =>
-            {
-                var serializer = sp.GetRequiredService<ISerializer>();
-                var json = File.ReadAllText(jsonApiScopesFile);
-                var items = serializer.Deserialize<List<TenantApiScopeHandle>>(json);
-                return items;
-            });
-            services.AddSingleton<IEnumerable<TenantApiResourceHandle>>(sp =>
-            {
-                var serializer = sp.GetRequiredService<ISerializer>();
-                var json = File.ReadAllText(jsonApiResourcesFile);
-                var items = serializer.Deserialize<List<TenantApiResourceHandle>>(json);
-                return items;
-            });
-            return services;
-        }
 
         public static IServiceCollection AddInMemoryTenantStore(
             this IServiceCollection services,

@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿ 
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace FluffyBunny4.DotNetCore.Extensions
 {
@@ -13,7 +15,7 @@ namespace FluffyBunny4.DotNetCore.Extensions
             {
                 try
                 {
-                    var obj = JToken.Parse(strInput);
+                    var obj = System.Text.Json.JsonDocument.Parse(strInput);
                     return true;
                 }
                 catch (Exception ex) //some other exception
