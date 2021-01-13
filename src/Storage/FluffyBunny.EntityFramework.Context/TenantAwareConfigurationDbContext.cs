@@ -46,6 +46,9 @@ namespace FluffyBunny.EntityFramework.Context
         public DbSet<ApiScope> ApiScopes { get; set; }
         public DbSet<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
         public DbSet<AllowedRevokeTokenTypeHint> AllowedRevokeTokenTypeHints { get; set; }
+        public DbSet<AllowedTokenExchangeExternalService> AllowedTokenExchangeExternalServices { get; set; }
+
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -64,7 +67,8 @@ namespace FluffyBunny.EntityFramework.Context
         {
             modelBuilder.ConfigureAllowedArbitraryIssuerContext();
             modelBuilder.ConfigureAllowedRevokeTokenTypeHintContext();
-            
+            modelBuilder.ConfigureAllowedTokenExchangeExternalServiceContext();
+
             modelBuilder.ConfigureExternalServicesContext();
             modelBuilder.ConfigureClientContext(_storeOptions);
             modelBuilder.ConfigureResourcesContext(_storeOptions);

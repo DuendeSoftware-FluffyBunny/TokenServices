@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.Models;
 
 namespace FluffyBunny4.Validation
 {
@@ -56,6 +57,8 @@ namespace FluffyBunny4.Validation
                 throw new ArgumentNullException(nameof(client));
             }
 
+            var clientExtra = client as ClientExtra;
+
             ////////////////////////////
             // make sure token is present
             ///////////////////////////
@@ -86,7 +89,18 @@ namespace FluffyBunny4.Validation
                 if (Constants.SupportedTokenTypeHints.Contains(hint))
                 {
                     _logger.LogDebug("Token type hint found in request: {tokenTypeHint}", hint);
-                    result.TokenTypeHint = hint;
+                    // check if this hint is allowed for this client;
+                    if (clientExtra.AllowedRevokeTokenTypeHints.Contains(hint))
+                    {
+                        result.TokenTypeHint = hint;
+                    }
+                    else
+                    {
+                        _logger.LogError("Not Allowed for this client. token type hint: {tokenTypeHint}", hint);
+                        result.IsError = true;
+                        result.Error = Constants.RevocationErrors.UnsupportedTokenType;
+
+                    }
                 }
                 else
                 {

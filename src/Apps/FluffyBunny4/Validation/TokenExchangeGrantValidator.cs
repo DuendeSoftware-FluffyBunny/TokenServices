@@ -215,13 +215,7 @@ namespace FluffyBunny4.Validation
             error = error || err;
             err = false;
 
-            if (error)
-            {
-                context.Result.IsError = true;
-                context.Result.Error = string.Join<string>(" | ", los);
-                _logger.LogError($"context.Result.Error");
-                return;
-            }
+       
 
            
 
@@ -230,9 +224,48 @@ namespace FluffyBunny4.Validation
             var requestedScopesRaw = form[Constants.Scope].Split(' ').ToList();
             var requestedServiceScopes = GetServiceToScopesFromRequest(requestedScopesRaw);
             _scopedOverrideRawScopeValues.IsOverride = true;
+
+            var externalServices = new Dictionary<string,ExternalService>();
+            // validate that this client is allowed to have access to external services
             foreach (var serviceScopeSet in requestedServiceScopes)
             {
                 var externalService = await _externalServicesStore.GetExternalServiceByNameAsync(serviceScopeSet.Key);
+                if (externalService == null)
+                {
+                    _logger.LogError($"external service: {serviceScopeSet.Key} does not exist");
+                    continue;
+                }
+
+                if (client.AllowedTokenExchangeExternalServices.Contains(externalService.Name))
+                {
+                    externalServices.Add(externalService.Name,externalService);
+                }
+                else
+                {
+                    err = true;
+                    var message = $"external_service:{externalService.Name} is not allowed for this client";
+                    los.Add(message);
+                    _logger.LogError(message);
+
+                }
+            }
+            error = error || err;
+            err = false;
+
+            if (error)
+            {
+                context.Result.IsError = true;
+                context.Result.Error = string.Join<string>(" | ", los);
+                _logger.LogError($"context.Result.Error");
+                return;
+            }
+
+            foreach (var serviceScopeSet in requestedServiceScopes)
+            {
+
+                ExternalService externalService = null;
+                externalServices.TryGetValue(serviceScopeSet.Key, out externalService);
+
                 if (externalService == null)
                 {
                     _logger.LogError($"external service: {serviceScopeSet.Key} does not exist");
@@ -272,8 +305,17 @@ namespace FluffyBunny4.Validation
                     {
                         AuthorizeType = doco.AuthorizationType,
                         Scopes = scopes,
-                        Subject = subject
+                        Subject = subject,
+                        Requester = new ConsentAuthorizeRequest.ClientRequester()
+                        {
+                            ClientDescription = client.Description,
+                            ClientId = client.ClientId,
+                            ClientName = client.ClientName,
+                            Namespace = client.Namespace,
+                            Tenant = client.TenantName
+                        }
                     };
+
                     var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
                     if (response.Error != null)
                     {

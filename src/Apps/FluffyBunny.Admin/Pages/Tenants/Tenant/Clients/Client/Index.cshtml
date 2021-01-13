@@ -23,10 +23,7 @@
             <a class="btn btn-sm btn-primary" asp-page="./Edit" asp-route-id="@Model.Entity.Id">Edit</a>
             <a class="btn btn-sm btn-primary" asp-page="./Delete" asp-route-id="@Model.Entity.Id">Delete</a>
             <a class="btn btn-sm btn-primary" asp-page="./Secrets/Index" asp-route-id="@Model.Entity.Id">Secrets</a>
-            <a class="btn btn-sm btn-primary" asp-page="./AllowedGrantTypes/Index" asp-route-id="@Model.Entity.Id">Allowed Grant Types</a>
-            <a class="btn btn-sm btn-primary" asp-page="./AllowedScopes/Index" asp-route-id="@Model.Entity.Id">Allowed Scopes</a>
-            <a class="btn btn-sm btn-primary" asp-page="./AllowedArbitraryIssuers/Index" asp-route-id="@Model.Entity.Id">Allowed Arbitrary Issuers</a>
-            <a class="btn btn-sm btn-primary" asp-page="./AllowedRevokeTokenTypeHints/Index" asp-route-id="@Model.Entity.Id">Allowed Revoke Token Type Hints</a>
+          
         </div>
         <div class="card-body">
            
@@ -87,7 +84,7 @@
                         </tr>
                     <tr>
                         <td class="w-50">
-                            @nameof(Model.Entity.AllowedGrantTypes)
+                            <a class="btn btn-sm btn-primary" asp-page="./AllowedGrantTypes/Index" asp-route-id="@Model.Entity.Id">Allowed Grant Types</a>
                         </td>
                         <td class="w-50">
                             @foreach (var allowedGrantType in Model.Entity.AllowedGrantTypes)
@@ -101,7 +98,7 @@
                     </tr>
                     <tr>
                         <td class="w-50">
-                            @nameof(Model.Entity.AllowedArbitraryIssuers)
+                            <a class="btn btn-sm btn-primary" asp-page="./AllowedArbitraryIssuers/Index" asp-route-id="@Model.Entity.Id">Allowed Arbitrary Issuers</a>
                         </td>
                         <td class="w-50">
                             @foreach (var allowedArbitraryIssuer in Model.Entity.AllowedArbitraryIssuers)
@@ -115,7 +112,7 @@
                     </tr>
                     <tr>
                         <td class="w-50">
-                            @nameof(Model.Entity.AllowedRevokeTokenTypeHints)
+                            <a class="btn btn-sm btn-primary" asp-page="./AllowedRevokeTokenTypeHints/Index" asp-route-id="@Model.Entity.Id">Allowed Revoke Token Type Hints</a>
                         </td>
                         <td class="w-50">
                             @foreach (var item in Model.Entity.AllowedRevokeTokenTypeHints)
@@ -126,10 +123,26 @@
                             }
 
                         </td>
+                       
+                        
+                    </tr>
+                    <tr>
+                        <td class="w-50">
+                            <a class="btn btn-sm btn-primary" asp-page="./AllowedTokenExchangeExternalServices/Index" asp-route-id="@Model.Entity.Id">Allowed External Services</a>
+                        </td>
+                        <td class="w-50">
+                            @foreach (var item in Model.Entity.AllowedTokenExchangeExternalServices)
+                            {
+                                <div class="checkbox">
+                                    @item.ExternalService
+                                </div>
+                            }
+
+                        </td>
                     </tr>
                         <tr>
                             <td class="w-50">
-                                @nameof(Model.Entity.AllowedScopes)
+                                <a class="btn btn-sm btn-primary" asp-page="./AllowedScopes/Index" asp-route-id="@Model.Entity.Id">Allowed Scopes</a>
                             </td>
                             <td class="w-50">
                                 @foreach (var allowedGrantType in Model.Entity.AllowedScopes)

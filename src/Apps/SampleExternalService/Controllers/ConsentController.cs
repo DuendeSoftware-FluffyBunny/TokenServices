@@ -32,7 +32,7 @@ namespace SampleExternalService.Controllers
             public string Name { get; set; }
             public int Value { get; set; }
             public List<Inner> Properties { get; set; }
-
+            public ConsentAuthorizeRequest ConsentAuthorizeRequest { get;  set; }
         }
 
         private AppOptions _options;
@@ -115,6 +115,7 @@ namespace SampleExternalService.Controllers
                 };
                 authorizeResponse.CustomPayload = new MyCustom
                 {
+                    ConsentAuthorizeRequest = authorizeRequest,
                     Name = nameof(MyCustom), Value = 1234,
                     Properties =  new List<MyCustom.Inner>()
                     {

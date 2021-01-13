@@ -277,7 +277,15 @@ namespace TokenService.Controllers
                         {
                             AuthorizeType = doco.AuthorizationType,
                             Scopes = scopes,
-                            Subject = subject
+                            Subject = subject,
+                            Requester = new ConsentAuthorizeRequest.ClientRequester()
+                            {
+                                ClientDescription = client.Description,
+                                ClientId = client.ClientId,
+                                ClientName = client.ClientName,
+                                Namespace = client.Namespace,
+                                Tenant = client.TenantName
+                            }
                         };
                         var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
                         if (response.Error != null)

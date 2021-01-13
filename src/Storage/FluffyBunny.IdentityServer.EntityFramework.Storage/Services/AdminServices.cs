@@ -728,6 +728,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.Claims)
                 .Include(x => x.AllowedArbitraryIssuers)
                 .Include(x => x.AllowedRevokeTokenTypeHints)
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -746,6 +748,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.Claims)
                 .Include(x => x.AllowedArbitraryIssuers)
                 .Include(x => x.AllowedRevokeTokenTypeHints)
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+            
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -1305,6 +1309,130 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                     break;
                 case ClientAllowedRevokeTokenTypeHintsSortType.NameAsc:
                     entities = entities.OrderBy(t => t.TokenTypeHint);
+                    break;
+
+            }
+
+            return entities;
+        }
+
+        public async Task UpsertClientAllowedTokenExchangeExternalServiceAsync(string tenantName, int clientId, AllowedTokenExchangeExternalService entity)
+        {
+            entity.ExternalService = entity.ExternalService.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+
+
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+                .FirstOrDefaultAsync();
+
+            var existing = (from item in clientInDb.AllowedTokenExchangeExternalServices
+                            where item.ExternalService == entity.ExternalService
+                            select item).FirstOrDefault();
+            if (existing != null)
+            {
+                return; // already here
+            }
+            existing = (from item in clientInDb.AllowedTokenExchangeExternalServices
+                        where item.Id == entity.Id
+                select item).FirstOrDefault();
+
+            if (existing != null)
+            {
+                // name update
+                existing.ExternalService = entity.ExternalService;
+            }
+            else
+            {
+                // brand new
+                clientInDb.AllowedTokenExchangeExternalServices.Add(entity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<AllowedTokenExchangeExternalService> GetClientAllowedTokenExchangeExternalServiceByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedTokenExchangeExternalServices.FirstOrDefault(x => x.Id == id);
+
+            return existing;
+        }
+
+        public async Task<AllowedTokenExchangeExternalService> GetClientAllowedTokenExchangeExternalServiceByNameAsync(string tenantName, int clientId, string name)
+        {
+            name = name.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            var existing = clientInDb.AllowedTokenExchangeExternalServices.FirstOrDefault(x => x.ExternalService == name);
+            return existing;
+        }
+
+        public async Task DeleteClientAllowedTokenExchangeExternalServiceByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedTokenExchangeExternalServices.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                clientInDb.AllowedTokenExchangeExternalServices.Remove(existing);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<AllowedTokenExchangeExternalService>> GetAllClientAllowedTokenExchangeExternalServicesAsync(string tenantName, int clientId, ClientAllowedTokenExchangeExternalServicesSortType sortType = ClientAllowedTokenExchangeExternalServicesSortType.NameDesc)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeExternalServices)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var entities = from item in clientInDb.AllowedTokenExchangeExternalServices
+                           select item;
+            switch (sortType)
+            {
+                case ClientAllowedTokenExchangeExternalServicesSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.ExternalService);
+                    break;
+                case ClientAllowedTokenExchangeExternalServicesSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.ExternalService);
                     break;
 
             }

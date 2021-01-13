@@ -15,7 +15,9 @@ namespace FluffyBunny.EntityFramework.Entities
         public string TenantName { get; set; }
         public List<AllowedArbitraryIssuer> AllowedArbitraryIssuers { get; set; }
         public List<AllowedRevokeTokenTypeHint> AllowedRevokeTokenTypeHints { get; set; }
+        public List<AllowedTokenExchangeExternalService> AllowedTokenExchangeExternalServices { get; set; }
         
+
        public string Namespace { get; set; }
     }
 }
