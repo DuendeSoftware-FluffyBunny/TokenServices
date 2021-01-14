@@ -84,6 +84,12 @@ namespace FluffyBunny4.Stores
             return await GetItemAsync(refreshTokenHandle) as RefreshToken;
         }
 
+        protected override Task<RefreshTokenExtra> GetItemAsync(string key)
+        {
+            var subKey = key.Substring(2);
+            return base.GetItemAsync(subKey);
+        }
+
         /// <summary>
         /// Removes the refresh token.
         /// </summary>

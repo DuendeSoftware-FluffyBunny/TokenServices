@@ -26,6 +26,7 @@ namespace FluffyBunny4.Middleware
         }
         public async Task Invoke(HttpContext context, 
             IScopedContext<TenantRequestContext> scopedTenantRequestContext,
+            IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             ITenantStore tenantStore)
         {
             try
@@ -61,6 +62,7 @@ namespace FluffyBunny4.Middleware
                     string newPath = sb.ToString();
                     context.Request.Path = newPath;
                     context.Request.PathBase = $"/{tenantName}";
+                    await scopedHttpContextRequestForm.GetFormCollectionAsync();
                 }
 
             }

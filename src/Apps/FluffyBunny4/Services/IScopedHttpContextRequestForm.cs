@@ -6,5 +6,6 @@ namespace FluffyBunny4.Services
     public interface IScopedHttpContextRequestForm
     {
         Task<NameValueCollection> GetFormCollectionAsync();
+        NameValueCollection GetFormCollection();
     }
 }

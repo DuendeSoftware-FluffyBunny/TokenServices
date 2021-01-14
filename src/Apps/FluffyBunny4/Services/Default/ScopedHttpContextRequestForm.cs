@@ -23,5 +23,10 @@ namespace FluffyBunny4.Services
             }
             return _form;
         }
+
+        public NameValueCollection GetFormCollection()
+        {
+            return _form;
+        }
     }
 }

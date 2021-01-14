@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer.Services;
+﻿using System.Threading.Tasks;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Stores.Serialization;
 using FluffyBunny4.Services;
@@ -34,5 +36,12 @@ namespace FluffyBunny4.Stores
         {
             return GetHashedKey(value);
         }
+
+        protected override Task<Token> GetItemAsync(string key)
+        {
+            var subKey = key.Substring(2);
+            return base.GetItemAsync(subKey);
+        }
+ 
     }
 }

@@ -19,16 +19,20 @@ namespace FluffyBunny4.Services.Default
 
     public class GraceRefreshTokenService : DefaultRefreshTokenService
     {
+        private IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
 
         public GraceRefreshTokenService(
+            IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             IRefreshTokenStore refreshTokenStore,
             IProfileService profile,
             ISystemClock clock,
             ILogger<DefaultRefreshTokenService> logger) :
             base(refreshTokenStore, profile, clock, logger)
         {
+            _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
         }
-        public override async Task<string> CreateRefreshTokenAsync(
+
+        public async Task<string> CreateRefreshTokenAsync(
             ClaimsPrincipal subject, Token accessToken, Client client)
         {
             Logger.LogDebug("Creating refresh token");
@@ -56,18 +60,182 @@ namespace FluffyBunny4.Services.Default
                 Logger.LogDebug("Setting a sliding lifetime: {slidingLifetime}", lifetime);
             }
 
+            var formCollection = await _scopedHttpContextRequestForm.GetFormCollectionAsync();
+            var originGrantType = formCollection["grant_type"];
             var refreshToken = new RefreshTokenExtra
             {
                 CreationTime = Clock.UtcNow.UtcDateTime,
                 Lifetime = lifetime,
-                AccessToken = accessToken
+                AccessToken = accessToken,
+                OriginGrantType = originGrantType
             };
 
             var handle = await RefreshTokenStore.StoreRefreshTokenAsync(refreshToken);
             return handle;
         }
 
-        public override async Task<string> UpdateRefreshTokenAsync(
+        public override async Task<string> CreateRefreshTokenAsync(RefreshTokenCreationRequest request)
+        {
+            Logger.LogDebug("Creating refresh token");
+
+            int lifetime;
+            if (request.Client.RefreshTokenExpiration == TokenExpiration.Absolute)
+            {
+                Logger.LogDebug("Setting an absolute lifetime: {absoluteLifetime}",
+                    request.Client.AbsoluteRefreshTokenLifetime);
+                lifetime = request.Client.AbsoluteRefreshTokenLifetime;
+            }
+            else
+            {
+                lifetime = request.Client.SlidingRefreshTokenLifetime;
+                if (request.Client.AbsoluteRefreshTokenLifetime > 0 && lifetime > request.Client.AbsoluteRefreshTokenLifetime)
+                {
+                    Logger.LogWarning(
+                        "Client {clientId}'s configured " + nameof(request.Client.SlidingRefreshTokenLifetime) +
+                        " of {slidingLifetime} exceeds its " + nameof(request.Client.AbsoluteRefreshTokenLifetime) +
+                        " of {absoluteLifetime}. The refresh_token's sliding lifetime will be capped to the absolute lifetime",
+                        request.Client.ClientId, lifetime, request.Client.AbsoluteRefreshTokenLifetime);
+                    lifetime = request.Client.AbsoluteRefreshTokenLifetime;
+                }
+
+                Logger.LogDebug("Setting a sliding lifetime: {slidingLifetime}", lifetime);
+            }
+            var formCollection = await _scopedHttpContextRequestForm.GetFormCollectionAsync();
+            var originGrantType = formCollection["grant_type"];
+
+            var refreshToken = new RefreshTokenExtra()
+            {
+                Subject = request.Subject,
+                ClientId = request.Client.ClientId,
+                Description = request.Description,
+                AuthorizedScopes = request.AuthorizedScopes,
+                AuthorizedResourceIndicators = request.AuthorizedResourceIndicators,
+
+                CreationTime = Clock.UtcNow.UtcDateTime,
+                Lifetime = lifetime,
+                OriginGrantType = originGrantType
+            };
+            refreshToken.SetAccessToken(request.AccessToken, request.RequestedResourceIndicator);
+
+            var handle = await RefreshTokenStore.StoreRefreshTokenAsync(refreshToken);
+            return handle;
+        }
+
+        public override async Task<string> UpdateRefreshTokenAsync(RefreshTokenUpdateRequest request)
+        {
+            Logger.LogDebug("Updating refresh token");
+
+            var refreshTokenExtra = request.RefreshToken as RefreshTokenExtra;
+            var client = request.Client;
+            var clientExtra = client as ClientExtra;
+
+            var handle = request.Handle;
+            bool needsCreate = false;
+            bool needsUpdate = request.MustUpdate;
+
+            if (request.Client.RefreshTokenUsage == TokenUsage.OneTimeOnly)
+            {
+                Logger.LogDebug("Token usage is one-time only. Setting current handle as consumed, and generating new handle");
+
+                // flag as consumed
+                if (request.RefreshToken.ConsumedTime == null)
+                {
+                    request.RefreshToken.ConsumedTime = Clock.UtcNow.UtcDateTime;
+                }
+
+                // increment the attempts used
+                refreshTokenExtra.ConsumedAttempts += 1;
+                if (!clientExtra.RefreshTokenGraceEnabled)
+                {
+                    await RefreshTokenStore.UpdateRefreshTokenAsync(handle, refreshTokenExtra);
+                }
+
+                // create new one
+                needsCreate = true;
+            }
+
+            if (request.Client.RefreshTokenExpiration == TokenExpiration.Sliding)
+            {
+                Logger.LogDebug("Refresh token expiration is sliding - extending lifetime");
+
+                // if absolute exp > 0, make sure we don't exceed absolute exp
+                // if absolute exp = 0, allow indefinite slide
+                var currentLifetime = request.RefreshToken.CreationTime.GetLifetimeInSeconds(Clock.UtcNow.UtcDateTime);
+                Logger.LogDebug("Current lifetime: {currentLifetime}", currentLifetime.ToString());
+
+                var newLifetime = currentLifetime + request.Client.SlidingRefreshTokenLifetime;
+                Logger.LogDebug("New lifetime: {slidingLifetime}", newLifetime.ToString());
+
+                // zero absolute refresh token lifetime represents unbounded absolute lifetime
+                // if absolute lifetime > 0, cap at absolute lifetime
+                if (request.Client.AbsoluteRefreshTokenLifetime > 0 && newLifetime > request.Client.AbsoluteRefreshTokenLifetime)
+                {
+                    newLifetime = request.Client.AbsoluteRefreshTokenLifetime;
+                    Logger.LogDebug("New lifetime exceeds absolute lifetime, capping it to {newLifetime}",
+                        newLifetime.ToString());
+                }
+
+                request.RefreshToken.Lifetime = newLifetime;
+                needsUpdate = true;
+            }
+
+            if (needsCreate)
+            {
+                var oldChild = refreshTokenExtra.RefeshTokenChild;
+                var oldParent = refreshTokenExtra.RefeshTokenParent;
+                var savedConsumedTime = refreshTokenExtra.ConsumedTime;
+
+                // set it to null so that we save non-consumed token
+                refreshTokenExtra.ConsumedTime = null;
+                refreshTokenExtra.RefeshTokenChild = null;
+                // carry forward the parent.
+                refreshTokenExtra.RefeshTokenParent = handle;
+
+                var newHandle = await RefreshTokenStore.StoreRefreshTokenAsync(refreshTokenExtra);
+
+                refreshTokenExtra.ConsumedTime = savedConsumedTime;
+                refreshTokenExtra.RefeshTokenParent = null;
+                if (client.RefreshTokenUsage == TokenUsage.OneTimeOnly)
+                {
+                    Logger.LogDebug("Token usage is one-time only. Setting current handle as consumed, and generating new handle");
+                    if (clientExtra.RefreshTokenGraceEnabled)
+                    {
+                        refreshTokenExtra.RefeshTokenChild = newHandle;
+                    }
+
+                    await RefreshTokenStore.UpdateRefreshTokenAsync(
+                        handle,
+                        refreshTokenExtra);
+
+                    if (clientExtra.RefreshTokenGraceEnabled)
+                    {
+                        if (!string.IsNullOrWhiteSpace(oldChild))
+                        {
+                            await RefreshTokenStore.RemoveRefreshTokenAsync(oldChild);
+                        }
+                        if (!string.IsNullOrWhiteSpace(oldParent))
+                        {
+                            await RefreshTokenStore.RemoveRefreshTokenAsync(oldParent);
+                        }
+                    }
+                }
+                handle = newHandle;
+                Logger.LogDebug("Created refresh token in store");
+            }
+            else if (needsUpdate)
+            {
+                await RefreshTokenStore.UpdateRefreshTokenAsync(handle, request.RefreshToken);
+                Logger.LogDebug("Updated refresh token in store");
+            }
+            else
+            {
+                Logger.LogDebug("No updates to refresh token done");
+            }
+
+            return handle;
+        }
+
+        public  async Task<string> UpdateRefreshTokenAsync(
             string handle,
             RefreshToken refreshToken,
             Client client)

@@ -231,7 +231,8 @@ namespace FluffyBunny4.Validation
                     tokenIssuedAtTime = dateTimeOffset.UtcDateTime;
 
                     var referenceTokenStoreGrantStoreHashAccessor = _referenceTokenStore as IGrantStoreHashAccessor;
-                    var hashKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(subjectToken);
+                    var fixedSubjectToken = subjectToken.Substring(2);
+                    var hashKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(fixedSubjectToken);
                     var accessTokenPersitedGrant = await _persistedGrantStore.GetAsync(hashKey);
                     if (accessTokenPersitedGrant == null)
                     {

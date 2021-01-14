@@ -26,12 +26,14 @@ namespace FluffyBunny4.ResponseHandling
     {
         private IScopedStorage _scopedStorage;
         private IPersistedGrantStoreEx _persistedGrantStore;
+        private IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
         private IHttpContextAccessor _contextAccessor;
         private IScopedOptionalClaims _scopedOptionalClaims;
         private IRefreshTokenStore _refreshTokenStore;
         private IReferenceTokenStore _referenceTokenStore;
 
         public MyTokenResponseGenerator(
+            IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             IHttpContextAccessor contextAccessor,
             IScopedOptionalClaims scopedOptionalClaims,
             IScopedStorage scopedStorage,
@@ -46,6 +48,7 @@ namespace FluffyBunny4.ResponseHandling
             IClientStore clients, 
             ILogger<TokenResponseGenerator> logger) : base(clock, tokenService, refreshTokenService, scopeParser, resources, clients, logger)
         {
+            _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
             _contextAccessor = contextAccessor;
             _scopedOptionalClaims = scopedOptionalClaims;
             _refreshTokenStore = refreshTokenStore;
@@ -68,6 +71,38 @@ namespace FluffyBunny4.ResponseHandling
                     return await base.ProcessTokenRequestAsync(validationResult);
                     break;
             }
+        }
+
+        protected override async Task<TokenResponse> ProcessRefreshTokenRequestAsync(TokenRequestValidationResult request)
+        {
+            var response = await base.ProcessRefreshTokenRequestAsync(request);
+            var refreshTokenExtra = request.ValidatedRequest.RefreshToken as RefreshTokenExtra;
+
+            switch (refreshTokenExtra.OriginGrantType)
+            {
+                case FluffyBunny4.Constants.GrantType.ArbitraryIdentity:
+                case FluffyBunny4.Constants.GrantType.ArbitraryToken:
+                case OidcConstants.GrantTypes.DeviceCode:
+                case FluffyBunny4.Constants.GrantType.TokenExchange:
+                case FluffyBunny4.Constants.GrantType.TokenExchangeMutate:
+                    response.RefreshToken = $"1_{response.RefreshToken}";
+                    if (!string.IsNullOrWhiteSpace(response.AccessToken) && !response.AccessToken.Contains("."))
+                    {
+                        response.AccessToken = $"1_{response.AccessToken}";
+                    }
+
+                    break;
+                default:
+                    response.RefreshToken = $"0_{response.RefreshToken}";
+                    if (!string.IsNullOrWhiteSpace(response.AccessToken) && !response.AccessToken.Contains("."))
+                    {
+                        response.AccessToken = $"0_{response.AccessToken}";
+                    }
+
+                    break;
+            }
+
+            return response;
         }
 
         private async Task<TokenResponse> ProcessArbitraryIdentityTokenResponse(TokenRequestValidationResult validationResult)
@@ -184,10 +219,13 @@ namespace FluffyBunny4.ResponseHandling
             string refreshToken = null;
             if (createRefreshToken)
             {
-                refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(
-                    validationResult.ValidatedRequest.Subject,
-                    at,
-                    validationResult.ValidatedRequest.Client);
+                var refreshTokenCreationRequest = new RefreshTokenCreationRequest
+                {
+                    Subject = validationResult.ValidatedRequest.Subject,
+                    AccessToken = at,
+                    Client = validationResult.ValidatedRequest.Client
+                };
+                refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(refreshTokenCreationRequest);
             }
 
             var tokenResonse = new TokenResponse
@@ -202,17 +240,28 @@ namespace FluffyBunny4.ResponseHandling
 
         protected async override Task<(string accessToken, string refreshToken)> CreateAccessTokenAsync(ValidatedTokenRequest request)
         {
-            TokenCreationRequest tokenRequest;
+            var tokenRequest = new TokenCreationRequest
+            {
+                Subject = request.Subject,
+                ValidatedResources = request.ValidatedResources,
+                ValidatedRequest = request
+            };
+
             bool createRefreshToken;
+            var authorizedScopes = Enumerable.Empty<string>();
+            IEnumerable<string> authorizedResourceIndicators = null;
 
             if (request.AuthorizationCode != null)
             {
-                createRefreshToken = request.AuthorizationCode.RequestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess);
+                createRefreshToken = request.ValidatedResources.Resources.OfflineAccess;
+
+                //                createRefreshToken = request.AuthorizationCode.RequestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess);
 
                 // load the client that belongs to the authorization code
                 Client client = null;
                 if (request.AuthorizationCode.ClientId != null)
                 {
+                    // todo: do we need this check?
                     client = await Clients.FindEnabledClientByIdAsync(request.AuthorizationCode.ClientId);
                 }
                 if (client == null)
@@ -220,16 +269,11 @@ namespace FluffyBunny4.ResponseHandling
                     throw new InvalidOperationException("Client does not exist anymore.");
                 }
 
-                var parsedScopesResult = ScopeParser.ParseScopeValues(request.AuthorizationCode.RequestedScopes);
-                var validatedResources = await Resources.CreateResourceValidationResult(parsedScopesResult);
+                tokenRequest.Subject = request.AuthorizationCode.Subject;
+                tokenRequest.Description = request.AuthorizationCode.Description;
 
-                tokenRequest = new TokenCreationRequest
-                {
-                    Subject = request.AuthorizationCode.Subject,
-                    Description = request.AuthorizationCode.Description,
-                    ValidatedResources = validatedResources,
-                    ValidatedRequest = request
-                };
+                authorizedScopes = request.AuthorizationCode.RequestedScopes;
+                authorizedResourceIndicators = request.AuthorizationCode.RequestedResourceIndicators;
             }
             else if (request.DeviceCode != null)
             {
@@ -238,6 +282,7 @@ namespace FluffyBunny4.ResponseHandling
                 Client client = null;
                 if (request.DeviceCode.ClientId != null)
                 {
+                    // todo: do we need this check?
                     client = await Clients.FindEnabledClientByIdAsync(request.DeviceCode.ClientId);
                 }
                 if (client == null)
@@ -245,27 +290,15 @@ namespace FluffyBunny4.ResponseHandling
                     throw new InvalidOperationException("Client does not exist anymore.");
                 }
 
-                var parsedScopesResult = ScopeParser.ParseScopeValues(request.DeviceCode.AuthorizedScopes);
-                var validatedResources = await Resources.CreateResourceValidationResult(parsedScopesResult);
+                tokenRequest.Subject = request.DeviceCode.Subject;
+                tokenRequest.Description = request.DeviceCode.Description;
 
-                tokenRequest = new TokenCreationRequest
-                {
-                    Subject = request.DeviceCode.Subject,
-                    Description = request.DeviceCode.Description,
-                    ValidatedResources = validatedResources,
-                    ValidatedRequest = request
-                };
+                authorizedScopes = request.DeviceCode.AuthorizedScopes;
             }
             else
             {
                 createRefreshToken = request.RequestedScopes.Contains(IdentityServerConstants.StandardScopes.OfflineAccess);
-
-                tokenRequest = new TokenCreationRequest
-                {
-                    Subject = request.Subject,
-                    ValidatedResources = request.ValidatedResources,
-                    ValidatedRequest = request
-                };
+                authorizedScopes = request.ValidatedResources.RawScopeValues;
             }
 
 
@@ -292,14 +325,25 @@ namespace FluffyBunny4.ResponseHandling
                     finalScopes.Remove(IdentityServerConstants.StandardScopes.OfflineAccess);
                 }
             }
-
          
             var accessToken = await TokenService.CreateSecurityTokenAsync(at);
 
             string refreshToken = null;
             if (createRefreshToken)
             {
-                refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(tokenRequest.Subject, at, request.Client);
+                var rtRequest = new RefreshTokenCreationRequest
+                {
+                    Client = request.Client,
+                    Subject = tokenRequest.Subject,
+                    Description = tokenRequest.Description,
+                    AuthorizedScopes = authorizedScopes,
+                    AuthorizedResourceIndicators = authorizedResourceIndicators,
+                    AccessToken = at,
+                    RequestedResourceIndicator = request.RequestedResourceIndicator,
+                };
+
+                
+                refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(rtRequest);
             }
 
             if (_scopedStorage.TryGetValue(Constants.ScopedRequestType.ExtensionGrantValidationContext, out obj))
@@ -338,10 +382,43 @@ namespace FluffyBunny4.ResponseHandling
 
                 }
             }
+            var formCollection = _scopedHttpContextRequestForm.GetFormCollection();
+            var grantType = formCollection["grant_type"];
+
+            switch (grantType)
+            {
+                case FluffyBunny4.Constants.GrantType.ArbitraryIdentity:
+                case FluffyBunny4.Constants.GrantType.ArbitraryToken:
+                case OidcConstants.GrantTypes.DeviceCode:
+                case FluffyBunny4.Constants.GrantType.TokenExchange:
+                case FluffyBunny4.Constants.GrantType.TokenExchangeMutate:
+                    if (!accessToken.Contains('.'))
+                    {
+                        accessToken = $"1_{accessToken}";
+                    }
+                   
+                    if (!string.IsNullOrWhiteSpace(refreshToken))
+                    {
+                        refreshToken = $"1_{refreshToken}";
+                    }
+
+                    break;
+                default:
+                    if (!accessToken.Contains('.'))
+                    {
+                        accessToken = $"0_{accessToken}";
+                    }
+                    if (!string.IsNullOrWhiteSpace(refreshToken))
+                    {
+                        refreshToken = $"0_{refreshToken}";
+                    }
+
+                    break;
+            }
 
             return (accessToken, refreshToken);
 
-     //       return (accessToken, null);
+            //       return (accessToken, null);
         }
     }
 }

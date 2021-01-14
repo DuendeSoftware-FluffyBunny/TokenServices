@@ -33,6 +33,7 @@ namespace FluffyBunny4.Services.Default
         {
             Logger.LogTrace("Creating introspection response");
 
+//            var token = validationResult.Token.Substring(2);
             // standard response
             var response = new Dictionary<string, object>
             {

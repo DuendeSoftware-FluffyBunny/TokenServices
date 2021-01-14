@@ -21,7 +21,7 @@ namespace IdentityServer4.Validation
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
         private readonly ILogger _logger;
-
+        private readonly IScopeParser _scopeParser;
         public MyDefaultResourceValidator(
             IHttpContextAccessor httpContextAccessor,
             IResourceStore store,
@@ -32,6 +32,33 @@ namespace IdentityServer4.Validation
             _httpContextAccessor = httpContextAccessor;
             _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
             _logger = logger;
+            _scopeParser = scopeParser;
+        }
+
+        public override async Task<ResourceValidationResult> ValidateRequestedResourcesAsync(ResourceValidationRequest request)
+        {
+            var nvc = _scopedHttpContextRequestForm.GetFormCollection();
+            var token = nvc["token"];
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                token = nvc["refresh_token"];
+
+            }
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                if (token.StartsWith("1_"))
+                {
+                    // this has already been validated.
+                    if (request == null) throw new ArgumentNullException(nameof(request));
+
+                    var result = new ResourceValidationResult();
+
+                    var parsedScopesResult = _scopeParser.ParseScopeValues(request.Scopes);
+                    result.ParsedScopes = parsedScopesResult.ParsedScopes;
+                    return result;
+                }
+            }
+            return await base.ValidateRequestedResourcesAsync(request);
         }
 
         /// <summary>
