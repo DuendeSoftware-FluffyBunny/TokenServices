@@ -24,6 +24,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 {
     class EntityFrameworkPersistedGrantStoreEx : IPersistedGrantStoreEx
     {
+        private IScopedHttpContextRequestForm _scopedHttpContextRequestForm;
         private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
         private IScopedStorage _scopedStorage;
         private IAdminServices _adminServices;
@@ -32,6 +33,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
         private ILogger<EntityFrameworkPersistedGrantStoreEx> Logger;
 
         public EntityFrameworkPersistedGrantStoreEx(
+            IScopedHttpContextRequestForm scopedHttpContextRequestForm,
             IScopedContext<TenantRequestContext> scopedTenantRequestContext,
             IScopedStorage scopedStorage,
             IAdminServices adminServices,
@@ -39,6 +41,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
             ITenantAwareConfigurationDbContextAccessor tenantAwareConfigurationDbContextAccessor,
             ILogger<EntityFrameworkPersistedGrantStoreEx> logger)
         {
+            _scopedHttpContextRequestForm = scopedHttpContextRequestForm;
             _scopedTenantRequestContext = scopedTenantRequestContext;
             _scopedStorage = scopedStorage;
             _adminServices = adminServices;
@@ -205,56 +208,99 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Stores
 
             var token = grant as FluffyBunny4.Models.PersistedGrantExtra;
 
-
-            object obj;
-            if (_scopedStorage.TryGetValue(Constants.ScopedRequestType.ExtensionGrantValidationContext, out obj))
+            var grantType = _scopedHttpContextRequestForm.GetFormCollection()["grant_type"];
+            if (grantType == "refresh_token")
             {
-                var extensionGrantValidationContext = obj as ExtensionGrantValidationContext;
-                if (extensionGrantValidationContext.Request.GrantType == FluffyBunny4.Constants.GrantType.TokenExchange ||
-                    extensionGrantValidationContext.Request.GrantType == FluffyBunny4.Constants.GrantType.TokenExchangeMutate)
+                if (grant.Type != IdentityServerConstants.PersistedGrantTypes.RefreshToken)
                 {
 
+                    // refresh_token coming. so save this access_token for later storage
+                    _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.AccessTokenPersistedGrant,
+                        grant);
+                    return;
 
-                    if (grant.Type != IdentityServerConstants.PersistedGrantTypes.RefreshToken)
+                    // store access_token for later
+                }
+                else
+                {
+                    object obj;
+                    _scopedStorage.TryGetValue(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
+                   
+                    if (obj != null)
                     {
-                        var offlineAccess =
-                            extensionGrantValidationContext.Request.RequestedScopes.FirstOrDefault(scope =>
-                                scope == IdentityServerConstants.StandardScopes.OfflineAccess);
-                        if (offlineAccess != null)
-                        {
-                            // refresh_token coming. so save this access_token for later storage
-                            _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.AccessTokenPersistedGrant,
-                                grant);
-                            return;
-                        }
-                        // store access_token for later
+                        var grantStored = obj as Duende.IdentityServer.Models.PersistedGrant;
+                        var extra = _entityFrameworkMapperAccessor.MapperOneToOne
+                            .Map<FluffyBunny4.Models.PersistedGrantExtra>(grantStored);
+
+                        extra.RefreshTokenKey = grant.Key;
+                        await InnerStoreAsync(extra);
+                        await InnerStoreAsync(grant);
+                        _scopedStorage.TryRemove(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
                     }
                     else
                     {
-                        _scopedStorage.TryGetValue(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
+                        // the persisted grant before this was NOT a reference token, so we will assume it was a JWT
+                        await InnerStoreAsync(grant);
+                    }
 
-                        if (obj != null)
+                    return;
+                }
+            }
+            else
+            {
+                object obj;
+                if (_scopedStorage.TryGetValue(Constants.ScopedRequestType.ExtensionGrantValidationContext, out obj))
+                {
+                    var extensionGrantValidationContext = obj as ExtensionGrantValidationContext;
+                    if (extensionGrantValidationContext.Request.GrantType == FluffyBunny4.Constants.GrantType.TokenExchange ||
+                        extensionGrantValidationContext.Request.GrantType == FluffyBunny4.Constants.GrantType.TokenExchangeMutate)
+                    {
+
+
+                        if (grant.Type != IdentityServerConstants.PersistedGrantTypes.RefreshToken)
                         {
-                            var grantStored = obj as Duende.IdentityServer.Models.PersistedGrant;
-                            var extra = _entityFrameworkMapperAccessor.MapperOneToOne
-                                .Map<FluffyBunny4.Models.PersistedGrantExtra>(grantStored);
-
-                            extra.RefreshTokenKey = grant.Key;
-                            await InnerStoreAsync(extra);
-                            await InnerStoreAsync(grant);
+                            var offlineAccess =
+                                extensionGrantValidationContext.Request.RequestedScopes.FirstOrDefault(scope =>
+                                    scope == IdentityServerConstants.StandardScopes.OfflineAccess);
+                            if (offlineAccess != null)
+                            {
+                                // refresh_token coming. so save this access_token for later storage
+                                _scopedStorage.AddOrUpdate(Constants.ScopedRequestType.AccessTokenPersistedGrant,
+                                    grant);
+                                return;
+                            }
+                            // store access_token for later
                         }
                         else
                         {
-                            // the persisted grant before this was NOT a reference token, so we will assume it was a JWT
-                            await InnerStoreAsync(grant);
-                        }
+                            _scopedStorage.TryGetValue(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
 
-                        //_scopedStorage.TryRemove(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
-                       // _scopedStorage.TryRemove(Constants.ScopedRequestType.ExtensionGrantValidationContext, out obj);
-                        return;
+                            if (obj != null)
+                            {
+                                var grantStored = obj as Duende.IdentityServer.Models.PersistedGrant;
+                                var extra = _entityFrameworkMapperAccessor.MapperOneToOne
+                                    .Map<FluffyBunny4.Models.PersistedGrantExtra>(grantStored);
+
+                                extra.RefreshTokenKey = grant.Key;
+                                await InnerStoreAsync(extra);
+                                await InnerStoreAsync(grant);
+                                _scopedStorage.TryRemove(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
+
+                            }
+                            else
+                            {
+                                // the persisted grant before this was NOT a reference token, so we will assume it was a JWT
+                                await InnerStoreAsync(grant);
+                            }
+
+                            //_scopedStorage.TryRemove(Constants.ScopedRequestType.AccessTokenPersistedGrant, out obj);
+                            // _scopedStorage.TryRemove(Constants.ScopedRequestType.ExtensionGrantValidationContext, out obj);
+                            return;
+                        }
                     }
                 }
             }
+         
 
             await InnerStoreAsync(grant);
            

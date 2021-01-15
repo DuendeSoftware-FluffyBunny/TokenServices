@@ -62,7 +62,19 @@ namespace FluffyBunny4.Middleware
                     string newPath = sb.ToString();
                     context.Request.Path = newPath;
                     context.Request.PathBase = $"/{tenantName}";
-                    await scopedHttpContextRequestForm.GetFormCollectionAsync();
+
+                    switch (context.Request.Method)
+                    {
+                        case "GET":
+                            break;
+                        case "POST":
+                            if (context.Request.ContentType == "application/x-www-form-urlencoded")
+                            {
+                                scopedTenantRequestContext.Context.FormCollection = await scopedHttpContextRequestForm.GetFormCollectionAsync();
+                            }
+                            break;
+                    }
+                    
                 }
 
             }

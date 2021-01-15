@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FluffyBunny4.Models;
 using System.Text.RegularExpressions;
 using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -147,7 +148,31 @@ namespace FluffyBunny4.Validation
             }
             error = error || err;
             err = false;
+            /*
+            bool allowOfflineAccess = client.AccessTokenType == AccessTokenType.Jwt;
+            var accessTokenType = form.Get(Constants.AccessTokenType);
+            if (!string.IsNullOrWhiteSpace(accessTokenType))
+            {
+                if (string.Compare(accessTokenType, "Reference", true) == 0)
+                {
+                    allowOfflineAccess = false;
+                }
+                else if (string.Compare(accessTokenType, "Jwt", true) == 0)
+                {
+                    allowOfflineAccess = true;
+                }
+            }
 
+            if (!allowOfflineAccess)
+            {
+
+                context.Request.ValidatedResources.ParsedScopes = context.Request.ValidatedResources.ParsedScopes.Where(item =>
+                    item.ParsedName != "offline_access").ToList();
+                context.Request.RequestedScopes = context.Request.RequestedScopes.Where(item =>
+                    item != "offline_access");
+                
+            }
+            */
             // VALIDATE if issuer must be allowed
             // -------------------------------------------------------------------
             var issuer = form.Get("issuer");
@@ -221,7 +246,7 @@ namespace FluffyBunny4.Validation
 
             var finalCustomPayload = new Dictionary<string, object>();
          
-            var requestedScopesRaw = form[Constants.Scope].Split(' ').ToList();
+            var requestedScopesRaw = form[Constants.Scope].Split(' ').Distinct().ToList();
             var requestedServiceScopes = GetServiceToScopesFromRequest(requestedScopesRaw);
             _scopedOverrideRawScopeValues.IsOverride = true;
 

@@ -129,7 +129,7 @@ namespace FluffyBunny4.Services.Default
             var client = request.Client;
             var clientExtra = client as ClientExtra;
 
-            var handle = request.Handle;
+            var handle = request.Handle.Substring(2);
             bool needsCreate = false;
             bool needsUpdate = request.MustUpdate;
 

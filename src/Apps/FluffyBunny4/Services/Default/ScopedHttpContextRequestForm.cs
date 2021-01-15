@@ -17,7 +17,9 @@ namespace FluffyBunny4.Services
         NameValueCollection _form;
         public async Task<NameValueCollection> GetFormCollectionAsync()
         {
-            if (_form == null)
+            if (_form == null 
+                && _httpContextAccessor.HttpContext.Request.Method == "POST"
+                && _httpContextAccessor.HttpContext.Request.ContentType == "application/x-www-form-urlencoded")
             {
                 _form = (await _httpContextAccessor.HttpContext.Request.ReadFormAsync()).AsNameValueCollection();
             }

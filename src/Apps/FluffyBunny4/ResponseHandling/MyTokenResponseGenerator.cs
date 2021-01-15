@@ -18,6 +18,7 @@ using FluffyBunny4.Stores;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny4.ResponseHandling
@@ -68,7 +69,9 @@ namespace FluffyBunny4.ResponseHandling
                     return await ProcessArbitraryIdentityTokenResponse(validationResult);
                     break;
                 default:
-                    return await base.ProcessTokenRequestAsync(validationResult);
+                    var response = await base.ProcessTokenRequestAsync(validationResult);
+                    response.Scope = validationResult.ValidatedRequest.RequestedScopes.ToSpaceSeparatedString();
+                    return response;
                     break;
             }
         }
@@ -238,8 +241,12 @@ namespace FluffyBunny4.ResponseHandling
             return tokenResonse;
         }
 
+      
         protected async override Task<(string accessToken, string refreshToken)> CreateAccessTokenAsync(ValidatedTokenRequest request)
         {
+            var formCollection = _scopedHttpContextRequestForm.GetFormCollection();
+            var grantType = formCollection["grant_type"];
+
             var tokenRequest = new TokenCreationRequest
             {
                 Subject = request.Subject,
@@ -357,11 +364,11 @@ namespace FluffyBunny4.ResponseHandling
                     _scopedStorage.TryGetValue(Constants.ScopedRequestType.PersistedGrantExtra, out obj);
                     var persistedGrantExtra =
                         _scopedStorage.Get<PersistedGrantExtra>(Constants.ScopedRequestType.PersistedGrantExtra);
-                    var subjectTokenType =
+                    var subjectToken =
                         _scopedStorage.Get<string>(Constants.ScopedRequestType.SubjectToken);
-
+                    var fixedSubjectToken = subjectToken.Substring(2);
                     var newKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(accessToken);
-                    var originalKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(subjectTokenType);
+                    var originalKey = referenceTokenStoreGrantStoreHashAccessor.GetHashedKey(fixedSubjectToken);
 
                     await _persistedGrantStore.CopyAsync(newKey, originalKey);
                     await _persistedGrantStore.RemoveAsync(newKey);
@@ -378,12 +385,11 @@ namespace FluffyBunny4.ResponseHandling
                     }
 
                     // we need to point the old access_token and refresh_token to this new set;
-                    return (subjectTokenType, null);  // mutate doesn't get to get the refresh_token back, the original holder of it is the only owner.
+                    return (subjectToken, null);  // mutate doesn't get to get the refresh_token back, the original holder of it is the only owner.
 
                 }
             }
-            var formCollection = _scopedHttpContextRequestForm.GetFormCollection();
-            var grantType = formCollection["grant_type"];
+          
 
             switch (grantType)
             {
