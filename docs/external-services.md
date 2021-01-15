@@ -36,15 +36,21 @@ The following is an example of what gets posted to the **myphotos** service auth
 ***NOTE***: Scopes must follow a strict convention where ***https://www.companyapis.com/auth/*** prepends all service scopes.  
 ```
 {
-  "authorization_type": "subject_and_scopes",
-  "subject": "1234abcd",
-  "scopes": [
-    "https://www.companyapis.com/auth/myphotos",
-    "https://www.companyapis.com/auth/myphotos.readonly",
-    "https://www.companyapis.com/auth/myphotos.modify"
-  ] 
+	"requester": {
+		"clientId": "e12b17b3-9528-4033-bb63-7223bae44d03",
+		"clientName": "SuperCorpClient",
+		"clientDescription": "Super Corp is our external Partner",
+		"namespace": "SuperCorp",
+		"tenant": "zep"
+	},
+	"authorization_type": "subject_and_scopes",
+	"subject": "1234abcd",
+	"scopes": [
+		"https://www.companyapis.com/auth/myphotos",
+		"https://www.companyapis.com/auth/myphotos.readonly",
+		"https://www.companyapis.com/auth/myphotos.modify"
+	]
 }
-
 ```
 ### Response
 ```
