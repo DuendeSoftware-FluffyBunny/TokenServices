@@ -215,64 +215,78 @@ namespace FluffyBunny4.Validation
             err = false;
 
 
+
+
+
+            // optional stuff;
+            var accessTokenTypeOverride = form.Get(Constants.AccessTokenType);
+            if (!string.IsNullOrWhiteSpace(accessTokenTypeOverride))
+            {
+                err = true;
+                if (string.Compare(accessTokenTypeOverride, "Reference", true) == 0 ||
+                    string.Compare(accessTokenTypeOverride, "Jwt", true) == 0)
+                {
+                    err = false;
+                }
+                if (err)
+                {
+                    los.Add($"{Constants.AccessTokenType} out of range.   Must be reference or jwt.");
+                }
+            }
+
+            error = error || err;
+            err = false;
+            
+            var idTokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(idTokenLifetimeOverride))
+            {
+                int idTokenLifetime = 0;
+                err = true;
+                if (int.TryParse(idTokenLifetimeOverride, out idTokenLifetime))
+                {
+                    if (idTokenLifetime > 0 
+                        && idTokenLifetime <= client.IdentityTokenLifetime)
+                    {
+                        // HERB: Setting this sets it for the global config.
+                        //client.AccessTokenLifetime = accessTokenLifetime;
+                        err = false;
+                    }
+                }
+                if (err)
+                {
+                    los.Add($"{Constants.IdTokenLifetime} out of range.   Must be > 0 and <= configured IdentityTokenLifetime:{client.IdentityTokenLifetime}.");
+                }
+            }
+            
+            error = error || err;
+            err = false;
+            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            {
+                int accessTokenLifetime = 0;
+                err = true;
+                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
+                {
+                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
+                    {
+                        err = false;
+                    }
+                }
+                if (err)
+                {
+                    los.Add($"{Constants.AccessTokenLifetime} out of range.   Must be > 0 and <= configured AccessTokenLifetime:{client.AccessTokenLifetime}.");
+                }
+            }
+
+            error = error || err;
+            err = false;
             if (error)
             {
                 context.Result.IsError = true;
                 context.Result.Error = string.Join<string>(" | ", los);
                 return;
             }
-            
-       
 
-            var accessTokenTypeOverride = form.Get(Constants.AccessTokenType);
-            if (!string.IsNullOrWhiteSpace(accessTokenTypeOverride))
-            {
-                error = true;
-                if (string.Compare(accessTokenTypeOverride, "Reference", true) == 0 ||
-                    string.Compare(accessTokenTypeOverride, "Jwt", true) == 0)
-                {
-                    error = false;
-                }
-                if (error)
-                {
-                    var errorDescription =
-                        $"{Constants.AccessTokenType} out of range.   Must be reference or jwt.";
-                    LogError(errorDescription);
-                    context.Result.IsError = true;
-                    context.Result.Error = errorDescription;
-                    context.Result.ErrorDescription = errorDescription;
-                    return;
-                }
-            }
-            
-            // optional stuff;
-            var idTokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
-            if (!string.IsNullOrWhiteSpace(idTokenLifetimeOverride))
-            {
-                int idTokenLifetime = 0;
-                error = true;
-                if (int.TryParse(idTokenLifetimeOverride, out idTokenLifetime))
-                {
-                    if (idTokenLifetime > 0 && idTokenLifetime <= client.AccessTokenLifetime)
-                    {
-                        // HERB: Setting this sets it for the global config.
-                        //client.AccessTokenLifetime = accessTokenLifetime;
-                        error = false;
-                    }
-                }
-                if (error)
-                {
-                    var errorDescription =
-                        $"{Constants.IdTokenLifetime} out of range.   Must be > 0 and <= configured IdTokenLifetime.";
-                    LogError(errorDescription);
-                    context.Result.IsError = true;
-                    context.Result.Error = errorDescription;
-                    context.Result.ErrorDescription = errorDescription;
-                    return;
-                }
-            }
-
-       
             if (idTokenArbitraryClaims != null)
             {
                 foreach (var arbitraryClaimSet in idTokenArbitraryClaims)

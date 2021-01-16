@@ -133,15 +133,24 @@ namespace FluffyBunny4.ResponseHandling
 
             var atClaims = accessTokenResultClaims.Distinct(new ClaimComparer()).ToList();
 
-            var tokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
-            int tokenLifetime = 0;
-            int.TryParse(tokenLifetimeOverride, out tokenLifetime);
+            var tokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            int accessTokenLifetime = validationResult.ValidatedRequest.Client.AccessTokenLifetime;
+            if (!string.IsNullOrWhiteSpace(tokenLifetimeOverride))
+            {
+                int.TryParse(tokenLifetimeOverride, out accessTokenLifetime);
+            }
+            tokenLifetimeOverride = form.Get(Constants.IdTokenLifetime);
+            int identityTokenLifetime = validationResult.ValidatedRequest.Client.IdentityTokenLifetime;
+            if (!string.IsNullOrWhiteSpace(tokenLifetimeOverride))
+            {
+                int.TryParse(tokenLifetimeOverride, out identityTokenLifetime);
+            }
 
             var at = new Token(OidcConstants.TokenTypes.AccessToken)
             {
                 CreationTime = Clock.UtcNow.UtcDateTime,
                 Issuer = issuer,
-                Lifetime = tokenLifetime,
+                Lifetime = accessTokenLifetime,
                 Claims = atClaims,
                 ClientId = validationResult.ValidatedRequest.ClientId,
                 //    Description = request.Description,
@@ -158,7 +167,7 @@ namespace FluffyBunny4.ResponseHandling
                 CreationTime = Clock.UtcNow.UtcDateTime,
                 //  Audiences = { aud },
                 Issuer = issuer,
-                Lifetime = tokenLifetime,
+                Lifetime = identityTokenLifetime,
                 Claims = resultClaims.Distinct(new ClaimComparer()).ToList(),
                 ClientId = validationResult.ValidatedRequest.ClientId,
                 AccessTokenType = validationResult.ValidatedRequest.AccessTokenType,
@@ -169,7 +178,7 @@ namespace FluffyBunny4.ResponseHandling
             {
                 AccessToken = accessToken,
                 IdentityToken = jwtIdToken,
-                AccessTokenLifetime = tokenLifetime
+                AccessTokenLifetime = accessTokenLifetime
             };
             return tokenResonse;
         }
@@ -203,8 +212,14 @@ namespace FluffyBunny4.ResponseHandling
             createRefreshToken = offlineAccessClaim != null;
 
             var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
-            int accessTokenLifetime = 0;
-            int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime);
+
+            int accessTokenLifetime = validationResult.ValidatedRequest.AccessTokenLifetime;
+            if(!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            {
+                int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime);
+            }
+       
+           
 
             var at = new Token(OidcConstants.TokenTypes.AccessToken)
             {

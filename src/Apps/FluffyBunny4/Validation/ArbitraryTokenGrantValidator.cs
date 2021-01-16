@@ -202,65 +202,56 @@ namespace FluffyBunny4.Validation
             err = false;
 
            
+           
+           
+            var claims = new List<Claim>();
+
+            // optional stuff;
+            var accessTokenTypeOverride = form.Get(Constants.AccessTokenType);
+            if (!string.IsNullOrWhiteSpace(accessTokenTypeOverride))
+            {
+                err = true;
+                if (string.Compare(accessTokenTypeOverride, "Reference", true) == 0 ||
+                    string.Compare(accessTokenTypeOverride, "Jwt", true) == 0)
+                {
+                    err = false;
+                }
+                if (err)
+                {
+                    los.Add($"{Constants.AccessTokenType} out of range.   Must be reference or jwt.");
+                }
+            }
+            error = error || err;
+            err = false;
+
+            
+            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
+            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
+            {
+                int accessTokenLifetime = 0;
+                err = true;
+                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
+                {
+                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
+                    {
+                        err = false;
+                    }
+                }
+                if (err)
+                {
+                    los.Add($"{Constants.AccessTokenLifetime} out of range.   Must be > 0 and <= configured AccessTokenLifetime:{client.AccessTokenLifetime}.");
+                }
+            }
+
+            error = error || err;
+            err = false;
             if (error)
             {
                 context.Result.IsError = true;
                 context.Result.Error = string.Join<string>(" | ", los);
                 return;
             }
-           
-            var claims = new List<Claim>();
 
-
-            var accessTokenTypeOverride = form.Get(Constants.AccessTokenType);
-            if (!string.IsNullOrWhiteSpace(accessTokenTypeOverride))
-            {
-                error = true;
-                if (string.Compare(accessTokenTypeOverride, "Reference", true) == 0 ||
-                    string.Compare(accessTokenTypeOverride, "Jwt", true) == 0)
-                {
-                    error = false;
-                }
-                if (error)
-                {
-                    var errorDescription =
-                        $"{Constants.AccessTokenType} out of range.   Must be reference or jwt.";
-                    LogError(errorDescription);
-                    context.Result.IsError = true;
-                    context.Result.Error = errorDescription;
-                    context.Result.ErrorDescription = errorDescription;
-                    return;
-                }
-            }
-            
-            // optional stuff;
-            var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
-            if (!string.IsNullOrWhiteSpace(accessTokenLifetimeOverride))
-            {
-                int accessTokenLifetime = 0;
-                error = true;
-                if (int.TryParse(accessTokenLifetimeOverride, out accessTokenLifetime))
-                {
-                    if (accessTokenLifetime > 0 && accessTokenLifetime <= client.AccessTokenLifetime)
-                    {
-                        // HERB: Setting this sets it for the global config.
-                        //client.AccessTokenLifetime = accessTokenLifetime;
-                        error = false;
-                    }
-                }
-                if (error)
-                {
-                    var errorDescription =
-                        $"{Constants.AccessTokenLifetime} out of range.   Must be > 0 and <= configured AccessTokenLifetime.";
-                    LogError(errorDescription);
-                    context.Result.IsError = true;
-                    context.Result.Error = errorDescription;
-                    context.Result.ErrorDescription = errorDescription;
-                    return;
-                }
-            }
-
-             
             if (arbitraryClaims != null)
             {
                 foreach (var arbitraryClaimSet in arbitraryClaims)
