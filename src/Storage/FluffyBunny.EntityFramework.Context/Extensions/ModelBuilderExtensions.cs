@@ -47,6 +47,19 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
             });
 
         }
+        public static void ConfigureAllowedTokenExchangeSubjectTokenTypeContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AllowedTokenExchangeSubjectTokenType>(entity =>
+            {
+                entity.ToTable("AllowedTokenExchangeSubjectTokenType");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.SubjectTokenType).HasMaxLength(64).IsRequired();
+                entity.HasIndex(x => x.SubjectTokenType).IsUnique();
+
+            });
+
+        }
+        
 
         public static void ConfigureAllowedTokenExchangeExternalServiceContext(this ModelBuilder modelBuilder)
         {

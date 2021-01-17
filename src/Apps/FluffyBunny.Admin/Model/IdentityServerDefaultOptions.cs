@@ -6,6 +6,7 @@ namespace FluffyBunny.Admin.Model
     {
         public List<string> AvailableGrantTypes { get; set; }
         public List<string> AvailableRevokeTokenTypeHints { get; set; }
-
+        public List<string> AvailableSubjectTokenTypes { get; set; }
+        
     }
 }

@@ -94,6 +94,7 @@ namespace FluffyBunny4.Models
         public string Namespace { get; set; }
         public ICollection<string> AllowedArbitraryIssuers { get; set; } = new HashSet<string>();
         public ICollection<string> AllowedRevokeTokenTypeHints { get; set; } = new HashSet<string>();
+        public ICollection<string> AllowedTokenExchangeSubjectTokenTypes { get; set; } = new HashSet<string>();
         public ICollection<string> AllowedTokenExchangeExternalServices { get; set; } = new HashSet<string>();
         
     }

@@ -140,6 +140,20 @@
 
                         </td>
                     </tr>
+                    <tr>
+                        <td class="w-50">
+                            <a class="btn btn-sm btn-primary" asp-page="./AllowedTokenExchangeSubjectTokenType/Index" asp-route-id="@Model.Entity.Id">Allowed TokenExchange Subject Token Type</a>
+                        </td>
+                        <td class="w-50">
+                            @foreach (var item in Model.Entity.AllowedTokenExchangeSubjectTokenTypes)
+                            {
+                                <div class="checkbox">
+                                    @item.SubjectTokenType
+                                </div>
+                            }
+
+                        </td>
+                    </tr>
                         <tr>
                             <td class="w-50">
                                 <a class="btn btn-sm btn-primary" asp-page="./AllowedScopes/Index" asp-route-id="@Model.Entity.Id">Allowed Scopes</a>

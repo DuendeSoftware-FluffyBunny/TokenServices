@@ -69,6 +69,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         NameDesc,
         NameAsc
     }
+    public enum ClientAllowedTokenExchangeSubjectTokenTypesSortType
+    {
+        NameDesc,
+        NameAsc
+    }
     
     public enum SecretsSortType
     {
@@ -167,6 +172,16 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task DeleteClientAllowedTokenExchangeExternalServiceByIdAsync(string tenantName, int clientId, int id);
         Task<IEnumerable<AllowedTokenExchangeExternalService>> GetAllClientAllowedTokenExchangeExternalServicesAsync(string tenantName, int clientId, ClientAllowedTokenExchangeExternalServicesSortType sortType = ClientAllowedTokenExchangeExternalServicesSortType.NameDesc);
         #endregion
+
+        #region ClientAllowedTokenExchangeSubjectTokenType
+        Task UpsertClientAllowedTokenExchangeSubjectTokenTypeAsync(string tenantName, int clientId, AllowedTokenExchangeSubjectTokenType entity);
+
+        Task<AllowedTokenExchangeSubjectTokenType> GetClientAllowedTokenExchangeSubjectTokenTypeByIdAsync(string tenantName, int clientId, int id);
+        Task<AllowedTokenExchangeSubjectTokenType> GetClientAllowedTokenExchangeSubjectTokenTypeByNameAsync(string tenantName, int clientId, string name);
+        Task DeleteClientAllowedTokenExchangeSubjectTokenTypeByIdAsync(string tenantName, int clientId, int id);
+        Task<IEnumerable<AllowedTokenExchangeSubjectTokenType>> GetAllClientAllowedTokenExchangeSubjectTokenTypesAsync(string tenantName, int clientId, ClientAllowedTokenExchangeSubjectTokenTypesSortType sortType = ClientAllowedTokenExchangeSubjectTokenTypesSortType.NameDesc);
+        #endregion
+
         #region ClientSecret
 
         Task UpsertClientSecretAsync(string tenantName, int clientId, ClientSecret entity);

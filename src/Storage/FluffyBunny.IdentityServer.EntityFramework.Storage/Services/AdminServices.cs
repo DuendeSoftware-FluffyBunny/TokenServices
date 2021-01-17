@@ -729,6 +729,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedArbitraryIssuers)
                 .Include(x => x.AllowedRevokeTokenTypeHints)
                 .Include(x => x.AllowedTokenExchangeExternalServices)
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
 
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -749,7 +750,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .Include(x => x.AllowedArbitraryIssuers)
                 .Include(x => x.AllowedRevokeTokenTypeHints)
                 .Include(x => x.AllowedTokenExchangeExternalServices)
-            
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             return clientInDb;
@@ -1433,6 +1435,133 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                     break;
                 case ClientAllowedTokenExchangeExternalServicesSortType.NameAsc:
                     entities = entities.OrderBy(t => t.ExternalService);
+                    break;
+
+            }
+
+            return entities;
+        }
+
+        public async Task UpsertClientAllowedTokenExchangeSubjectTokenTypeAsync(string tenantName, int clientId, AllowedTokenExchangeSubjectTokenType entity)
+        {
+            entity.SubjectTokenType = entity.SubjectTokenType.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+
+
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+                .FirstOrDefaultAsync();
+
+            var existing = (from item in clientInDb.AllowedTokenExchangeSubjectTokenTypes
+                            where item.SubjectTokenType == entity.SubjectTokenType
+                            select item).FirstOrDefault();
+            if (existing != null)
+            {
+                return; // already here
+            }
+            existing = (from item in clientInDb.AllowedTokenExchangeSubjectTokenTypes
+                        where item.Id == entity.Id
+                select item).FirstOrDefault();
+
+            if (existing != null)
+            {
+                // name update
+                existing.SubjectTokenType = entity.SubjectTokenType;
+            }
+            else
+            {
+                // brand new
+                clientInDb.AllowedTokenExchangeSubjectTokenTypes.Add(entity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<AllowedTokenExchangeSubjectTokenType> GetClientAllowedTokenExchangeSubjectTokenTypeByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedTokenExchangeSubjectTokenTypes.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                clientInDb.AllowedTokenExchangeSubjectTokenTypes.Remove(existing);
+                await tenantContext.SaveChangesAsync();
+            }
+            return existing;
+        }
+
+        public async Task<AllowedTokenExchangeSubjectTokenType> GetClientAllowedTokenExchangeSubjectTokenTypeByNameAsync(string tenantName, int clientId, string name)
+        {
+            name = name.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+            var existing = clientInDb.AllowedTokenExchangeSubjectTokenTypes.FirstOrDefault(x => x.SubjectTokenType == name);
+            return existing;
+        }
+
+        public async Task DeleteClientAllowedTokenExchangeSubjectTokenTypeByIdAsync(string tenantName, int clientId, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+                .FirstOrDefaultAsync();
+
+            var existing = clientInDb.AllowedTokenExchangeSubjectTokenTypes.FirstOrDefault(x => x.Id == id);
+            if (existing != null)
+            {
+                clientInDb.AllowedTokenExchangeSubjectTokenTypes.Remove(existing);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<AllowedTokenExchangeSubjectTokenType>> GetAllClientAllowedTokenExchangeSubjectTokenTypesAsync(string tenantName, int clientId, ClientAllowedTokenExchangeSubjectTokenTypesSortType sortType = ClientAllowedTokenExchangeSubjectTokenTypesSortType.NameDesc)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var query =
+                from client in tenantContext.Clients
+                where client.Id == clientId
+                select client;
+
+            var clientInDb = await query
+                .Include(x => x.AllowedTokenExchangeSubjectTokenTypes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            var entities = from item in clientInDb.AllowedTokenExchangeSubjectTokenTypes
+                           select item;
+            switch (sortType)
+            {
+                case ClientAllowedTokenExchangeSubjectTokenTypesSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.SubjectTokenType);
+                    break;
+                case ClientAllowedTokenExchangeSubjectTokenTypesSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.SubjectTokenType);
                     break;
 
             }

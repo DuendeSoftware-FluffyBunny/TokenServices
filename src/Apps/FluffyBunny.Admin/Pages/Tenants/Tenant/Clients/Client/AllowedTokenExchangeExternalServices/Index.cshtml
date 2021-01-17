@@ -1,0 +1,56 @@
+﻿@page
+@model FluffyBunny.Admin.Pages.Tenants.Tenant.Clients.Client.AllowedTokenExchangeExternalServices.IndexModel
+@{
+    ViewData["Title"] = "Allowed External Services";
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Index">Tenants</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Index">@Model.TenantId</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Clients/Index">Clients</a></li>
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Tenants/Tenant/Clients/Client/Index" asp-route-id="@Model.ClientId">Client</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+<div class="card">
+
+    <form id="manage-client-allowed-scopes" method="post">
+        <input hidden asp-for="TenantId" class="form-control" />
+        <input hidden asp-for="ClientId" class="form-control" />
+        <div class="card">
+
+            @if (Model.AllowedTokenExchangeExternalServiceContainers.Any())
+            {
+                <div class="card-body">
+                    <table class="table">
+
+                        <tbody class="table-body ">
+                        @for (int i = 0; i < Model.AllowedTokenExchangeExternalServiceContainers.Count; i++)
+                        {
+                            <tr>
+                                <td class="w-50">
+                                    <label>@Model.AllowedTokenExchangeExternalServiceContainers[i].AllowedTokenExchangeExternalService.ExternalService</label>
+                                </td>
+                                <td class="w-50">
+                                    <input asp-for="AllowedTokenExchangeExternalServiceContainers[i].AllowedTokenExchangeExternalService.ExternalService" hidden class="form-control" />
+                                    <input asp-for="AllowedTokenExchangeExternalServiceContainers[i].Enabled" />
+                                    <label>Allow</label>
+                                </td>
+                            </tr>
+                        }
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-muted">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+
+            }
+
+        </div>
+    </form>
+
+
+
+</div>
