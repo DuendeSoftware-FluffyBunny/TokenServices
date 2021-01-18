@@ -1,3 +1,10 @@
+# [Azure's on-behalf-of (OBO)](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow)  
+This is really nothing more than a OAuth2 token_exchange flow where the subject_token == access_token.  The requirement for both the Azure OBO and the OAuth2 flows is that the access_token must be valid and contain a known subject.  
+
+Why Azure would cook their own OBO vs just using the OAuth2 token_exchange specification is for them to answer.
+
+Saying that, this token_service supports passing an access_token via the token_exchange flow.
+
 # token_exchange_mutate vs on-behalf-of (OBO)
 
 Both of these try to address the "Oops, that access_token that I have isn't going to work for that downstream service" problem.  
