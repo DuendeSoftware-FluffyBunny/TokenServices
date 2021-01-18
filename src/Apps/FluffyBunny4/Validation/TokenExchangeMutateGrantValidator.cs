@@ -203,9 +203,16 @@ namespace FluffyBunny4.Validation
                         err = true;
                         los.Add($"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
                     }
-
                     subject = validatedResultAccessToken.Claims
-                        .FirstOrDefault(claim => claim.Type == JwtClaimTypes.Subject).Value;
+                        .Where(item => item.Type == JwtClaimTypes.Subject)
+                        .Select(item => item.Value)
+                        .FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(subject))
+                    {
+                        err = true;
+                        los.Add($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                    }
+
 
                     claims = validatedResultAccessToken.Claims.ToList();
                     var amr = claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.AuthenticationMethod &&

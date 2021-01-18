@@ -37,6 +37,12 @@ namespace FluffyBunny4.Stores
             return GetHashedKey(value);
         }
 
+        protected override Task RemoveItemAsync(string key)
+        {
+            var subKey = key.Substring(2);
+            return base.RemoveItemAsync(subKey);
+        }
+
         protected override Task<Token> GetItemAsync(string key)
         {
             var subKey = key.Substring(2);

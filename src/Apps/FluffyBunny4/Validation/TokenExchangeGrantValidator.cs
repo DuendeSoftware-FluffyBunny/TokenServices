@@ -42,6 +42,7 @@ namespace FluffyBunny4.Validation
         private IConsentDiscoveryCacheAccessor _consentDiscoveryCacheAccessor;
         private TokenExchangeOptions _tokenExchangeOptions;
         private IIdentityTokenValidator _identityTokenValidator;
+        private readonly ITokenValidator _tokenValidator;
         private ILogger _logger;
         private IScopedContext<TenantRequestContext> _scopedTenantRequestContext;
 
@@ -63,6 +64,7 @@ namespace FluffyBunny4.Validation
             IConsentDiscoveryCacheAccessor consentDiscoveryCacheAccessor,
             IOptions<TokenExchangeOptions> tokenExchangeOptions,
             IIdentityTokenValidator identityTokenValidator,
+            ITokenValidator tokenValidator,
             ILogger<TokenExchangeGrantValidator> logger)
         {
             _scopedTenantRequestContext = scopedTenantRequestContext;
@@ -76,6 +78,7 @@ namespace FluffyBunny4.Validation
             _consentDiscoveryCacheAccessor = consentDiscoveryCacheAccessor;
             _tokenExchangeOptions = tokenExchangeOptions.Value;
             _identityTokenValidator = identityTokenValidator;
+            _tokenValidator = tokenValidator;
             _logger = logger;
         }
 
@@ -206,45 +209,19 @@ namespace FluffyBunny4.Validation
                 err = true;
                 los.Add($"{FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType} is required");
             }
-            error = error || err;
-            err = false;
-
-            var subject = "";
-            switch (subjectTokenType)
-            {
-
-                case FluffyBunny4.Constants.TokenExchangeTypes.IdToken:
-                 
-                    var validatedResult = await _identityTokenValidator.ValidateIdTokenAsync(subjectToken, _tokenExchangeOptions.AuthorityKey);
-                    if (validatedResult.IsError)
-                    {
-                        err = true;
-                        los.Add($"failed to validate id_token");
-                        _logger.LogError( $"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}\nError={validatedResult.Error}");
-                    }
-
-                    subject = SubjectFromClaimsPrincipal(validatedResult.User);
-                    if (string.IsNullOrWhiteSpace(subject))
-                    {
-                        err = true;
-                        los.Add($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
-                    }
-                   
-
-                    break;
-                default:
+            else
+            {  
+                // check to see if the subjectTokenType is allowed
+                var allowedSubjectTokenType = client.AllowedTokenExchangeSubjectTokenTypes.FirstOrDefault(x => x == subjectTokenType);
+                if (string.IsNullOrWhiteSpace(allowedSubjectTokenType))
+                {
+                    // not here
                     err = true;
-                    los.Add( $"not supported: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
-                    break;
+                    los.Add($"{subjectTokenType} is NOT allowed for this client");
+                }
             }
             error = error || err;
             err = false;
-
-       
-
-           
-
-            var finalCustomPayload = new Dictionary<string, object>();
          
             var requestedScopesRaw = form[Constants.Scope].Split(' ').Distinct().ToList();
             var requestedServiceScopes = GetServiceToScopesFromRequest(requestedScopesRaw);
@@ -270,12 +247,63 @@ namespace FluffyBunny4.Validation
                     err = true;
                     var message = $"external_service:{externalService.Name} is not allowed for this client";
                     los.Add(message);
-                    _logger.LogError(message);
-
                 }
             }
             error = error || err;
             err = false;
+
+            var subject = "";
+            if (!error)
+            {
+                switch (subjectTokenType)
+                {
+
+                    case FluffyBunny4.Constants.TokenExchangeTypes.IdToken:
+
+                        var validatedResult = await _identityTokenValidator.ValidateIdTokenAsync(subjectToken, _tokenExchangeOptions.AuthorityKey);
+                        if (validatedResult.IsError)
+                        {
+                            err = true;
+                            los.Add($"failed to validate id_token");
+                            _logger.LogError($"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}\nError={validatedResult.Error}");
+                        }
+
+                        subject = SubjectFromClaimsPrincipal(validatedResult.User);
+                        if (string.IsNullOrWhiteSpace(subject))
+                        {
+                            err = true;
+                            los.Add($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                        }
+
+
+                        break;
+                    case FluffyBunny4.Constants.TokenExchangeTypes.AccessToken:
+                        var validatedResultAccessToken = await _tokenValidator.ValidateAccessTokenAsync(subjectToken);
+                        if (validatedResultAccessToken.IsError)
+                        {
+                            err = true;
+                            los.Add($"failed to validate: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.AccessToken}={subjectToken}");
+                        }
+
+                        subject = validatedResultAccessToken.Claims
+                                .Where(item => item.Type == JwtClaimTypes.Subject)
+                                .Select(item => item.Value)
+                                .FirstOrDefault();
+                        if (string.IsNullOrWhiteSpace(subject))
+                        {
+                            err = true;
+                            los.Add($"subject does not exist: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                        }
+
+                        break;
+                    default:
+                        err = true;
+                        los.Add($"not supported: {FluffyBunny4.Constants.TokenExchangeTypes.SubjectTokenType}={subjectTokenType},{FluffyBunny4.Constants.TokenExchangeTypes.SubjectToken}={subjectToken}");
+                        break;
+                }
+                error = error || err;
+                err = false;
+            }
 
             if (error)
             {
@@ -285,6 +313,7 @@ namespace FluffyBunny4.Validation
                 return;
             }
 
+            var finalCustomPayload = new Dictionary<string, object>();
             foreach (var serviceScopeSet in requestedServiceScopes)
             {
 
