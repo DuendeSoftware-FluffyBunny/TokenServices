@@ -1,0 +1,39 @@
+name: MAIN CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+env:
+    BuildNumber: $(date +%s)
+jobs:
+ 
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Dump Github Environment Variables
+      id: buildnumber
+      run: |
+        echo 'HOME':${{ env.HOME}}
+        echo 'GITHUB_RUN_ID':${{ env.GITHUB_RUN_ID}}
+        echo 'GITHUB_RUN_NUMBER':${{ env.GITHUB_RUN_NUMBER}}
+        echo "::set-output name=build_number::$(date +%s)"
+    
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v2
+
+    - name: 'az login'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Build Image'
+      run: |
+        echo 'BuildNumber':${{ steps.buildnumber.outputs.build_number }}
+        
+        docker build . --file Dockerfile-Build                            --tag fluffybunny4/build
+        docker images
+    
