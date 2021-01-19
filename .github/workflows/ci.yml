@@ -40,6 +40,7 @@ jobs:
         docker build . --file ./Dockerfile-TokenService            --tag fluffybunny4/tokenservice:${{ steps.buildnumber.outputs.build_number }} 
         docker build . --file ./Dockerfile-WebAppExternalLogin     --tag fluffybunny4/webappexternallogin:${{ steps.buildnumber.outputs.build_number }} 
         docker build . --file ./Dockerfile-OIDCConsentOrchestrator --tag fluffybunny4/oidcconsentorchestrator:${{ steps.buildnumber.outputs.build_number }} 
+        docker build . --file ./Dockerfile-IdentityServerHost      --tag fluffybunny4/identityserverhost:${{ steps.buildnumber.outputs.build_number }} 
 
  
         docker images

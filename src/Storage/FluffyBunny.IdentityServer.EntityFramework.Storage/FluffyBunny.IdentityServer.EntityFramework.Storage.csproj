@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Apps\FluffyBunny4.DotNetCore\FluffyBunny4.DotNetCore.csproj" />
     <ProjectReference Include="..\..\Apps\FluffyBunny4\FluffyBunny4.csproj" />
-    <ProjectReference Include="..\EntityFramework.Entities\FluffyBunny.EntityFramework.Entities.csproj" />
     <ProjectReference Include="..\FluffyBunny.EntityFramework.Context\FluffyBunny.EntityFramework.Context.csproj" />
     <ProjectReference Include="..\FluffyBunny.EntityFramework.Entities\FluffyBunny.EntityFramework.Entities.csproj" />
   </ItemGroup>
