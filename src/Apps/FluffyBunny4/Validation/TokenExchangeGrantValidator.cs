@@ -20,6 +20,7 @@ using FluffyBunny4.Stores;
 using Microsoft.Extensions.Options;
 using FluffyBunny4.Configuration;
 using FluffyBunny4.DotNetCore.Services;
+using FluffyBunny4.Models.Client;
 using IdentityModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -82,6 +83,11 @@ namespace FluffyBunny4.Validation
             _logger = logger;
         }
 
+        public class PostContext
+        {
+            public KeyValuePair<string, List<string>> ServiceScopeSet { get; internal set; }
+            public ConsentDiscoveryDocumentResponse DiscoveryDocument { get; set; }
+        }
         public string GrantType => Constants.GrantType.TokenExchange;
         Dictionary<string,List<string>> GetServiceToScopesFromRequest(List<string> requestedScopes)
         {
@@ -313,6 +319,7 @@ namespace FluffyBunny4.Validation
                 return;
             }
 
+            var consentAuthorizeResponseTasks = new List<Task<ConsentAuthorizeResponseContainer<PostContext>>>();
             var finalCustomPayload = new Dictionary<string, object>();
             foreach (var serviceScopeSet in requestedServiceScopes)
             {
@@ -370,45 +377,60 @@ namespace FluffyBunny4.Validation
                         }
                     };
 
-                    var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
-                    if (response.Error != null)
+                    // How to send many requests in parallel in ASP.Net Core
+                    // https://www.michalbialecki.com/2018/04/19/how-to-send-many-requests-in-parallel-in-asp-net-core/
+                    var task = _consentExternalService.PostAuthorizationRequestAsync(doco, request, new PostContext()
                     {
-                        _logger.LogError($"ExternalService:{serviceScopeSet.Key},Error:{response.Error.Message}");
-
-                    }
-                    else if (response.Authorized)
-                    {
-                        switch (doco.AuthorizationType)
-                        {
-
-                            case Constants.AuthorizationTypes.SubjectAndScopes:
-                                // make sure no funny business is coming in from the auth call.
-                                var serviceRoot = $"{_tokenExchangeOptions.BaseScope}{serviceScopeSet.Key}";
-                                var query = (from item in response.Scopes
-                                    where item.StartsWith(serviceRoot)
-                                    select item);
-                                _scopedOverrideRawScopeValues.Scopes.AddRange(query);
-                                if (response.Claims != null && response.Claims.Any())
-                                {
-                                    foreach (var cac in response.Claims)
-                                    {
-                                        // namespace the claims.
-                                        _scopedOptionalClaims.Claims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
-                                            cac.Value));
-                                    }
-                                }
-
-                                if (response.CustomPayload != null)
-                                {
-                                    finalCustomPayload.Add(serviceScopeSet.Key, response.CustomPayload);
-                                }
-
-                                break;
-                        }
-                    }
-                    _logger.LogInformation($"ExternalService:{serviceScopeSet.Key},Authorized:{response.Authorized}");
+                        ServiceScopeSet  = serviceScopeSet,
+                        DiscoveryDocument = doco
+                    });
+                    consentAuthorizeResponseTasks.Add(task);
+                    
                 }
             }
+            var consentAuthorizeResponses = await Task.WhenAll(consentAuthorizeResponseTasks);
+            foreach (var consentAuthorizeResponse in consentAuthorizeResponses)
+            {
+                var response = consentAuthorizeResponse.Response;
+                var serviceScopeSet = consentAuthorizeResponse.Context.ServiceScopeSet;
+                var doco = consentAuthorizeResponse.Context.DiscoveryDocument;
+                if (response.Error != null)
+                {
+                    _logger.LogError($"ExternalService:{serviceScopeSet.Key},Error:{response.Error.Message}");
+
+                }
+                else if (response.Authorized)
+                {
+                    switch (doco.AuthorizationType)
+                    {
+
+                        case Constants.AuthorizationTypes.SubjectAndScopes:
+                            // make sure no funny business is coming in from the auth call.
+                            var serviceRoot = $"{_tokenExchangeOptions.BaseScope}{serviceScopeSet.Key}";
+                            var query = (from item in response.Scopes
+                                where item.StartsWith(serviceRoot)
+                                select item);
+                            _scopedOverrideRawScopeValues.Scopes.AddRange(query);
+                            if (response.Claims != null && response.Claims.Any())
+                            {
+                                foreach (var cac in response.Claims)
+                                {
+                                    // namespace the claims.
+                                    _scopedOptionalClaims.Claims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
+                                        cac.Value));
+                                }
+                            }
+
+                            if (response.CustomPayload != null)
+                            {
+                                finalCustomPayload.Add(serviceScopeSet.Key, response.CustomPayload);
+                            }
+
+                            break;
+                    }
+                }
+            }
+
             if (finalCustomPayload.Any())
             {
                 _scopedOptionalClaims.Claims.Add(new Claim(

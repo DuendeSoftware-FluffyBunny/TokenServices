@@ -87,6 +87,14 @@ namespace TokenService
             };
             return JsonSerializer.Serialize(obj, jsonSerializerOptions);
         }
+
+        void LogOptions<T>(string key) where T:class
+        {
+            var config = Configuration
+                .GetSection(key)
+                .Get<T>();
+            _logger.LogDebug($"{key}:{ToJson(config)}");
+        }
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -102,18 +110,19 @@ namespace TokenService
                 var keyVaultSigningOptions = Configuration
                     .GetSection("KeyVaultSigningOptions")
                     .Get<KeyVaultSigningOptions>();
-                _logger.LogDebug($"keyVaultName:{ToJson(keyVaultSigningOptions)}");
+                
 
-                var cosmosDbConfiguration = Configuration
-                    .GetSection("CosmosDbConfiguration")
-                    .Get<CosmosDbConfiguration>();
-                _logger.LogDebug($"cosmosDbConfiguration:{ToJson(cosmosDbConfiguration)}");
-
-
+                LogOptions<KeyVaultSigningOptions>("KeyVaultSigningOptions");
+                LogOptions<CosmosDbConfiguration>("CosmosDbConfiguration");
+                LogOptions<IdentityServerOptions>("IdentityServer");
+                LogOptions<TokenExchangeOptions>("TokenExchangeOptions");
+                LogOptions<ExternalServicesOptions>("ExternalServicesOptions");
 
                 services.Configure<IdentityServerOptions>(Configuration.GetSection("IdentityServer"));
                 services.Configure<KeyVaultSigningOptions>(Configuration.GetSection("KeyVaultSigningOptions"));
                 services.Configure<TokenExchangeOptions>(Configuration.GetSection("TokenExchangeOptions"));
+                services.Configure<ExternalServicesOptions>(Configuration.GetSection("ExternalServicesOptions"));
+                
                 _logger.LogInformation($"HostingEnvironment.EnvironmentNam:{HostingEnvironment.EnvironmentName}");
                 if (HostingEnvironment.IsDevelopment())
                 {

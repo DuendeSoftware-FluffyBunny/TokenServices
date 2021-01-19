@@ -5,17 +5,25 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using FluffyBunny4.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace FluffyBunny4.Services
 {
     public class ConsentExternalService : IConsentExternalService
     {
+        private ExternalServicesOptions _options;
         private IHttpClientFactory _httpClientFactory;
         private ILogger<ConsentExternalService> _logger;
 
-        public ConsentExternalService(IHttpClientFactory httpClientFactory, ILogger<ConsentExternalService> logger)
+        public ConsentExternalService(
+            IOptions<ExternalServicesOptions> options,
+            IHttpClientFactory httpClientFactory, 
+            ILogger<ConsentExternalService> logger)
         {
+            _options = options.Value;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
@@ -24,7 +32,7 @@ namespace FluffyBunny4.Services
         {
             return _httpClientFactory.CreateClient(FluffyBunny4.Constants.ExternalServiceClient.HttpClientName);
         }
-        private static async Task<HttpResponseMessage> PostJsonContentAsync<T>(string uri, HttpClient httpClient, T obj)
+        private static async Task<HttpResponseMessage> PostJsonContentAsync<T>(string uri, HttpClient httpClient, T obj, CancellationToken cancellationToken)
         {
 
             var postRequest = new HttpRequestMessage(HttpMethod.Post, uri)
@@ -32,25 +40,29 @@ namespace FluffyBunny4.Services
                 Content = JsonContent.Create(obj)
             };
 
-            var postResponse = await httpClient.SendAsync(postRequest);
+            var postResponse = await httpClient.SendAsync(postRequest, cancellationToken);
 
             // postResponse.EnsureSuccessStatusCode();
 
             return postResponse;
         }
 
-        public async Task<ConsentAuthorizeResponse> PostAuthorizationRequestAsync(
+        public async Task<ConsentAuthorizeResponseContainer<T>> PostAuthorizationRequestAsync<T>(
             ConsentDiscoveryDocumentResponse discovery,
-            ConsentAuthorizeRequest requestObject)
+            ConsentAuthorizeRequest requestObject,
+            T context) where T: class
         {
+            var response = new ConsentAuthorizeResponseContainer<T> {Context = context};
             try
             {
+                var s_cts = new CancellationTokenSource(); 
+                s_cts.CancelAfter(_options.RequestTimeout);
                 var httpClient = GetHttpClient();
-                using var httpResponse = await PostJsonContentAsync(discovery.AuthorizeEndpoint, httpClient, requestObject);
+                using var httpResponse = await PostJsonContentAsync(discovery.AuthorizeEndpoint, httpClient, requestObject, s_cts.Token);
 
                 if (!httpResponse.IsSuccessStatusCode)
                 {
-                    var result = new ConsentAuthorizeResponse()
+                    response.Response = new ConsentAuthorizeResponse()
                     {
                         Subject = requestObject.Subject,
                         Scopes = requestObject.Scopes,
@@ -64,10 +76,10 @@ namespace FluffyBunny4.Services
                     if (httpResponse.Content is object)
                     {
                         var contentText = await httpResponse.Content.ReadAsStringAsync();
-                        result.Error.Message = contentText;
+                        response.Response.Error.Message = contentText;
                     }
-                    _logger.LogError($"authorizationEndPoint={discovery.AuthorizeEndpoint},statusCode={httpResponse.StatusCode},content=\'{result.Error.Message}\'");
-                    return result;
+                    _logger.LogError($"authorizationEndPoint={discovery.AuthorizeEndpoint},statusCode={httpResponse.StatusCode},content=\'{response.Response.Error.Message}\'");
+                    return response;
                 }
 
 
@@ -76,14 +88,15 @@ namespace FluffyBunny4.Services
                     var contentStream = await httpResponse.Content.ReadAsStreamAsync();
 
                     var consentAuthorizeResponse = await System.Text.Json.JsonSerializer.DeserializeAsync<ConsentAuthorizeResponse>(contentStream, new System.Text.Json.JsonSerializerOptions { IgnoreNullValues = true, PropertyNameCaseInsensitive = true });
-                    return consentAuthorizeResponse;
+                    response.Response = consentAuthorizeResponse;
+                    return response;
                 }
                 throw new Exception("HTTP Response was invalid and cannot be deserialized.");
 
             }
             catch (Exception ex)
             {
-                var result = new ConsentAuthorizeResponse()
+                response.Response = new ConsentAuthorizeResponse()
                 {
                     Subject = requestObject.Subject,
                     Scopes = requestObject.Scopes,
@@ -94,7 +107,7 @@ namespace FluffyBunny4.Services
                         StatusCode = (int)HttpStatusCode.BadRequest
                     }
                 };
-                return result;
+                return response;
             }
         }
     }

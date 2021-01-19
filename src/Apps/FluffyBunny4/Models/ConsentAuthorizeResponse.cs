@@ -3,6 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace FluffyBunny4.Models
 {
+    public class ConsentAuthorizeResponseContainer<T> where T : class
+    {
+        public T Context { get; set; }
+        public ConsentAuthorizeResponse Response { get; set; }
+    }
     public class ConsentAuthorizeResponse : ConsentBaseResponse
     {
         public class ConsentAuthorizeClaim

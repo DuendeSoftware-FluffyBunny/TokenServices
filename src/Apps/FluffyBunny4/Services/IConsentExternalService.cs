@@ -8,6 +8,6 @@ namespace FluffyBunny4.Services
 {
     public interface IConsentExternalService
     {
-        Task<ConsentAuthorizeResponse> PostAuthorizationRequestAsync(ConsentDiscoveryDocumentResponse discovery, ConsentAuthorizeRequest requestObject);
+        Task<ConsentAuthorizeResponseContainer<T>> PostAuthorizationRequestAsync<T>(ConsentDiscoveryDocumentResponse discovery, ConsentAuthorizeRequest requestObject,T context) where T:class;
     }
 }

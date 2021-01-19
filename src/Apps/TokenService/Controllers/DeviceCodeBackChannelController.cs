@@ -15,6 +15,7 @@ using FluffyBunny4.Cache;
 using FluffyBunny4.Configuration;
 using FluffyBunny4.DotNetCore.Services;
 using FluffyBunny4.Models;
+using FluffyBunny4.Models.Client;
 using FluffyBunny4.Services;
 using FluffyBunny4.Stores;
 using IdentityModel;
@@ -67,7 +68,12 @@ namespace TokenService.Controllers
             _logger = logger;
         }
 
- 
+        public class PostContext
+        {
+            public KeyValuePair<string, List<string>> ServiceScopeSet { get; internal set; }
+            public ConsentDiscoveryDocumentResponse DiscoveryDocument { get; set; }
+        }
+
         [HttpGet]
         [Route("device-code-by-user-code")]
         public async Task<ActionResult<DeviceCode>> GetDeviceCodeByUserCodeAsync(string userCode)
@@ -237,6 +243,8 @@ namespace TokenService.Controllers
                 var allowedScopes = new List<string>();
                 var allowedClaims = new List<Claim>();
                 var finalCustomPayload = new Dictionary<string, object>();
+
+                var consentAuthorizeResponseTasks = new List<Task<ConsentAuthorizeResponseContainer<PostContext>>>();
                 var requestedServiceScopes = GetServiceToScopesFromRequest(deviceAuth.RequestedScopes.ToList());
                 foreach (var serviceScopeSet in requestedServiceScopes)
                 {
@@ -287,41 +295,56 @@ namespace TokenService.Controllers
                                 Tenant = client.TenantName
                             }
                         };
-                        var response = await _consentExternalService.PostAuthorizationRequestAsync(doco, request);
-                        if (response.Error != null)
+                        // How to send many requests in parallel in ASP.Net Core
+                        // https://www.michalbialecki.com/2018/04/19/how-to-send-many-requests-in-parallel-in-asp-net-core/
+                        var task = _consentExternalService.PostAuthorizationRequestAsync(doco, request, new PostContext()
                         {
-                            _logger.LogError(response.Error.Message);
-                            continue;
-                        }
-                        if (response.Authorized)
+                            ServiceScopeSet = serviceScopeSet,
+                            DiscoveryDocument = doco
+                        });
+                        consentAuthorizeResponseTasks.Add(task);
+                    }
+                }
+                var consentAuthorizeResponses = await Task.WhenAll(consentAuthorizeResponseTasks);
+                foreach (var consentAuthorizeResponse in consentAuthorizeResponses)
+                {
+                    var response = consentAuthorizeResponse.Response;
+                    var serviceScopeSet = consentAuthorizeResponse.Context.ServiceScopeSet;
+                    var doco = consentAuthorizeResponse.Context.DiscoveryDocument;
+
+                    if (response.Error != null)
+                    {
+                        _logger.LogError(response.Error.Message);
+                        continue;
+                    }
+                    if (response.Authorized)
+                    {
+                        switch (doco.AuthorizationType)
                         {
-                            switch (doco.AuthorizationType)
-                            {
 
-                                case Constants.AuthorizationTypes.SubjectAndScopes:
-                                    // make sure no funny business is coming in from the auth call.
-                                    var serviceRoot = $"{_tokenExchangeOptions.BaseScope}{serviceScopeSet.Key}";
-                                    var query = (from item in response.Scopes
-                                        where item.StartsWith(serviceRoot)
-                                        select item);
-                                    allowedScopes.AddRange(query);
-                                    if (response.Claims != null && response.Claims.Any())
+                            case Constants.AuthorizationTypes.SubjectAndScopes:
+                                // make sure no funny business is coming in from the auth call.
+                                var serviceRoot = $"{_tokenExchangeOptions.BaseScope}{serviceScopeSet.Key}";
+                                var query = (from item in response.Scopes
+                                    where item.StartsWith(serviceRoot)
+                                    select item);
+                                allowedScopes.AddRange(query);
+                                if (response.Claims != null && response.Claims.Any())
+                                {
+                                    foreach (var cac in response.Claims)
                                     {
-                                        foreach (var cac in response.Claims)
-                                        {
-                                            // namespace the claims.
-                                            allowedClaims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
-                                                cac.Value));
-                                        }
+                                        // namespace the claims.
+                                        allowedClaims.Add(new Claim($"{serviceScopeSet.Key}.{cac.Type}",
+                                            cac.Value));
                                     }
+                                }
 
-                                    if (response.CustomPayload != null)
-                                    {
-                                        finalCustomPayload.Add(serviceScopeSet.Key, response.CustomPayload);
-                                    }
+                                if (response.CustomPayload != null)
+                                {
+                                    finalCustomPayload.Add(serviceScopeSet.Key, response.CustomPayload);
+                                }
 
-                                    break;
-                            }
+                                break;
                         }
                     }
                 }

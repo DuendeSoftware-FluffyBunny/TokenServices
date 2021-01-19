@@ -65,17 +65,19 @@ namespace FluffyBunny4.Validation
 
             var deviceCode = await _devices.FindByDeviceCodeAsync(context.DeviceCode);
             var deviceCodeExtra = deviceCode as DeviceCodeExtra;
-            if (deviceCodeExtra.AccessTokenLifetime != null)
-            {
-                context.Request.AccessTokenLifetime = (int) deviceCodeExtra.AccessTokenLifetime;
-            }
-            _scopedTenantRequestContext.Context.Issuer = deviceCodeExtra.Issuer;
-            if (deviceCode == null)
+            if (deviceCodeExtra == null)
             {
                 _logger.LogError("Invalid device code");
                 context.Result = new TokenRequestValidationResult(context.Request, OidcConstants.TokenErrors.InvalidGrant);
                 return;
             }
+
+            if (deviceCodeExtra.AccessTokenLifetime != null)
+            {
+                context.Request.AccessTokenLifetime = (int) deviceCodeExtra.AccessTokenLifetime;
+            }
+            _scopedTenantRequestContext.Context.Issuer = deviceCodeExtra.Issuer;
+            
 
             // validate client binding
             if (deviceCode.ClientId != context.Request.Client.ClientId)
