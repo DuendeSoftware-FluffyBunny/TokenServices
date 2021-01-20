@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FluffyBunny.EntityFramework.Context
 {
+    
     public class TenantAwareConfigurationDbContext : DbContext, ITenantAwareConfigurationDbContext
     {
         private string _tenantId;
@@ -50,7 +51,9 @@ namespace FluffyBunny.EntityFramework.Context
         
         public DbSet<AllowedTokenExchangeExternalService> AllowedTokenExchangeExternalServices { get; set; }
 
-        
+        public DbSet<SelfHelpUser> SelfHelpUsers { get; set; }
+        public DbSet<AllowedSelfHelpClient> AllowedClients { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -67,6 +70,10 @@ namespace FluffyBunny.EntityFramework.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.ConfigureSelfHelpUserContext();
+            modelBuilder.ConfigureSelfHelpAllowedClientContext();
+
             modelBuilder.ConfigureAllowedArbitraryIssuerContext();
             modelBuilder.ConfigureAllowedRevokeTokenTypeHintContext();
             modelBuilder.ConfigureAllowedTokenExchangeSubjectTokenTypeContext();

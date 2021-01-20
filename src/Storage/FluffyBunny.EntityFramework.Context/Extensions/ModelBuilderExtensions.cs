@@ -35,6 +35,35 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
             });
 
         }
+
+        public static void ConfigureSelfHelpUserContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SelfHelpUser>(entity =>
+            {
+                entity.ToTable("SelfHelpUser");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                entity.Property(x => x.ExternalUserId).HasMaxLength(200).IsRequired();
+                entity.HasIndex(x => x.ExternalUserId).IsUnique();
+
+                entity.HasMany(x => x.AllowedSelfHelpClients)
+                    .WithOne(x => x.SelfHelpUser)
+                    .HasForeignKey(x => x.SelfHelpUserId)
+                    .IsRequired().OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        public static void ConfigureSelfHelpAllowedClientContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AllowedSelfHelpClient>(entity =>
+            {
+                entity.ToTable("AllowedSelfHelpClient");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.ClientId).HasMaxLength(2000).IsRequired();
+                entity.HasIndex(x => x.ClientId).IsUnique();
+            });
+
+        }
         public static void ConfigureAllowedRevokeTokenTypeHintContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AllowedRevokeTokenTypeHint>(entity =>
@@ -95,11 +124,7 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
                 entity.HasIndex(x => x.Name).IsUnique();
-
             });
-
         }
-
-        
     }
 }

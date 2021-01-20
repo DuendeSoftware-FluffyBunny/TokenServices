@@ -24,7 +24,9 @@ namespace FluffyBunny.EntityFramework.Context
 
         public DbSet<ApiScope> ApiScopes { get; set; }
 
-        
+        public DbSet<SelfHelpUser> SelfHelpUsers { get; set; }
+        public DbSet<AllowedSelfHelpClient> AllowedClients { get; set; }
+
         DbContext DbContext { get; }
         Task<int> SaveChangesAsync();
 

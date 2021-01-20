@@ -41,7 +41,8 @@ namespace MigrateHost
 
                 var dbContextOptionsProvider = serviceProvider.GetRequiredService<IDbContextOptionsProvider>();
                 dbContextOptionsProvider.Configure(optionsBuilder);
-            });
+            }); 
+             
             services.AddDbContext<MainEntityCoreContext>((serviceProvider, optionsBuilder) => {
                 var dbContextOptionsProvider = serviceProvider.GetRequiredService<IDbContextOptionsProvider>();
                 dbContextOptionsProvider.Configure(optionsBuilder);
