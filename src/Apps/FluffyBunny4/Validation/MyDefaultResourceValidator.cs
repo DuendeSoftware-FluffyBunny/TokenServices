@@ -86,6 +86,7 @@ namespace IdentityServer4.Validation
 
             switch (grantType)
             {
+                case Constants.GrantType.DeviceCode:
                 case Constants.GrantType.DeviceAuthorization:
                 case Constants.GrantType.TokenExchangeMutate:
                 case Constants.GrantType.TokenExchange:

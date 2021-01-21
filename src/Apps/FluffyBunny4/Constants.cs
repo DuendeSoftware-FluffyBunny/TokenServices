@@ -74,15 +74,17 @@ namespace FluffyBunny4
         {
             public const string UnsupportedTokenType = "unsupported_token_type";
         }
+
         public class GrantType
         {
             public const string ArbitraryIdentity = "arbitrary_identity";
             public const string ArbitraryToken = "arbitrary_token";
             public const string TokenExchange = "urn:ietf:params:oauth:grant-type:token-exchange";
             public const string TokenExchangeMutate = "urn:ietf:params:oauth:grant-type:token-exchange-mutate";
-            public const string TokenExchangeStoreDownstream = "urn:ietf:params:oauth:grant-type:token-store-downstream";
             public const string DeviceAuthorization = "DeviceAuthorization";
+            public const string DeviceCode = "urn:ietf:params:oauth:grant-type:device_code";
         }
+
 
         public static class EndpointNames
         {
