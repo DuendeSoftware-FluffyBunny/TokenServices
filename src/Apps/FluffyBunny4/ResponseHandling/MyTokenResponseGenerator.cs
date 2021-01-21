@@ -70,7 +70,7 @@ namespace FluffyBunny4.ResponseHandling
                     break;
                 default:
                     var response = await base.ProcessTokenRequestAsync(validationResult);
-                    response.Scope = validationResult.ValidatedRequest.RequestedScopes.ToSpaceSeparatedString();
+//                    response.Scope = validationResult.ValidatedRequest.RequestedScopes.ToSpaceSeparatedString();
                     return response;
                     break;
             }
