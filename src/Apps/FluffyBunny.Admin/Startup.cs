@@ -29,7 +29,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
- 
+using FluffyBunny.Admin.Extensions;
 
 namespace FluffyBunny.Admin
 {
@@ -139,18 +139,23 @@ namespace FluffyBunny.Admin
                 };
                 services.AddSingleton(operationalStoreOptions);
 
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(
-                        Configuration.GetConnectionString("DefaultConnection")));
+                 
                 services.AddDatabaseDeveloperPageExceptionFilter();
 
-                services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+ 
+
+                services.AddDbContext<ApplicationDbContext>(config =>
+                {
+                    // for in memory database  
+                    config.UseInMemoryDatabase("InMemoryIdentityDatabase");
+                }); 
+                services.AddIdentity<IdentityUser, IdentityRole>()
+  
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
-
-              
-
-                services.AddAuthentication();
+                services.AddAuthentication<IdentityUser>(Configuration);
+                services.AddScoped<IExternalLoginContext, ExternalLoginContext>();
+               
 
 
                 services.AddControllers();

@@ -19,7 +19,8 @@ using Microsoft.Extensions.Logging;
 namespace FluffyBunny.Admin.Pages.Tenants
 {
     [Authorize]
-    [HasPermission(Permissions.Admin|Permissions.SelfHelp)]
+//    [HasPermission(Permissions.Admin|Permissions.SelfHelp)]
+    [HasPermission(Permissions.Admin)]
     public class IndexModel : PageModel
     {
         

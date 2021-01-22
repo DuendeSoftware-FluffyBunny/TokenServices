@@ -6,6 +6,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using FluffyBunny.Admin.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -19,17 +21,20 @@ namespace FluffyBunny.Admin.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
+        private readonly IExternalLoginContext _externalLoginContext;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
+            IExternalLoginContext externalLoginContext,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender)
         {
+            _externalLoginContext = externalLoginContext;
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
@@ -72,7 +77,7 @@ namespace FluffyBunny.Admin.Areas.Identity.Pages.Account
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
@@ -81,31 +86,44 @@ namespace FluffyBunny.Admin.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
+            _externalLoginContext.ExternalLoginInfo = info;
+            var oidc = await HarvestOidcDataAsync();
+
+            var externalPrincipalClaims = info.Principal.Claims.ToList();
+
+            var nameIdentifier = GetValueFromClaim(externalPrincipalClaims, ClaimTypes.NameIdentifier);
+
+            await _signInManager.SignOutAsync();
+
+            var user = new IdentityUser
+            {
+                UserName = nameIdentifier,
+                Email = null
+            };
+            var result = await _userManager.CreateAsync(user);
+
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                var newUser = await _userManager.FindByIdAsync(user.Id);
+                var eClaims = new List<Claim>
+                {
+                    new Claim(".displayName", user.Id),
+                    new Claim(".externalNamedIdentitier",nameIdentifier),
+                    new Claim(".loginProvider",info.LoginProvider),
+                    new Claim(".id_token",oidc["id_token"]),
+                    new Claim(".access_token",oidc["access_token"])
+                };
+
+                // normalized id.
+                await _userManager.AddClaimsAsync(newUser, eClaims);
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                await _userManager.DeleteAsync(user); // just using this inMemory userstore as a scratch holding pad
+
+
                 return LocalRedirect(returnUrl);
             }
-            if (result.IsLockedOut)
-            {
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-                {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
-                }
-                return Page();
-            }
+            return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
@@ -163,6 +181,33 @@ namespace FluffyBunny.Admin.Areas.Identity.Pages.Account
             ProviderDisplayName = info.ProviderDisplayName;
             ReturnUrl = returnUrl;
             return Page();
+        }
+        private string GetValueFromClaim(List<Claim> claims, string type)
+        {
+            var query = from claim in claims
+                where claim.Type == type
+                select claim;
+            var theClaim = query.FirstOrDefault();
+            var value = theClaim?.Value;
+            return value;
+        }
+        private async Task<Dictionary<string, string>> HarvestOidcDataAsync()
+        {
+            var at = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "access_token");
+            var idt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "id_token");
+            var rt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "refresh_token");
+            var tt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "token_type");
+            var ea = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "expires_at");
+
+            var oidc = new Dictionary<string, string>
+            {
+                {"access_token", at},
+                {"id_token", idt},
+                {"refresh_token", rt},
+                {"token_type", tt},
+                {"expires_at", ea}
+            };
+            return oidc;
         }
     }
 }
