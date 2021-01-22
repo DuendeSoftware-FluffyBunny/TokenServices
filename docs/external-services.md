@@ -98,6 +98,6 @@ The response comming back from the service must be honored.  The resulting acces
 }
 ```
 
-# Multiple Expernal Services
+# Multiple External Services
 The token_exchange flow can accept scopes to many external services, so in the end we will have a single access_token with all the scopes allowed from each external servies, as well as the service claims and custom payloads.
 
