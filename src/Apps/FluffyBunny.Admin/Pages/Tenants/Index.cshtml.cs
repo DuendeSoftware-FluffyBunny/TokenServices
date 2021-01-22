@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using FluffyBunny.Admin.PermissionParts;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.IdentityServer.EntityFramework.Storage;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Services;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 namespace FluffyBunny.Admin.Pages.Tenants
 {
     [Authorize]
+    [HasPermission(Permissions.Admin|Permissions.SelfHelp)]
     public class IndexModel : PageModel
     {
         

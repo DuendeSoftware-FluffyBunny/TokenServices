@@ -120,8 +120,8 @@ services:
     volumes:
       - ${CERTIFICATE_PATH}:/root/.dotnet/https
     ports:
-      - 6600:80
-      - 6601:443
+      - 56600:80
+      - 56601:443
     environment:
       - AppOptions__DangerousAcceptAnyServerCertificateValidator=true
       - Logging__LogLevel__Default=Debug    

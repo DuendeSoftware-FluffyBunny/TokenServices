@@ -18,6 +18,7 @@ namespace TokenService.Models
         public DatabaseTypes DatabaseType { get; set; }
         public DatabaseTypes OperationalStoreType { get; set; }
         public bool DisableHttpRedirect { get; set; }
+        public bool DangerousAcceptAnyServerCertificateValidator { get; set; } = false;
 
     }
 }

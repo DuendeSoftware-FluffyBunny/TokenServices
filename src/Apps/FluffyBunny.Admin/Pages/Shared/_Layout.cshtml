@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using FluffyBunny.Admin.PermissionParts
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,16 +22,20 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Manage
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" asp-page="/Tenants/Index">Tenants</a>
+                        @if (User.UserHasThisPermission(Permissions.Admin))
+                        {
+                            <li class="nav-item dropdown">
+                                <div class="dropdown">
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Manage
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" asp-page="/Tenants/Index">Tenants</a>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
+                        }
+                           
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>

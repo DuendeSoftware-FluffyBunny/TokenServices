@@ -124,7 +124,7 @@ namespace TokenService
                 services.Configure<ExternalServicesOptions>(Configuration.GetSection("ExternalServicesOptions"));
                 
                 _logger.LogInformation($"HostingEnvironment.EnvironmentNam:{HostingEnvironment.EnvironmentName}");
-                if (HostingEnvironment.IsDevelopment())
+                if (AppOptions.DangerousAcceptAnyServerCertificateValidator)
                 {
                     Func<HttpMessageHandler> configureHandler = () =>
                     {
@@ -141,7 +141,8 @@ namespace TokenService
                     };
 
 
-                    services.AddHttpClient(FluffyBunny4.Constants.ExternalServiceClient.HttpClientName).ConfigurePrimaryHttpMessageHandler(configureHandler);
+                    services.AddHttpClient(FluffyBunny4.Constants.ExternalServiceClient.HttpClientName)
+                        .ConfigurePrimaryHttpMessageHandler(configureHandler);
                 }
                 else
                 {
@@ -373,6 +374,7 @@ namespace TokenService
                 {
                     c.SwaggerDoc("v1", new OpenApiInfo {Title = "TokenService", Version = "v1"});
                 });
+ 
             }
             catch (Exception ex)
             {

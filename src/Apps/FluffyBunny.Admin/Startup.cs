@@ -15,13 +15,16 @@ using System.Threading.Tasks;
 using Duende.IdentityServer.EntityFramework.Options;
 using FluffyBunny.Admin.AutoMapper;
 using FluffyBunny.Admin.Model;
+using FluffyBunny.Admin.PermissionParts;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.EntityFramework.Context;
 using FluffyBunny.EntityFramework.Context.Extensions;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions;
 using FluffyBunny4.DotNetCore;
 using FluffyBunny4.DotNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -53,6 +56,10 @@ namespace FluffyBunny.Admin
         {
             try
             {
+                //Register the Permission policy handlers
+                services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+                services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+
                 services.AddSingleton<IEmailSender, NullEmailSender>();
                 var mapperOneToOne = MapperConfigurationBuilder.BuidOneToOneMapper;
                 var mapperIgnoreBase = MapperConfigurationBuilder.BuidIgnoreBaseMapper;
@@ -76,7 +83,9 @@ namespace FluffyBunny.Admin
 
                 services.AddScoped<ISessionTenantAccessor, SessionTenantAccessor>();
                 services.AddTransient<ISigninManager, DefaultSigninManager>();
-                services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, SeedSessionClaimsPrincipalFactory>();
+           //     services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, SeedSessionClaimsPrincipalFactory>();
+                services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, FluffyBunnyAdminPermissionsClaimsPrincipalFactory>();
+                
 
                 services.AddCors(options => options.AddPolicy("CorsPolicy",
                     builder =>
