@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
 {
-    internal class AdminServices : IAdminServices
+    internal class AdminServices : IAdminServices, IAdminSelfHelpUserServices
     {
         private IMainEntityCoreContext _mainEntityCoreContext;
         private ITenantAwareConfigurationDbContextAccessor _tenantAwareConfigurationDbContextAccessor;
@@ -1567,6 +1567,122 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             }
 
             return entities;
+        }
+
+        public async Task UpsertSelfHelpUserAsync(string tenantName, SelfHelpUser entity)
+        {
+            entity.Name = entity.Name.ToLower();
+            entity.Email = entity.Email.ToLower();
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .SelfHelpUsers
+                .FirstOrDefaultAsync(x => x.Name == entity.Name);
+            if (entityInDb != null)
+            {
+                entityInDb.Enabled = entity.Enabled;
+                entityInDb.Name = entity.Name;
+                entityInDb.Email = entity.Email;
+            }
+            else
+            {
+                var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<SelfHelpUser>(entity);
+                tenantContext.SelfHelpUsers.Add(newEntity);
+            }
+
+            await tenantContext.SaveChangesAsync();
+        }
+
+        public async Task<SelfHelpUser> GetSelfHelpUserByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Name == name);
+            return entityInDb;
+        }
+
+        public async Task<SelfHelpUser> GetSelfHelpUserByEmailAsync(string tenantName, string email)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Email == email);
+            return entityInDb;
+        }
+
+        public async Task<SelfHelpUser> GetSelfHelpUserByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id);
+            return entityInDb;
+        }
+
+        public async Task DeleteSelfHelpUserByNameAsync(string tenantName, string name)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers.FirstOrDefaultAsync(e => e.Name == name);
+            if (entityInDb != null)
+            {
+                tenantContext.SelfHelpUsers.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteSelfHelpUserByEmailAsync(string tenantName, string email)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers.FirstOrDefaultAsync(e => e.Email == email);
+            if (entityInDb != null)
+            {
+                tenantContext.SelfHelpUsers.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteSelfHelpUserByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.SelfHelpUsers.FirstOrDefaultAsync(e => e.Id == id);
+            if (entityInDb != null)
+            {
+                tenantContext.SelfHelpUsers.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<PaginatedList<SelfHelpUser>> PageSelfHelpUsersAsync(string tenantName, int pageNumber, int pageSize, SelfHelpUsersSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var entities = from t in tenantContext.SelfHelpUsers
+                select t;
+            switch (sortType)
+            {
+                case SelfHelpUsersSortType.EmailDesc:
+                    entities = entities.OrderByDescending(t => t.Email);
+                    break;
+                case SelfHelpUsersSortType.EmailAsc:
+                    entities = entities.OrderBy(t => t.Email);
+                    break;
+                case SelfHelpUsersSortType.NameDesc:
+                    entities = entities.OrderByDescending(t => t.Name);
+                    break;
+                case SelfHelpUsersSortType.NameAsc:
+                    entities = entities.OrderBy(t => t.Name);
+                    break;
+                case SelfHelpUsersSortType.EnabledDesc:
+                    entities = entities.OrderByDescending(t => t.Enabled);
+                    break;
+                case SelfHelpUsersSortType.EnabledAsc:
+                    entities = entities.OrderBy(t => t.Enabled);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<SelfHelpUser>
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
         }
     }
 }

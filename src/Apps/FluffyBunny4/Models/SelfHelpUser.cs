@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace FluffyBunny.EntityFramework.Entities
+namespace FluffyBunny4.Models
 {
     public class SelfHelpUser
     {
@@ -13,7 +9,6 @@ namespace FluffyBunny.EntityFramework.Entities
         public string Name { get; set; }
         public string Email { get; set; }
         public bool Enabled { get; set; }
-        public List<AllowedSelfHelpClient> AllowedSelfHelpClients { get; set; }
-
+        public ICollection<string> AllowedSelfHelpClients { get; set; } = new HashSet<string>();
     }
 }

@@ -45,7 +45,8 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
                 entity.Property(x => x.ExternalUserId).HasMaxLength(200).IsRequired();
                 entity.HasIndex(x => x.ExternalUserId).IsUnique();
-
+                entity.Property(x => x.Email).HasMaxLength(200).IsRequired();
+                entity.HasIndex(x => x.Email).IsUnique();
                 entity.HasMany(x => x.AllowedSelfHelpClients)
                     .WithOne(x => x.SelfHelpUser)
                     .HasForeignKey(x => x.SelfHelpUserId)

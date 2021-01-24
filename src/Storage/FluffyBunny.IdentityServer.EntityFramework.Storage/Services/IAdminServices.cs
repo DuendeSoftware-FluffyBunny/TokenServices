@@ -201,4 +201,28 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         #endregion
 
     }
+    public enum SelfHelpUsersSortType
+    {
+        NameDesc,
+        NameAsc,
+        EmailDesc,
+        EmailAsc,
+        EnabledDesc,
+        EnabledAsc
+    }
+    public interface IAdminSelfHelpUserServices
+    {
+        #region SelfHelpUser
+
+        Task UpsertSelfHelpUserAsync(string tenantName, SelfHelpUser entity);
+        Task<SelfHelpUser> GetSelfHelpUserByNameAsync(string tenantName, string name);
+        Task<SelfHelpUser> GetSelfHelpUserByEmailAsync(string tenantName, string email);
+        Task<SelfHelpUser> GetSelfHelpUserByIdAsync(string tenantName, int id);
+        Task DeleteSelfHelpUserByNameAsync(string tenantName, string name);
+        Task DeleteSelfHelpUserByEmailAsync(string tenantName, string email);
+        Task DeleteSelfHelpUserByIdAsync(string tenantName, int id);
+        Task<PaginatedList<SelfHelpUser>> PageSelfHelpUsersAsync(string tenantName, int pageNumber, int pageSize, SelfHelpUsersSortType sortType);
+
+        #endregion
+    }
 }
