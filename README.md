@@ -3,9 +3,9 @@
 This project requires [Duende](https://duendesoftware.com/) as its base and as such you must agree to the Duende Software [licensing terms](https://github.com/DuendeSoftware/IdentityServer/blob/main/LICENSE).
 
 # OAuth2 Services
-Whilst IdentityServer provides OIDC functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
+Duende Software provides OIDC SSO functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, and a stand-alone Duende SSO deployment that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
 
-The OAuth2 services supported are;
+The OAuth2 services supported by this project are;
 
 1. [**client_credentials**](https://identityserver4.readthedocs.io/en/latest/endpoints/token.html?highlight=client_credentials#token-endpoint)    
   We get this for free with IdentityServer.  This is used for service-2-service trust.  
@@ -13,10 +13,10 @@ The OAuth2 services supported are;
 2.  [**token_exchange**](docs/token-exchange.md)  
   This is custom because there is no reference answer when it comes to exchanging an id_token (issued by google) for an access_token to services that I control.  
   This is used for granting authorization to services that a user can access.  
-  In this flow I fan out calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requested scopes.  The real control of what a user gets access to is delegated to the actual services.  
+  In this flow I fan out calls to well known external services, passing them the user and scopes that were requested.  The external service rejects, accepts or accepts and modifies the requested scopes.  The real control of what a user gets access to is delegated to the actual services.  I also support exchanging an access_token for another access_token (exactly like the Azure OBO flows)  
 
 3. [**token_exchange_mutate**](docs/token-exchange-mutate.md)  
-   This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but [better](docs/mutate-vs-on-behalf-of.md), to the a ["On Behalf Of" flow](docs/mutate-vs-on-behalf-of.md).  This flow requires that reference_tokens be used, because we want to modify the backend database by changing the scopes the original access_token is pointing to.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token.     
+   This is a followup to a token_exhange where ***"Oops, I wish I would have asked for more scopes in the original token_exchange!"***  This is similar, but [better](docs/mutate-vs-on-behalf-of.md), to the a ["On Behalf Of" flow](docs/mutate-vs-on-behalf-of.md).  This flow requires that reference_tokens be used, because we want to modify the backend database by changing the scopes the original access_token is referencing.  In this case a special token_exchange is rerun but with more scopes than before.  The output doesn't change the infield access_token or refresh_token(if there was one).     
 
 4. **device_code_flow**   
   Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating he user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
