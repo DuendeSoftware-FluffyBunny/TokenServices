@@ -3,7 +3,7 @@
 This project requires [Duende](https://duendesoftware.com/) as its base and as such you must agree to the Duende Software [licensing terms](https://github.com/DuendeSoftware/IdentityServer/blob/main/LICENSE).
 
 # OAuth2 Services
-Duende Software provides OIDC SSO functionality, this assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD or OKTA, and a stand-alone Duende SSO deployment that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
+Duende Software provides OIDC SSO functionality, this project assumes that SSO services (Authentication) is provided externally.  In my case there is an existing SSO, like AzureAD, OKTA, Google, or a stand-alone Duende SSO deployment that is already in place.  For a lot of my proofs I use Google as my OIDC IDP.  
 
 The OAuth2 services supported by this project are;
 
