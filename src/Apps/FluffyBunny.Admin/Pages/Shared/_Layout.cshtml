@@ -27,7 +27,7 @@
                             <li class="nav-item dropdown">
                                 <div class="dropdown">
                                     <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Manage
+                                        Admin
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item" asp-page="/Tenants/Index">Tenants</a>
@@ -35,7 +35,19 @@
                                 </div>
                             </li>
                         }
-                           
+                        @if (User.UserHasThisPermission(Permissions.SelfHelp))
+                        {
+                            <li class="nav-item dropdown">
+                                <div class="dropdown">
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        SelfHelp
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" asp-page="/Tenants/Index">Tenants</a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>

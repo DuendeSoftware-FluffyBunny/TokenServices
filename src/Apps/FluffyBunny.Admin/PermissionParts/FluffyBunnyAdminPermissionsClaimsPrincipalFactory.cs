@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -32,24 +33,46 @@ namespace FluffyBunny.Admin.PermissionParts
 
         protected override async Task<ClaimsIdentity> GenerateClaimsAsync(IdentityUser user)
         {
+            var claimsPrincipal = _externalLoginContext.ExternalLoginInfo.Principal;
             var sessionKey = GuidN;
             var identity = await base.GenerateClaimsAsync(user);
             identity.AddClaim(new Claim(".sessionKey", sessionKey));
             _httpContextAccessor.HttpContext.Session.SetString(sessionKey, sessionKey);
 
             // TODO: Lookup user in our database to 
-            if (_externalLoginContext.ExternalLoginInfo.LoginProvider == "google")
+            Int64 permissions = 0;
+            Claim preferredUsernameClaim;
+            switch (_externalLoginContext.ExternalLoginInfo.LoginProvider)
             {
-                var permissions = (Int64)Permissions.Admin;
-                identity.AddClaim(new Claim("permissions", permissions.ToString()));
+                case "azuread-artificer":
+                    preferredUsernameClaim = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "preferred_username");
+                    identity.AddClaim(new Claim("preferred_username", $"{preferredUsernameClaim.Value}"));
+                    if (claimsPrincipal.HasClaim(ClaimTypes.Role, "Task.Administrator"))
+                    {
+                        permissions = permissions | (Int64) Permissions.Admin;
+                    }
+                    if (claimsPrincipal.HasClaim(ClaimTypes.Role, "Task.SelfHelp"))
+                    {
+                        permissions = permissions | (Int64)Permissions.SelfHelp;
+                    }
+                    
+                    break;
+                case "google":
+                    permissions = (Int64)Permissions.Admin;
+                    preferredUsernameClaim = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "name");
+                    identity.AddClaim(new Claim("preferred_username", $"{preferredUsernameClaim.Value} (google)"));
+                    break;
+                default:
+                    preferredUsernameClaim = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "name");
+                    identity.AddClaim(new Claim("preferred_username", $"{preferredUsernameClaim.Value} (demo)"));
+                    permissions = (Int64)Permissions.SelfHelp;
+                    break;
             }
-            else
-            {
-                var permissions =  (Int64)Permissions.SelfHelp;
-                identity.AddClaim(new Claim("permissions", permissions.ToString()));
-            }
+            identity.AddClaim(new Claim("permissions", permissions.ToString()));
 
             return identity;
         }
+
+       
     }
 }

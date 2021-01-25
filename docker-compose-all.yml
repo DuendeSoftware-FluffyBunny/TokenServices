@@ -35,6 +35,9 @@ services:
       - externalOIDC__1__authority=${externalOIDC__1__authority}
       - externalOIDC__1__clientId=${externalOIDC__1__clientId}
       - externalOIDC__1__clientSecret=${externalOIDC__1__clientSecret}    
+      - externalOIDC__2__authority=${externalOIDC__2__authority}
+      - externalOIDC__2__clientId=${externalOIDC__2__clientId}
+      - externalOIDC__2__clientSecret=${externalOIDC__2__clientSecret}   
     depends_on:
       - sqlserver-microservice
 
