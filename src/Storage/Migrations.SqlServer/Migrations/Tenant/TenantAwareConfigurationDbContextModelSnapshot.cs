@@ -55,6 +55,9 @@ namespace SqlServer.Migrations.Tenant
                     b.Property<bool>("NonEditable")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("RequireResourceIndicator")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ShowInDiscoveryDocument")
                         .HasColumnType("bit");
 
@@ -1058,7 +1061,9 @@ namespace SqlServer.Migrations.Tenant
                         .UseIdentityColumn();
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("bit");
@@ -1074,6 +1079,9 @@ namespace SqlServer.Migrations.Tenant
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("ExternalUserId")
                         .IsUnique();

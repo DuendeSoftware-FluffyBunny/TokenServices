@@ -28,8 +28,19 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver-microservice;Database=myDataBase;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
       - EntityFrameworkConnectionOptions__ConnectionString=Server=sqlserver-microservice;Database=fluffybunny;User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
       - EntityFrameworkConnectionOptions__ConnectionStringDatabaseTemplate=Server=sqlserver-microservice;Database={{Database}};User Id=sa;password=Your_password123;Trusted_Connection=False;MultipleActiveResultSets=true
+      - externalOIDC__0__authority=https://demo.identityserver.io/
+      - externalOIDC__0__clientId=interactive.confidential
+      - externalOIDC__0__clientSecret=secret
+      - externalOIDC__0__callbackPath=/signin-demo-identityserver
+      - externalOIDC__1__authority=${externalOIDC__1__authority}
+      - externalOIDC__1__clientId=${externalOIDC__1__clientId}
+      - externalOIDC__1__clientSecret=${externalOIDC__1__clientSecret}    
+      - externalOIDC__2__authority=${externalOIDC__2__authority}
+      - externalOIDC__2__clientId=${externalOIDC__2__clientId}
+      - externalOIDC__2__clientSecret=${externalOIDC__2__clientSecret}   
     depends_on:
       - sqlserver-microservice
+      
 
   externalservice-microservice:
     image: ghstahl/sampleexternalservice:latest
@@ -74,9 +85,6 @@ services:
       - externalOIDC__1__authority=${externalOIDC__1__authority}
       - externalOIDC__1__clientId=${externalOIDC__1__clientId}
       - externalOIDC__1__clientSecret=${externalOIDC__1__clientSecret}
-      - externalOIDC__2__authority=${externalOIDC__2__authority}
-      - externalOIDC__2__clientId=${externalOIDC__2__clientId}
-      - externalOIDC__2__clientSecret=${externalOIDC__2__clientSecret}   
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=${ASPNETCORE_URLS}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_KESTREL_CERTIFICATE_PASSWORD}
