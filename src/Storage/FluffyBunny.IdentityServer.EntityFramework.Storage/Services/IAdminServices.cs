@@ -25,6 +25,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         EnabledDesc,
         EnabledAsc
     }
+    public enum OpenIdConnectAuthoritiesSortType
+    {
+        NameDesc,
+        NameAsc,
+        EnabledDesc,
+        EnabledAsc
+    }
     public enum ExternalServicesSortType
     {
         NameDesc,
@@ -32,6 +39,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         EnabledDesc,
         EnabledAsc
     }
+
     public enum ApiResourcesSortType
     {
         NameDesc,
@@ -94,6 +102,17 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task<Tenant> GetTenantByNameAsync(string tenantId);
     
         Task UpdateTenantAsync(Tenant tenant);
+
+        #endregion
+        #region OpenIdConnectAuthorities
+
+        Task UpsertOpenIdConnectAuthorityAsync(string tenantName, OpenIdConnectAuthority entity);
+        Task<OpenIdConnectAuthority> GetOpenIdConnectAuthorityByNameAsync(string tenantName, string name);
+        Task<OpenIdConnectAuthority> GetOpenIdConnectAuthorityByIdAsync(string tenantName, int id);
+        Task<List<OpenIdConnectAuthority>> GetAllOpenIdConnectAuthoritiesAsync(string tenantName);
+        Task DeleteOpenIdConnectAuthorityByNameAsync(string tenantName, string name);
+        Task DeleteOpenIdConnectAuthorityByIdAsync(string tenantName, int id);
+        Task<PaginatedList<OpenIdConnectAuthority>> PageOpenIdConnectAuthoritiesAsync(string tenantName, int pageNumber, int pageSize, OpenIdConnectAuthoritiesSortType sortType);
 
         #endregion
         #region ExternalServices

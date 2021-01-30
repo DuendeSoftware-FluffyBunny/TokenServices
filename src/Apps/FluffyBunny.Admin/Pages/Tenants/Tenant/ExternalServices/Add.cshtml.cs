@@ -14,7 +14,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
-        private ILogger<AddModel> _logger;
+        private ILogger _logger;
 
         public AddModel(
             IAdminServices adminServices,

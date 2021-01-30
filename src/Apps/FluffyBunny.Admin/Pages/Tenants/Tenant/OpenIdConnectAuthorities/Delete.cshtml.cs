@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.EntityFramework.Entities;
@@ -7,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.OpenIdConnectAuthorities
 {
     public class DeleteModel : PageModel
     {
@@ -26,18 +28,18 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
         }
         [BindProperty]
         public string TenantId { get; set; }
-        public ExternalService Entity { get; private set; }
+        public OpenIdConnectAuthority Entity { get; private set; }
         public class InputModel
         {
             public int Id { get; set; }
         }
         [BindProperty]
-        public InputModel Input { get; set; }
+        public ExternalServices.DeleteModel.InputModel Input { get; set; }
         public async Task OnGetAsync(int id)
         {
             TenantId = _sessionTenantAccessor.TenantId;
-            Entity = await _adminServices.GetExternalServiceByIdAsync(TenantId, id);
-            Input = new InputModel()
+            Entity = await _adminServices.GetOpenIdConnectAuthorityByIdAsync(TenantId, id);
+            Input = new ExternalServices.DeleteModel.InputModel()
             {
                 Id = Entity.Id,
             };
@@ -48,7 +50,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
             {
                 if (string.Compare(submit, "delete", true) == 0)
                 {
-                    await _adminServices.DeleteExternalServiceByIdAsync(TenantId, Input.Id);
+                    await _adminServices.DeleteOpenIdConnectAuthorityByIdAsync(TenantId, Input.Id);
                 }
             }
             catch (Exception ex)
@@ -61,3 +63,4 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
         }
     }
 }
+

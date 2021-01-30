@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.EntityFramework.Entities;
@@ -7,18 +10,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.OpenIdConnectAuthorities
 {
-    public class DeleteModel : PageModel
+    public class AddModel : PageModel
     {
         private IAdminServices _adminServices;
         private ISessionTenantAccessor _sessionTenantAccessor;
         private ILogger _logger;
 
-        public DeleteModel(
+        public AddModel(
             IAdminServices adminServices,
             ISessionTenantAccessor sessionTenantAccessor,
-            ILogger<DeleteModel> logger)
+            ILogger<ExternalServices.AddModel> logger)
         {
             _adminServices = adminServices;
             _sessionTenantAccessor = sessionTenantAccessor;
@@ -26,37 +29,41 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
         }
         [BindProperty]
         public string TenantId { get; set; }
-        public ExternalService Entity { get; private set; }
         public class InputModel
         {
             public int Id { get; set; }
+            public string Name { get; set; }  // service name
+            [Required]
+            public string Description { get; set; }
+            [Required]
+            public string Authority { get; set; }
+            [Required]
+            public bool Enabled { get; set; }
         }
         [BindProperty]
         public InputModel Input { get; set; }
-        public async Task OnGetAsync(int id)
+        public async Task OnGetAsync()
         {
             TenantId = _sessionTenantAccessor.TenantId;
-            Entity = await _adminServices.GetExternalServiceByIdAsync(TenantId, id);
-            Input = new InputModel()
-            {
-                Id = Entity.Id,
-            };
         }
-        public async Task<IActionResult> OnPostAsync(string submit)
+        public async Task<IActionResult> OnPostAsync()
         {
             try
             {
-                if (string.Compare(submit, "delete", true) == 0)
+                var entity = new OpenIdConnectAuthority()
                 {
-                    await _adminServices.DeleteExternalServiceByIdAsync(TenantId, Input.Id);
-                }
+                    Name = Input.Name,
+                    Description = Input.Description,
+                    Authority = Input.Authority,
+                    Enabled = Input.Enabled
+                };
+                await _adminServices.UpsertOpenIdConnectAuthorityAsync(TenantId, entity);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return Page();
             }
-
             return RedirectToPage("./Index");
         }
     }

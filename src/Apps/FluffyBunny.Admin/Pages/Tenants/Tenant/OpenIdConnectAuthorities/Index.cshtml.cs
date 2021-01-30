@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluffyBunny.Admin.Services;
 using FluffyBunny.EntityFramework.Entities;
@@ -9,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
-namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
+namespace FluffyBunny.Admin.Pages.Tenants.Tenant.OpenIdConnectAuthorities
 {
     public class IndexModel : PageModel
     {
@@ -31,24 +33,23 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
         }
         [BindProperty]
         public string TenantId { get; set; }
-         
+
         public List<SelectListItem> PageSizeOptions { get; private set; }
 
         [ViewData]
-        public ExternalServicesSortType NameSortType { get; set; }
-        public PaginatedList<ExternalService> PagedEntities { get; private set; }
+        public OpenIdConnectAuthoritiesSortType NameSortType { get; set; }
+        public PaginatedList<OpenIdConnectAuthority> PagedEntities { get; private set; }
         [ViewData]
-        public ExternalServicesSortType EnabledSortType { get; set; }
+        public OpenIdConnectAuthoritiesSortType EnabledSortType { get; set; }
         [ViewData]
-        public ExternalServicesSortType CurrentSortType { get; set; }
+        public OpenIdConnectAuthoritiesSortType CurrentSortType { get; set; }
 
         [ViewData]
         public int PageSize { get; set; }
 
         [BindProperty]
         public int SelectedPageSize { get; set; }
-
-        public async Task OnGetAsync(ExternalServicesSortType sortOrder, int? pageNumber, int? pageSize)
+        public async Task OnGetAsync(OpenIdConnectAuthoritiesSortType sortOrder, int? pageNumber, int? pageSize)
         {
             TenantId = _sessionTenantAccessor.TenantId;
             PageSize = _pagingHelper.ValidatePageSize(pageSize);
@@ -58,54 +59,50 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.ExternalServices
             switch (sortOrder)
             {
 
-                case ExternalServicesSortType.EnabledAsc:
+                case OpenIdConnectAuthoritiesSortType.EnabledAsc:
                     PagedEntities =
-                        await _adminServices.PageExternalServicesAsync(
+                        await _adminServices.PageOpenIdConnectAuthoritiesAsync(
                             TenantId,
-                            (int)(pageNumber ?? 1), 
+                            (int)(pageNumber ?? 1),
                             PageSize,
-                            ExternalServicesSortType.EnabledAsc);
-                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
+                            OpenIdConnectAuthoritiesSortType.EnabledAsc);
+                    EnabledSortType = OpenIdConnectAuthoritiesSortType.EnabledDesc;
                     break;
-                case ExternalServicesSortType.EnabledDesc:
+                case OpenIdConnectAuthoritiesSortType.EnabledDesc:
                     PagedEntities =
-                        await _adminServices.PageExternalServicesAsync(
-                            TenantId, 
-                            (int)(pageNumber ?? 1), 
+                        await _adminServices.PageOpenIdConnectAuthoritiesAsync(
+                            TenantId,
+                            (int)(pageNumber ?? 1),
                             PageSize,
-                            ExternalServicesSortType.EnabledDesc);
-                    EnabledSortType = ExternalServicesSortType.EnabledAsc;
+                            OpenIdConnectAuthoritiesSortType.EnabledDesc);
+                    EnabledSortType = OpenIdConnectAuthoritiesSortType.EnabledAsc;
                     break;
-                case ExternalServicesSortType.NameDesc:
+                case OpenIdConnectAuthoritiesSortType.NameDesc:
                     PagedEntities =
-                        await _adminServices.PageExternalServicesAsync(
-                            TenantId, 
-                            (int)(pageNumber ?? 1), 
+                        await _adminServices.PageOpenIdConnectAuthoritiesAsync(
+                            TenantId,
+                            (int)(pageNumber ?? 1),
                             PageSize,
-                            ExternalServicesSortType.NameDesc);
-                    NameSortType = ExternalServicesSortType.NameAsc;
-                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
+                            OpenIdConnectAuthoritiesSortType.NameDesc);
+                    NameSortType = OpenIdConnectAuthoritiesSortType.NameAsc;
+                    EnabledSortType = OpenIdConnectAuthoritiesSortType.EnabledDesc;
                     break;
-                case ExternalServicesSortType.NameAsc:
+                case OpenIdConnectAuthoritiesSortType.NameAsc:
                 default:
                     PagedEntities =
-                        await _adminServices.PageExternalServicesAsync(
-                            TenantId, 
-                            (int)(pageNumber ?? 1), 
+                        await _adminServices.PageOpenIdConnectAuthoritiesAsync(
+                            TenantId,
+                            (int)(pageNumber ?? 1),
                             PageSize,
-                            ExternalServicesSortType.NameAsc);
-                    NameSortType = ExternalServicesSortType.NameDesc;
-                    EnabledSortType = ExternalServicesSortType.EnabledDesc;
+                            OpenIdConnectAuthoritiesSortType.NameAsc);
+                    NameSortType = OpenIdConnectAuthoritiesSortType.NameDesc;
+                    EnabledSortType = OpenIdConnectAuthoritiesSortType.EnabledDesc;
 
                     break;
             }
 
             CurrentSortType = sortOrder;
-
         }
-        public async Task<IActionResult> OnPostPageSizeAsync()
-        {
-            return RedirectToPage(new { sortOrder = CurrentSortType, pageNumber = 1, pageSize = SelectedPageSize });
-        }
+        
     }
 }
