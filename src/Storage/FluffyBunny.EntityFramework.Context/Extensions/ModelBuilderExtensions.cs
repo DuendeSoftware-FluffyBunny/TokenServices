@@ -18,11 +18,11 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 ? entityTypeBuilder.ToTable(configuration.Name)
                 : entityTypeBuilder.ToTable(configuration.Name, configuration.Schema);
         }
+
         /// <summary>
         /// Configures the ExternalService context.
         /// </summary>
         /// <param name="modelBuilder">The model builder.</param>
-
         public static void ConfigureAllowedArbitraryIssuerContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AllowedArbitraryIssuer>(entity =>
@@ -31,9 +31,7 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Issuer).HasMaxLength(2000).IsRequired();
                 entity.HasIndex(x => x.Issuer).IsUnique();
-
             });
-
         }
 
         public static void ConfigureSelfHelpUserContext(this ModelBuilder modelBuilder)
@@ -73,10 +71,9 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.TokenTypeHint).HasMaxLength(64).IsRequired();
                 entity.HasIndex(x => x.TokenTypeHint).IsUnique();
-
             });
-
         }
+
         public static void ConfigureAllowedTokenExchangeSubjectTokenTypeContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AllowedTokenExchangeSubjectTokenType>(entity =>
@@ -85,11 +82,8 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.SubjectTokenType).HasMaxLength(64).IsRequired();
                 entity.HasIndex(x => x.SubjectTokenType).IsUnique();
-
             });
-
         }
-        
 
         public static void ConfigureAllowedTokenExchangeExternalServiceContext(this ModelBuilder modelBuilder)
         {
@@ -99,24 +93,33 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.ExternalService).HasMaxLength(64).IsRequired();
                 entity.HasIndex(x => x.ExternalService).IsUnique();
-
             });
-
         }
 
-        
+        public static void ConfigureOpenIdConnectAuthoritiesContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OpenIdConnectAuthority>(entity =>
+            {
+                entity.ToTable("OpenIdConnectAuthority");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Authority).IsRequired();
+                entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                entity.HasIndex(x => x.Name).IsUnique();
+            });
+        }
+
         public static void ConfigureExternalServicesContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExternalService>(entity =>
             {
                 entity.ToTable("ExternalService");
                 entity.HasKey(x => x.Id);
+                entity.Property(x => x.Authority).IsRequired();
                 entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
                 entity.HasIndex(x => x.Name).IsUnique();
-
             });
-
         }
+
         public static void ConfigureTenantContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tenant>(entity =>

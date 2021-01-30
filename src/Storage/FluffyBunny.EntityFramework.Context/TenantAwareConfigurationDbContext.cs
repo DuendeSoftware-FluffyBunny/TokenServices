@@ -38,6 +38,7 @@ namespace FluffyBunny.EntityFramework.Context
         }
         public DbContext DbContext => this;
         public DbSet<ClientExtra> Clients { get; set; }
+        public DbSet<OpenIdConnectAuthority> OpenIdConnectAuthorities { get; set; }
         public DbSet<ExternalService> ExternalServices { get; set; }
         public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }
         public DbSet<DeviceFlowCodes> DeviceFlowCodes { get; set; }
@@ -80,6 +81,8 @@ namespace FluffyBunny.EntityFramework.Context
             
             modelBuilder.ConfigureAllowedTokenExchangeExternalServiceContext();
 
+            
+            modelBuilder.ConfigureOpenIdConnectAuthoritiesContext();
             modelBuilder.ConfigureExternalServicesContext();
             modelBuilder.ConfigureClientContext(_storeOptions);
             modelBuilder.ConfigureResourcesContext(_storeOptions);

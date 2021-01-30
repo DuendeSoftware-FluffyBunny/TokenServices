@@ -18,6 +18,9 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                     FluffyBunny.EntityFramework.Entities.SelfHelpUser>()
                 .Ignore(record => record.Id);
 
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority,
+                    FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority>()
+                .Ignore(record => record.Id);
 
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
                     FluffyBunny.EntityFramework.Entities.ExternalService>()
@@ -59,6 +62,11 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.SelfHelpUser,
                 FluffyBunny4.Models.SelfHelpUser>()
                 .ForMember(dest => dest.AllowedSelfHelpClients, opt => opt.ConvertUsing(new SelfHelpUserAllowedClientConverter()));
+
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority,
+                FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority,
+                FluffyBunny4.Models.OpenIdConnectAuthority>();
 
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
                 FluffyBunny.EntityFramework.Entities.ExternalService>();

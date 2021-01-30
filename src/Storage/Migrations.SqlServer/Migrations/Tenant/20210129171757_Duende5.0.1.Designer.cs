@@ -4,14 +4,16 @@ using FluffyBunny.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SqlServer.Migrations.Tenant
 {
     [DbContext(typeof(TenantAwareConfigurationDbContext))]
-    partial class TenantAwareConfigurationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210129171757_Duende5.0.1")]
+    partial class Duende501
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1031,8 +1033,7 @@ namespace SqlServer.Migrations.Tenant
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Authority")
-                        .IsRequired()
+                    b.Property<string>("OpenIdConnectAuthority")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -1052,36 +1053,6 @@ namespace SqlServer.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("ExternalService");
-                });
-
-            modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.OpenIdConnectAuthority", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Authority")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("OpenIdConnectAuthority");
                 });
 
             modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.SelfHelpUser", b =>
