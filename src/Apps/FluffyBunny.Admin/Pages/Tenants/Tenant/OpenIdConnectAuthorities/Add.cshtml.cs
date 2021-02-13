@@ -32,6 +32,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.OpenIdConnectAuthorities
         public class InputModel
         {
             public int Id { get; set; }
+            [Required] 
             public string Name { get; set; }  // service name
             [Required]
             public string Description { get; set; }

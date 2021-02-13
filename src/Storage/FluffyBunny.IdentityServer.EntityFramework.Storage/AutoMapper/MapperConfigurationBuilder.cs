@@ -26,6 +26,12 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                     FluffyBunny.EntityFramework.Entities.ExternalService>()
                 .Ignore(record => record.Id);
 
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Certificate,
+                    FluffyBunny.EntityFramework.Entities.Certificate>()
+                .Ignore(record => record.Id);
+
+            
+
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Tenant,
                     FluffyBunny.EntityFramework.Entities.Tenant>()
                 .Ignore(record => record.Id);
@@ -72,6 +78,13 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper
                 FluffyBunny.EntityFramework.Entities.ExternalService>();
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.ExternalService,
                 FluffyBunny4.Models.ExternalService>();
+
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Certificate,
+                FluffyBunny.EntityFramework.Entities.Certificate>();
+            cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Certificate,
+                FluffyBunny4.Models.Certificate>();
+
+            
 
 
             cfg.CreateMap<FluffyBunny.EntityFramework.Entities.Tenant,

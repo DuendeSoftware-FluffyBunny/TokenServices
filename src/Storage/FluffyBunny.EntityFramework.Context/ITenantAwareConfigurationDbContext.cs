@@ -10,6 +10,8 @@ namespace FluffyBunny.EntityFramework.Context
     {
         public DbSet<OpenIdConnectAuthority> OpenIdConnectAuthorities { get; set; }
         public DbSet<ExternalService> ExternalServices { get; set; }
+        public DbSet<Certificate> Certificates { get; set; }
+        
 
         public DbSet<ClientExtra> Clients { get; set; }
         public DbSet<PersistedGrantExtra> PersistedGrants { get; set; }

@@ -13,9 +13,9 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="IdentityModel" Version="5.0.0" />
+    <PackageReference Include="IdentityModel" Version="5.0.1" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.1" />
     <PackageReference Include="RSAKeyVaultProvider" Version="2.1.1" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>

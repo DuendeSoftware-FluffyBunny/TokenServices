@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using FluffyBunny.Admin.Extensions;
+using FluffyBunny.CryptoServices;
 
 namespace FluffyBunny.Admin
 {
@@ -56,6 +57,9 @@ namespace FluffyBunny.Admin
         {
             try
             {
+                services.AddCertificateManager();
+                services.AddSingleton<ICryptoServices, CertificateCryptoServices>();
+
                 //Register the Permission policy handlers
                 services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
                 services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
@@ -80,6 +84,8 @@ namespace FluffyBunny.Admin
                     .Get<AppOptions>();
                 services.Configure<AppOptions>(Configuration.GetSection("AppOptions"));
                 services.Configure<EntityFrameworkConnectionOptions>(Configuration.GetSection("EntityFrameworkConnectionOptions"));
+
+                services.Configure<CertificatesOptions>(Configuration.GetSection("CertificatesOptions"));
 
                 services.AddScoped<ISessionTenantAccessor, SessionTenantAccessor>();
                 services.AddTransient<ISigninManager, DefaultSigninManager>();

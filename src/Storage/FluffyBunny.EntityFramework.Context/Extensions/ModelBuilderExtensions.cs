@@ -119,7 +119,18 @@ namespace FluffyBunny.EntityFramework.Context.Extensions
                 entity.HasIndex(x => x.Name).IsUnique();
             });
         }
-
+        public static void ConfigureCertificatesContext(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Certificate>(entity =>
+            {
+                entity.ToTable("Certificate");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.SigningAlgorithm).HasMaxLength(32).IsRequired();
+                entity.Property(x => x.PFXBase64).IsRequired();
+                entity.Property(x => x.NotBefore).IsRequired();
+                entity.Property(x => x.Expiration).IsRequired(); 
+            });
+        }
         public static void ConfigureTenantContext(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tenant>(entity =>

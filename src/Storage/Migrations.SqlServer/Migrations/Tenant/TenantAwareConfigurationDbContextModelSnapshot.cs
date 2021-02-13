@@ -1024,6 +1024,33 @@ namespace SqlServer.Migrations.Tenant
                     b.ToTable("AllowedTokenExchangeSubjectTokenType");
                 });
 
+            modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.Certificate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NotBefore")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PFXBase64")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SigningAlgorithm")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Certificate");
+                });
+
             modelBuilder.Entity("FluffyBunny.EntityFramework.Entities.ExternalService", b =>
                 {
                     b.Property<int>("Id")

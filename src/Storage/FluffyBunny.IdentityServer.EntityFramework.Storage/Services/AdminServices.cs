@@ -335,6 +335,100 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
             return paginatedList;
         }
+
+        public async Task UpsertCertificateAsync(string tenantName, Certificate entity)
+        {
+            try
+            {
+
+                var tenantContext = GetTenantContext(tenantName);
+                var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<Certificate>(entity);
+                tenantContext.Certificates.Add(newEntity);
+                await tenantContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex,ex.Message);
+                if (ex.InnerException != null)
+                {
+                    _logger.LogCritical(ex.InnerException,ex.InnerException.Message);
+
+                }
+            }
+
+        }
+
+        public async Task<Certificate> GetCertificateByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext.Certificates
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id);
+            return entityInDb;
+        }
+
+        public async Task<List<Certificate>> GetAllCertificatesAsync(string tenantName)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entities = from t in tenantContext.Certificates
+                select t;
+            return entities.ToList();
+        }
+        public async Task<List<Certificate>> GetAllCertificatesAsync(string tenantName, string signingAlgorithm, DateTime notBefore, DateTime notAfter)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entities = from t in tenantContext.Certificates
+                           where t.SigningAlgorithm == signingAlgorithm && (t.NotBefore >= notBefore && t.NotBefore <= notAfter)
+                select t;
+            return entities.ToList();
+        }
+
+        public async Task DeleteCertificateByIdAsync(string tenantName, int id)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+            var entityInDb = await tenantContext
+                .Certificates
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (entityInDb != null)
+            {
+                tenantContext.Certificates.Remove(entityInDb);
+                await tenantContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<PaginatedList<Certificate>> PageCertificatesAsync(string tenantName, int pageNumber, int pageSize, CertificatesSortType sortType)
+        {
+            var tenantContext = GetTenantContext(tenantName);
+
+            var entities = from t in tenantContext.Certificates
+                select t;
+            switch (sortType)
+            {
+                case CertificatesSortType.NotBeforeDesc:
+                    entities = entities.OrderByDescending(t => t.NotBefore);
+                    break;
+                case CertificatesSortType.NotBeforeAsc:
+                    entities = entities.OrderBy(t => t.NotBefore);
+                    break;
+                case CertificatesSortType.ExpirationDesc:
+                    entities = entities.OrderByDescending(t => t.Expiration);
+                    break;
+                case CertificatesSortType.ExpirationAsc:
+                    entities = entities.OrderBy(t => t.Expiration);
+                    break;
+                case CertificatesSortType.SigningAlgorithmDesc:
+                    entities = entities.OrderByDescending(t => t.SigningAlgorithm);
+                    break;
+                case CertificatesSortType.SigningAlgorithmAsc:
+                    entities = entities.OrderBy(t => t.SigningAlgorithm);
+                    break;
+            }
+
+            var paginatedList = await PaginatedList<Certificate>
+                .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
+            return paginatedList;
+        }
+
         public async Task<List<ApiResource>> GetAllApiResourcesAsync(string tenantName)
         {
             var tenantContext = GetTenantContext(tenantName);
@@ -1785,5 +1879,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
                 .CreateAsync(entities.AsNoTracking(), pageNumber, pageSize);
             return paginatedList;
         }
+
+        
     }
 }

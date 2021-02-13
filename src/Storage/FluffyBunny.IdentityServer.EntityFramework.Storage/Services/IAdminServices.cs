@@ -39,6 +39,15 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         EnabledDesc,
         EnabledAsc
     }
+    public enum CertificatesSortType
+    {
+        NotBeforeDesc,
+        NotBeforeAsc,
+        ExpirationDesc,
+        ExpirationAsc,
+        SigningAlgorithmDesc,
+        SigningAlgorithmAsc
+    }
 
     public enum ApiResourcesSortType
     {
@@ -124,6 +133,17 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         Task DeleteExternalServiceByNameAsync(string tenantName, string name);
         Task DeleteExternalServiceByIdAsync(string tenantName, int id);
         Task<PaginatedList<ExternalService>> PageExternalServicesAsync(string tenantName, int pageNumber, int pageSize, ExternalServicesSortType sortType);
+
+        #endregion
+
+        #region Certificates
+
+        Task UpsertCertificateAsync(string tenantName, Certificate entity);
+        Task<Certificate> GetCertificateByIdAsync(string tenantName, int id);
+        Task<List<Certificate>> GetAllCertificatesAsync(string tenantName);
+        Task<List<Certificate>> GetAllCertificatesAsync(string tenantName, string signingAlgorithm, DateTime notBefore, DateTime notAfter);
+        Task DeleteCertificateByIdAsync(string tenantName, int id);
+        Task<PaginatedList<Certificate>> PageCertificatesAsync(string tenantName, int pageNumber, int pageSize, CertificatesSortType sortType);
 
         #endregion
 
