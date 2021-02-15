@@ -26,6 +26,8 @@ using Duende.IdentityServer.Validation;
 using FluffyBunny.EntityFramework.Context;
 using FluffyBunny.EntityFramework.Context.Extensions;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.Models;
+using FluffyBunny.IdentityServer.EntityFramework.Storage.Stores;
 using Microsoft.AspNetCore.Http;
 using TokenService.Models;
 using FluffyBunny4.Configuration;
@@ -101,6 +103,7 @@ namespace TokenService
             
             try
             {
+                services.AddSerializers();
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 AppOptions = Configuration
                     .GetSection("AppOptions")
@@ -122,7 +125,11 @@ namespace TokenService
                 services.Configure<KeyVaultSigningOptions>(Configuration.GetSection("KeyVaultSigningOptions"));
                 services.Configure<TokenExchangeOptions>(Configuration.GetSection("TokenExchangeOptions"));
                 services.Configure<ExternalServicesOptions>(Configuration.GetSection("ExternalServicesOptions"));
-                
+                services.Configure<SelfManagedCertificatesOptions>(Configuration.GetSection("SelfManagedCertificatesOptions"));
+                var dd = Configuration
+                    .GetSection("SelfManagedCertificatesOptions")
+                    .Get<SelfManagedCertificatesOptions>();
+
                 _logger.LogInformation($"HostingEnvironment.EnvironmentNam:{HostingEnvironment.EnvironmentName}");
                 if (AppOptions.DangerousAcceptAnyServerCertificateValidator)
                 {
@@ -318,15 +325,17 @@ namespace TokenService
                 services.AddTenantResolverCache<TenantResolver>();
 
 
-                ///////////////////////////////////////////////////////////////////////////////
-                /// Add KeyVaultSigningServices
-                ///////////////////////////////////////////////////////////////////////////////
-                _logger.LogInformation("ConfigureServices - KeyVaultSigningServices ");
-                services.AddKeyVaultTokenCreationServices();
-              
-                switch (keyVaultSigningOptions.SigningType)
+                if (keyVaultSigningOptions.Enabled)
                 {
-                    case KeyVaultSigningOptions.SigningTypes.KeyVaultCertificate:
+                    ///////////////////////////////////////////////////////////////////////////////
+                    /// Add KeyVaultSigningServices
+                    ///////////////////////////////////////////////////////////////////////////////
+                    _logger.LogInformation("ConfigureServices - KeyVaultSigningServices ");
+                    services.AddKeyVaultTokenCreationServices();
+
+                    switch (keyVaultSigningOptions.SigningType)
+                    {
+                        case KeyVaultSigningOptions.SigningTypes.KeyVaultCertificate:
                         {
                             services.AddKeyVaultCertificatesStores(options =>
                             {
@@ -336,21 +345,29 @@ namespace TokenService
                             });
                             services.AddAzureKeyVaultCertificateSignatureProvider();
                         }
-                        break;
-                    case KeyVaultSigningOptions.SigningTypes.KeyVaultECDsaKey:
+                            break;
+                        case KeyVaultSigningOptions.SigningTypes.KeyVaultECDsaKey:
                         {
+
                             services.AddKeyVaultECDsaStores(options =>
                             {
                                 options.ExpirationSeconds = 43200;
                                 options.KeyVaultName = keyVaultSigningOptions.KeyVaultName;
                                 options.KeyIdentifier = "{0}-key-ecc-signing";
                             });
+
                             services.AddAzureKeyVaultECDsaSignatureProvider();
                         }
-                        break;
-                    default:
-                        throw new Exception("Need a SigningType!");
+                            break;
+                        default:
+                            throw new Exception("Need a SigningType!");
+                    }
                 }
+                else
+                {
+                    services.AddSelfManagedValidationKeysStores();
+                }
+               
 
                 switch (AppOptions.OperationalStoreType)
                 {

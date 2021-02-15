@@ -371,7 +371,8 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         {
             var tenantContext = GetTenantContext(tenantName);
             var entities = from t in tenantContext.Certificates
-                select t;
+                orderby t.NotBefore ascending
+                           select t;
             return entities.ToList();
         }
         public async Task<List<Certificate>> GetAllCertificatesAsync(string tenantName, string signingAlgorithm, DateTime notBefore, DateTime notAfter)
@@ -379,6 +380,7 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
             var tenantContext = GetTenantContext(tenantName);
             var entities = from t in tenantContext.Certificates
                            where t.SigningAlgorithm == signingAlgorithm && (t.NotBefore >= notBefore && t.NotBefore <= notAfter)
+                           orderby t.NotBefore ascending 
                 select t;
             return entities.ToList();
         }

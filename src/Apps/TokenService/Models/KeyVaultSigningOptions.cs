@@ -10,6 +10,6 @@
         }
         public SigningTypes SigningType { get; set; }
         public string KeyVaultName { get; set; }
-
+        public bool Enabled { get; set; } = false;
     }
 }

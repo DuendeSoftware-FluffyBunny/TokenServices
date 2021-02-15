@@ -42,7 +42,7 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Certificates
         public string TenantId { get; set; }
         public enum SigningAlgorithmType
         {
-            RSA,
+  //          RSA,
             ECDsa
         }
 
@@ -50,12 +50,15 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Certificates
         {
             [Display(Name = "SigningAlgorithmType")]
             public SigningAlgorithmType SigningAlgorithmType { get; set; }
-            public string[] SigningAlgorithmTypes = new[] { SigningAlgorithmType.RSA.ToString(), SigningAlgorithmType.ECDsa.ToString() };
+            public string[] SigningAlgorithmTypes = new[]
+            {
+//                SigningAlgorithmType.RSA.ToString(), 
+                SigningAlgorithmType.ECDsa.ToString()
+            };
 
             [Required]
-            public DateTime NotBefore { get; set; }
-            [Required]
-            public DateTime Expiration { get; set; }
+            [Range(1,20)]
+            public int Years { get; set; }
  
         }
         [BindProperty]
@@ -67,35 +70,67 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Certificates
             Input = new InputModel()
             {
                 SigningAlgorithmType = SigningAlgorithmType.ECDsa,
-                NotBefore = utcNow,
-                Expiration = utcNow.AddMonths(9)
+                Years = 5
             };
         }
         public async Task<IActionResult> OnPostAsync()
         {
             try
             {
-                string pfx = "";
-                switch (Input.SigningAlgorithmType)
+                var utc = DateTime.UtcNow;
+                DateTime utcStart = new DateTime(utc.Year, 1, 1, 0, 0, 0);
+                for (int i = 0; i < Input.Years; i++)
                 {
-                    default:
-                    case SigningAlgorithmType.ECDsa:
-                        pfx = _cryptoServices.CreateECDsaCertificatePFX(_certificatesOptions.DnsName,
-                            Input.NotBefore, Input.Expiration, _certificatesOptions.Password);
-                        break;
-                    case SigningAlgorithmType.RSA:
-                        pfx = _cryptoServices.CreateRSACertificatePFX(_certificatesOptions.DnsName,
-                            Input.NotBefore, Input.Expiration, _certificatesOptions.Password);
-                        break;
-                }
+                    string pfx = "";
+                    var startTime = utcStart.AddMonths(i * 12);
+                    var expiration = startTime.AddMonths(12);
+                    switch (Input.SigningAlgorithmType)
+                    {
+                        default:
+                        case SigningAlgorithmType.ECDsa:
+                            pfx = _cryptoServices.CreateECDsaCertificatePFX(_certificatesOptions.DnsName,
+                                startTime, expiration, _certificatesOptions.Password);
+                            break;
+/*
+                        case SigningAlgorithmType.RSA:
+                            pfx = _cryptoServices.CreateRSACertificatePFX(_certificatesOptions.DnsName,
+                                startTime, expiration, _certificatesOptions.Password);
+                            break;
+*/
+                    }
+                    await _adminServices.UpsertCertificateAsync(TenantId, new EntityFramework.Entities.Certificate()
+                    {
+                        Expiration = expiration,
+                        NotBefore = startTime,
+                        PFXBase64 = pfx,
+                        SigningAlgorithm = Input.SigningAlgorithmType.ToString()
+                    });
 
-                await _adminServices.UpsertCertificateAsync(TenantId, new EntityFramework.Entities.Certificate()
-                {
-                    Expiration = Input.Expiration,
-                    NotBefore = Input.NotBefore,
-                    PFXBase64 = pfx,
-                    SigningAlgorithm = Input.SigningAlgorithmType.ToString()
-                });
+                    startTime = startTime.AddMonths(6);
+                    expiration = startTime.AddMonths(12);
+                    switch (Input.SigningAlgorithmType)
+                    {
+                        default:
+                        case SigningAlgorithmType.ECDsa:
+                            pfx = _cryptoServices.CreateECDsaCertificatePFX(_certificatesOptions.DnsName,
+                                startTime, expiration, _certificatesOptions.Password);
+                            break;
+                        /*
+                        case SigningAlgorithmType.RSA:
+                            pfx = _cryptoServices.CreateRSACertificatePFX(_certificatesOptions.DnsName,
+                                startTime, expiration, _certificatesOptions.Password);
+                            break;
+                        */
+                    }
+                    await _adminServices.UpsertCertificateAsync(TenantId, new EntityFramework.Entities.Certificate()
+                    {
+                        Expiration = expiration,
+                        NotBefore = startTime,
+                        PFXBase64 = pfx,
+                        SigningAlgorithm = Input.SigningAlgorithmType.ToString()
+                    });
+                }
+               
                 
             }
             catch (Exception ex)
@@ -105,5 +140,6 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Certificates
             }
             return RedirectToPage("./Index");
         }
+       
     }
 }

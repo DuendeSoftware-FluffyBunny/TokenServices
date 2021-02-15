@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddKeyVaultTokenCreationServices(this IServiceCollection services)
         {
-            services.AddSerializers();
+           
             services.AddAzureClients();
             services.RemoveAll<ITokenCreationService>();
             services.AddTransient<ITokenCreationService, KeyVaultTokenCreationService>();
@@ -77,7 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 var implementation = sp.GetRequiredService<KeyVaultECDsaKeyStore>();
                 return implementation;
             });
-            services.AddScoped<IValidationKeysStore, TenantValidationKeyStore>();
+        //    services.AddScoped<IValidationKeysStore, TenantValidationKeyStore>();
 
             if (options == null)
             {

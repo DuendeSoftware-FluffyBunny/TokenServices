@@ -59,7 +59,7 @@ namespace FluffyBunny.Admin
             {
                 services.AddCertificateManager();
                 services.AddSingleton<ICryptoServices, CertificateCryptoServices>();
-
+            
                 //Register the Permission policy handlers
                 services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
                 services.AddSingleton<IAuthorizationHandler, PermissionHandler>();

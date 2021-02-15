@@ -134,5 +134,9 @@ namespace FluffyBunny.Admin.Pages.Tenants.Tenant.Certificates
 
             CurrentSortType = sortOrder;
         }
+        public async Task<IActionResult> OnPostPageSizeAsync()
+        {
+            return RedirectToPage(new { sortOrder = CurrentSortType, pageNumber = 1, pageSize = SelectedPageSize });
+        }
     }
 }

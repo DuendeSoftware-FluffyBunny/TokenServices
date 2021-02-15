@@ -4,6 +4,7 @@ using System.Text;
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Interfaces;
 using Duende.IdentityServer.EntityFramework.Options;
+using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using FluffyBunny.EntityFramework.Context;
 using FluffyBunny.IdentityServer.EntityFramework.Storage.AutoMapper;
@@ -20,9 +21,17 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Extensions
 {
     public static class DependencyInjectionExtensions
     {
-       
-       
 
+
+        public static IServiceCollection AddSelfManagedValidationKeysStores(
+            this IServiceCollection services)
+        {
+ 
+            services.AddScoped<IValidationKeysStore, SelfManagedValidationKeysStore>();
+            services.AddScoped<IKeyMaterialService, SelfManagedValidationKeysStore>();
+           
+            return services;
+        }
         public static IIdentityServerBuilder AddEntityFrameworkStores(
             this IIdentityServerBuilder builder)
         {
