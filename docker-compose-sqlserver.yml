@@ -11,8 +11,12 @@ services:
         - "11143:1433"
         volumes:
         - C:\Docker\DockerVolumes\sqlserver:/var/opt/mssql/data 
+        networks:
+            - mydbnet
 volumes:
   sqlsystem:
   sqldata:
   sqllog:
   sqlbackup:
+networks:
+    mydbnet:

@@ -340,11 +340,22 @@ namespace FluffyBunny.IdentityServer.EntityFramework.Storage.Services
         {
             try
             {
-
                 var tenantContext = GetTenantContext(tenantName);
-                var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<Certificate>(entity);
-                tenantContext.Certificates.Add(newEntity);
-                await tenantContext.SaveChangesAsync();
+
+                var entityInDb = await tenantContext.Certificates
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.NotBefore == entity.NotBefore && e.SigningAlgorithm == entity.SigningAlgorithm);
+                if (entityInDb == null)
+                {
+                    var newEntity = _entityFrameworkMapperAccessor.MapperIgnoreBase.Map<Certificate>(entity);
+                    tenantContext.Certificates.Add(newEntity);
+                    await tenantContext.SaveChangesAsync();
+                }
+                else
+                {
+                    _logger.LogError($"Certificate already exists for {entity.SigningAlgorithm} at {entity.NotBefore}");
+                }
+
             }
             catch (Exception ex)
             {
