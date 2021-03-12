@@ -16,11 +16,12 @@ grant_type=arbitrary_token&subject=66C8C5A139F65007808EF00716203B09B5C157C3&issu
 
 |Argument |Description  | 
 --- | --- |
-|grant_type|(required) arbitrary_token|
+|grant_type|(required) **arbitrary_token**|
 |subject|(optional) The subject, usually a user id|
 |issuer|(required) Usually the authority of this OAuth2 service|
 |client_id|(Requied) This is required unless it is as a basic auth|
 |client_secret|(Requied) This is required unless it is as a basic auth|
-|arbitrary_claims|(optional) a json map of []string. i.e. {"amr":["password","homer"]}|
+|arbitrary_claims|(optional) a json map of []string. i.e. **{"amr":["password","homer"]}**|
+|arbitrary_json|(optional) a json map of anything. i.e. **{"tip":{"dog":"cat","rats":["a"]},"top":{"dog":"cat","rats":["a"]} }**|
 |access_token_lifetime|(optional) the access token lifetime is in the client configuration.  This value can be used to decrease it.  i.e. configured to be 100, but here we can pull it back to 50|
-|access_token_type|(optional) this is configured in the client, but can be overriden here.  [jwt or reference]|
+|access_token_type|(optional) this is configured in the client, but can be overriden here.  [**jwt** or **reference**]|
