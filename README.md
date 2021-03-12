@@ -21,7 +21,7 @@ The OAuth2 services supported by this project are;
 4. **device_code_flow**   
   Nothing more than a variant of a token_exchange.  You see this flow on your TV or ROKU device, where a user_code is presented and the user is asked to go to a web portal to authorize the application.  This is accomplished by an orchestrator validating the user_code, having the user login, and updating the backend device code record that that native ROKU app is polling against.  Even here, a token exchange happens and the native app is delivered access_tokens via the poll.   
 
-5. **arbitrary_token**  
+5. [**arbitrary_token**  ](docs/arbitrary-token.md)
   This is a custom extension grant that accounts for systems where a token exchange doesn't fit.  Its essentially externalizes the creation of an access_token by providing commodity services like storage and in the case of a JWT signing key management.  Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  Here the only real requirement is that the caller has to take responsibility of becoming the issuer.
 
 6. **arbitrary_identity**  
