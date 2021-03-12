@@ -27,6 +27,15 @@ The OAuth2 services supported by this project are;
 6. **arbitrary_identity**  
   Its essentially externalizes the creation of an id_token and access_token by providing commodity services like storage and in the case of a JWT signing key management.   Its nothing more then having those private JWT libraries in your code without having to maintain your own database or signing services.  Here the only real requirement is that the caller has to take responsibility of becoming the issuer.  This api could be used as the id_token and access_token minter for an OIDC provider.  The access_token created is only meant to call the issuers user_info endpoint and thus forces that opinion in the implementation.  You can have a truely arbitrary identity, but NOT an arbitrary access_token.
 
+7. **Revocation**  
+Revocation of a token can only be achieved if the token is a refresh_token or a reference token.  All this means is that the token is stored in our backend database.  If we revoke a refresh_token, the associated access_token floating around in the field is still good until it expires.  
+Revocation of an access_token doesn't mean that it is gone in the field.  Usually services will cache the introspection calls it make for those reference tokens for a short time.  So your security posture must account for those caches.  
+Revocation can happen on 3 types of token hints;  
+a. **refresh_token**  
+b. **access_token**  
+c. **subject**  (this one will revoke enmasse any and all references in the database that is associated with the subject.  You would do this if you are a bank).  
+
+
 
 
 # OIDC Orchestrator
