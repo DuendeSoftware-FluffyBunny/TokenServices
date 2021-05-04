@@ -86,8 +86,12 @@ namespace FluffyBunny4.Stores
 
         protected override Task<RefreshTokenExtra> GetItemAsync(string key)
         {
-            var subKey = key.Substring(2);
-            return base.GetItemAsync(subKey);
+            if (key.StartsWith("1_") || key.StartsWith("0_"))
+            {
+                 var subKey = key.Substring(2);
+                 return base.GetItemAsync(subKey);
+            }
+            return base.GetItemAsync(key);
         }
 
         /// <summary>

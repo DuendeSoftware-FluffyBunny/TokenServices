@@ -10,6 +10,7 @@ using Duende.IdentityServer.ResponseHandling;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Validation;
+using FluffyBunny4.AutoMapper;
 using FluffyBunny4.DotNetCore.Services;
 using FluffyBunny4.Extensions;
 using FluffyBunny4.Models;
@@ -19,7 +20,9 @@ using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+ 
 
 namespace FluffyBunny4.ResponseHandling
 {
@@ -211,6 +214,10 @@ namespace FluffyBunny4.ResponseHandling
                     x.Type == JwtClaimTypes.Scope && x.Value == IdentityServerConstants.StandardScopes.OfflineAccess);
             createRefreshToken = offlineAccessClaim != null;
 
+            var authorizedScopes = (from c in atClaims
+                where c.Type == JwtClaimTypes.Scope
+                select c.Value).ToList();
+                
             var accessTokenLifetimeOverride = form.Get(Constants.AccessTokenLifetime);
 
             int accessTokenLifetime = validationResult.ValidatedRequest.AccessTokenLifetime;
@@ -241,7 +248,8 @@ namespace FluffyBunny4.ResponseHandling
                 {
                     Subject = validationResult.ValidatedRequest.Subject,
                     AccessToken = at,
-                    Client = validationResult.ValidatedRequest.Client
+                    Client = validationResult.ValidatedRequest.Client,
+                    AuthorizedScopes = authorizedScopes
                 };
                 refreshToken = await RefreshTokenService.CreateRefreshTokenAsync(refreshTokenCreationRequest);
             }
@@ -250,7 +258,7 @@ namespace FluffyBunny4.ResponseHandling
             {
                 AccessToken = accessToken,
                 IdentityToken = null,
-                RefreshToken = refreshToken,
+                RefreshToken = $"1_{refreshToken}",
                 AccessTokenLifetime = accessTokenLifetime
             };
             return tokenResonse;

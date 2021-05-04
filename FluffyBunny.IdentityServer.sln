@@ -63,7 +63,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTest_crypto", "src\Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluffyBunny.CryptoServices", "src\Apps\FluffyBunny.CryptoServices\FluffyBunny.CryptoServices.csproj", "{9ECBA24F-51CE-4379-8DD1-0FC020658622}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Duende.IdentityServer", "src\Duende\5.0.4\IdentityServer\Duende.IdentityServer.csproj", "{6BE6726F-805E-40E2-A8B3-A977AFDD43D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Duende.IdentityServer", "src\Duende\5.1.1\IdentityServer\Duende.IdentityServer.csproj", "{8C50AF79-E332-4098-A08B-F3E82718D81E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -175,10 +175,10 @@ Global
 		{9ECBA24F-51CE-4379-8DD1-0FC020658622}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ECBA24F-51CE-4379-8DD1-0FC020658622}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ECBA24F-51CE-4379-8DD1-0FC020658622}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BE6726F-805E-40E2-A8B3-A977AFDD43D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BE6726F-805E-40E2-A8B3-A977AFDD43D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BE6726F-805E-40E2-A8B3-A977AFDD43D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BE6726F-805E-40E2-A8B3-A977AFDD43D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C50AF79-E332-4098-A08B-F3E82718D81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C50AF79-E332-4098-A08B-F3E82718D81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C50AF79-E332-4098-A08B-F3E82718D81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C50AF79-E332-4098-A08B-F3E82718D81E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,7 +210,7 @@ Global
 		{A8EA50A8-4C7A-49A6-9CFF-C0043FF754FE} = {19672543-997A-4C4D-8C8A-F76E60E25DC3}
 		{F9F63481-9CC1-466A-B615-E581E7D81AF8} = {41B8C65A-EFAF-45CA-A397-3BA9F2A0D58D}
 		{9ECBA24F-51CE-4379-8DD1-0FC020658622} = {19672543-997A-4C4D-8C8A-F76E60E25DC3}
-		{6BE6726F-805E-40E2-A8B3-A977AFDD43D7} = {D691CC2E-CC31-4A64-9891-15976F0653B8}
+		{8C50AF79-E332-4098-A08B-F3E82718D81E} = {D691CC2E-CC31-4A64-9891-15976F0653B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B2F0F19A-BC0A-4B98-A9F2-2F19B8CA049B}

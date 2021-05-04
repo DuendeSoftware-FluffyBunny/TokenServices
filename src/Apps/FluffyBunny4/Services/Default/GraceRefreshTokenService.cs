@@ -184,9 +184,11 @@ namespace FluffyBunny4.Services.Default
                 var oldChild = refreshTokenExtra.RefeshTokenChild;
                 var oldParent = refreshTokenExtra.RefeshTokenParent;
                 var savedConsumedTime = refreshTokenExtra.ConsumedTime;
+                var savedConsumedAttempts = refreshTokenExtra.ConsumedAttempts;
 
                 // set it to null so that we save non-consumed token
                 refreshTokenExtra.ConsumedTime = null;
+                refreshTokenExtra.ConsumedAttempts = 0;
                 refreshTokenExtra.RefeshTokenChild = null;
                 // carry forward the parent.
                 refreshTokenExtra.RefeshTokenParent = handle;
@@ -194,6 +196,7 @@ namespace FluffyBunny4.Services.Default
                 var newHandle = await RefreshTokenStore.StoreRefreshTokenAsync(refreshTokenExtra);
 
                 refreshTokenExtra.ConsumedTime = savedConsumedTime;
+                refreshTokenExtra.ConsumedAttempts = savedConsumedAttempts;
                 refreshTokenExtra.RefeshTokenParent = null;
                 if (client.RefreshTokenUsage == TokenUsage.OneTimeOnly)
                 {
